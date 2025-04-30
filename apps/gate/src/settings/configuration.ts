@@ -18,5 +18,6 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.GATE_PORT,
+    USERS_PORT: process.env.USERS_PORT,
   };
 };

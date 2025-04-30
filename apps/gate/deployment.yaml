@@ -21,3 +21,9 @@ spec:
            ports:
              - containerPort: PORT_CONTAINER
 
+           env:
+             - name: USERS_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: USERS_PORT

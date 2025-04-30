@@ -22,7 +22,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
             options: {
               // host: configService.get<string>('FILES_TCP'),
               host: '0.0.0.0',
-              port: 3001,
+              port: configService.get('USERS_PORT'),
             },
           };
         },
