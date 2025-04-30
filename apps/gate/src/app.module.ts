@@ -20,8 +20,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           return {
             transport: Transport.TCP,
             options: {
-              // host: configService.get<string>('FILES_TCP'),
-              host: 'users-yogram-service',
+              host: configService.get<string>('USERS_SERVICE'),
               port: configService.get('USERS_PORT'),
             },
           };
