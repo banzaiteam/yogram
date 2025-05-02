@@ -1,14 +1,14 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+import { GateService } from '../../libs/gateService';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    @Inject('USER_REQUEST_SERVICE')
-    private readonly userRequestService: ClientProxy,
+    private readonly gateService: GateService,
+    // @Inject('USER_REQUEST_SERVICE')
+    // private readonly userRequestService: ClientProxy,
   ) { }
 
   @Get()
@@ -18,9 +18,7 @@ export class AppController {
 
   @Get('users')
   async getUsers() {
-    const result = await firstValueFrom(
-      this.userRequestService.send({ cmd: 'check_users' }, { userId: 'loh' }),
-    );
-    return result;
+    const data = await this.gateService.usersHttpServiceGet('users', {});
+    return data;
   }
 }
