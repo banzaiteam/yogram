@@ -15,7 +15,7 @@ export class GateService {
     this.env = this.configService.get('NODE_ENV') === 'DEVELOPMENT';
     this.usersHttpService = this.env
       ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
-      : this.configService.get('USERS_PROD_SERVICE_URL');
+      : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
   }
 
   async usersHttpServicePost(path, payload, headers) {
