@@ -27,8 +27,8 @@ spec:
                  secretKeyRef:
                    name: gate-yogram-production-config-secret
                    key: USERS_PORT
-             - name: USERS_SERVICE
+             - name: USERS_PROD_SERVICE_URL
                valueFrom:
                  secretKeyRef:
                    name: gate-yogram-production-config-secret
-                   key: USERS_SERVICE
+                   key: USERS_PROD_SERVICE_URL
