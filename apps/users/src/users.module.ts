@@ -29,4 +29,4 @@ import { UsersResolver } from './users.resolver';
   controllers: [UsersController],
   providers: [UsersService, UsersResolver],
 })
-export class UsersModule { }
+export class UsersModule {}

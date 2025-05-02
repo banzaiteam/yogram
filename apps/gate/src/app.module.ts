@@ -68,4 +68,4 @@ import { HttpModule } from '@nestjs/axios';
   controllers: [AppController],
   providers: [AppService, GateService],
 })
-export class AppModule { }
+export class AppModule {}
