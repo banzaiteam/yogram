@@ -7,8 +7,6 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly gateService: GateService,
-    // @Inject('USER_REQUEST_SERVICE')
-    // private readonly userRequestService: ClientProxy,
   ) { }
 
   @Get()
