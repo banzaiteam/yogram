@@ -7,7 +7,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly gateService: GateService,
-  ) { }
+  ) {}
 
   @Get()
   getHello(): string {
