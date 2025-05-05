@@ -3,7 +3,7 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 3864
+        PORT = 3870
         NAMESPACE = "yogram-ru"
         REGISTRY_HOSTNAME = "idogmat"
         PROJECT = "users-yogram"
