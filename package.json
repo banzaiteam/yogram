@@ -14,17 +14,17 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/gate/main",
     "build:gate": "nest build gate",
-    "start:gate": "node dist/apps/gate/main",
-    "start:dev:gate": "nest start gate --watch",
+    "start:gate": "NODE_ENV=DEVELOPMENT node dist/apps/gate/main",
+    "start:dev:gate": "NODE_ENV=DEVELOPMENT nest start gate --watch",
     "build:users": "nest build users",
-    "start:users": "node dist/apps/users/main",
-    "start:dev:users": "nest start users --watch",
+    "start:users": "NODE_ENV=DEVELOPMENT node dist/apps/users/main",
+    "start:dev:users": "NODE_ENV=DEVELOPMENT nest start users --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/gate/test/jest-e2e.json"
+    "test:e2e": "NODE_ENV=TESTING jest --config ./apps/gate/test/jest-e2e.json"
   },
   "dependencies": {
     "@apollo/gateway": "^2.10.2",
@@ -87,7 +87,12 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/yogram(|/.*)$": "<rootDir>/libs/yogram/src/$1"
+    }
   }
 }
