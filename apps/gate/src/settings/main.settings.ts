@@ -45,6 +45,7 @@ const setSwagger = (app: INestApplication, prefix: string) => {
     .setDescription('API for control YoGram')
     .setVersion('1.1')
     .addBearerAuth()
+    .addBasicAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

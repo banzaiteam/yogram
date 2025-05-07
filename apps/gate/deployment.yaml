@@ -22,19 +22,13 @@ spec:
              - containerPort: PORT_CONTAINER
 
            env:
-             - name: NODE_ENV
-               valueFrom:
-                 secretKeyRef:
-                   name: gate-yogram-production-config-secret
-                   key: NODE_ENV    
-             - name: USERS_PORT
-               valueFrom:
-                 secretKeyRef:
-                   name: gate-yogram-production-config-secret
-                   key: USERS_PORT
              - name: USERS_PROD_SERVICE_URL
                valueFrom:
                  secretKeyRef:
                    name: gate-yogram-production-config-secret
                    key: USERS_PROD_SERVICE_URL
-               
+             - name: NODE_ENV
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: NODE_ENV
