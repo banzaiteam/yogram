@@ -13,6 +13,7 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
+import { DatabaseModule } from 'apps/libs/common/database/database.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -37,6 +38,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
         process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
+    DatabaseModule.register(),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
