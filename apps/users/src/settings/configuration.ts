@@ -1,3 +1,8 @@
+import path from 'path';
+import { Profile } from '../infrastructure/entity/Profile.entity';
+import { User } from '../infrastructure/entity/User.entity';
+import { cwd } from 'process';
+
 export type EnvironmentsTypes =
   | 'DEVELOPMENT'
   | 'STAGING'
@@ -10,6 +15,10 @@ export const EnvironmentMode = {
   TESTING: 'TESTING',
 };
 export const Environments = Object.keys(EnvironmentMode);
+console.log(
+  'dirname',
+  path.join(cwd(), '/apps/users/src/**/*.entity{.ts,.js}'),
+);
 
 export const getConfiguration = () => {
   console.log(process.env.NODE_ENV?.trim(), 'NODE_ENV');
@@ -18,5 +27,19 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.USERS_PORT,
+    DATABASE: {
+      type: process.env.POSTGRES_TYPE,
+      host: process.env.POSTGRES_HOST,
+      port: process.env.POSTGRES_PORT,
+      username: process.env.POSTGRES_USERNAME,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DATABASE,
+      migrationsTableName: process.env.POSTGRES_MIGRATION_TABLE,
+      entities: [User, Profile],
+      migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+      autoLoadEntities: process.env.AUTOLOAD_ENTITIES,
+      synchronize: false,
+      extra: { ssl: true },
+    },
   };
 };
