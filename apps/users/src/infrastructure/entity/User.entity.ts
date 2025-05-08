@@ -1,5 +1,5 @@
 import { BaseEntity } from 'apps/libs/common/entity/base.entity';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { Profile } from './Profile.entity';
 
 @Entity('users')
