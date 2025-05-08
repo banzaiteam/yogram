@@ -23,6 +23,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   if (env === EnvironmentMode.TESTING) {
     return ['apps/users/src/.env.test', ...defaultEnvFilePath];
   }
+  if (env === EnvironmentMode.PRODUCTION) {
+    return ['apps/users/src/.env'];
+  }
 
   return defaultEnvFilePath;
 };
@@ -31,9 +34,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
-      ignoreEnvFile:
-        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
-        process.env.NODE_ENV !== EnvironmentMode.TESTING,
+
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
