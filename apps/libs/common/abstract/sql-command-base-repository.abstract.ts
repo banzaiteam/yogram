@@ -1,21 +1,20 @@
 import { Repository } from 'typeorm';
 import { BaseEntity } from '../entity/base.entity';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { IRepositoryAbstract } from '../interface/repository-abstract.interface';
+import { ICommandRepository } from '../interface/command-repository.interface';
 import { IModelEntityConvert } from '../interface/model-entity-convert.interface';
 import { RpcException } from '@nestjs/microservices';
 
 /**
- * Abstract method which implements base crud methods.
+ * Abstract method which implements base sql crud methods.
  *
  * @param {AggregateRoot} TModel - Business model type that extends from cqrs(ddd) AggregateRoot class which allows dispatching events within model.
  * @param {BaseEntity} TEntity - Each dataBase entity should extends from BaseEntity
- * @returns {void}
  */
-export abstract class SqlBaseRepository<
+export abstract class SqlCommandBaseRepository<
   TModel extends AggregateRoot,
   TEntity extends BaseEntity,
-> implements IRepositoryAbstract<TModel, TEntity>
+> implements ICommandRepository<TModel, TEntity>
 {
   constructor(
     private readonly repository: Repository<TEntity>,
