@@ -12,15 +12,17 @@ import { uuid } from 'uuidv4';
 import { ClassProperties } from 'apps/libs/types/ClassProperties.type';
 import { ProfileModel } from './Profile.model';
 
-type UserInput = Omit<
+export type UserInput = Pick<
   ClassProperties<typeof UserModel>,
-  | 'autoCommit'
-  | 'id'
-  | '[IS_AUTO_COMMIT_ENABLED]'
-  | 'updatedAt'
-  | 'deletedAt'
-  | 'profile'
->;
+  | 'firstName'
+  | 'lastName'
+  | 'birthdate'
+  | 'city'
+  | 'country'
+  | 'email'
+  | 'password'
+> &
+  Partial<Pick<ClassProperties<typeof UserModel>, 'description'>>;
 
 export class UserModel extends AggregateRoot {
   @IsUUID()
@@ -50,7 +52,7 @@ export class UserModel extends AggregateRoot {
   @IsNotEmpty()
   private _city: string;
   @IsOptional()
-  @IsString()
+  // @IsString()
   private _description?: string;
   @IsBoolean()
   private _published: boolean;
@@ -141,8 +143,8 @@ export class UserModel extends AggregateRoot {
     newUser._verified = false;
     newUser._published = true;
     newUser._description = userArgs?.description;
-    newUser._createdAt = userArgs.createdAt;
-    newUser._updatedAt = userArgs.createdAt;
+    newUser._createdAt = new Date();
+    newUser._updatedAt = newUser.createdAt;
     newUser._deletedAt = null;
     return newUser;
   }

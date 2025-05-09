@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { uuid } from 'uuidv4';
 
-type ProfileInput = Pick<
+export type ProfileInput = Pick<
   ClassProperties<typeof ProfileModel>,
   'username' | 'userId' | 'createdAt'
 >;
@@ -48,7 +48,7 @@ export class ProfileModel {
     return this._updatedAt;
   }
 
-  static createProfile(profileArgs: ProfileInput): ProfileModel {
+  static create(profileArgs: ProfileInput): ProfileModel {
     const newProfile = new ProfileModel();
     newProfile._id = uuid();
     newProfile._userId = profileArgs.userId;
