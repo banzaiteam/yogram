@@ -13,7 +13,7 @@ export class BaseEntity {
   @CreateDateColumn({ type: 'date' })
   createdAt: Date;
   @UpdateDateColumn({ type: 'date' })
-  updateAt: Date;
+  updatedAt: Date;
   @DeleteDateColumn({ type: 'date' })
   deletedAt: Date;
 }
