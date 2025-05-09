@@ -12,11 +12,9 @@ export class GateService {
     private readonly configService: ConfigService,
   ) {
     // FIXME check env and route path on k8s
-    // this.env = this.configService.get('NODE_ENV') === 'DEVELOPMENT';
-    this.env = true;
-    console.log('this.env', this.configService.get('PORT'));
+    this.env = this.configService.get('NODE_ENV') === 'DEVELOPMENT';
     this.usersHttpService = this.env
-      ? `http://localhost:3001/api/v1`
+      ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
       : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
   }
 

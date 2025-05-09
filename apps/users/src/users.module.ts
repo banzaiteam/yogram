@@ -24,6 +24,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     return ['apps/users/src/.env.test', ...defaultEnvFilePath];
   }
   if (env === EnvironmentMode.PRODUCTION) {
+    console.log('PRODUCTIONPRODUCTION');
+
     return ['apps/users/src/.env'];
   }
 
