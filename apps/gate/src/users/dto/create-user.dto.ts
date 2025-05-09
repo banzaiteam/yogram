@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -24,7 +25,11 @@ export class CreateUserDto {
   @MinLength(2)
   @MaxLength(30)
   username: string;
-  // @IsDate()
+  @ApiProperty({
+    format: 'MM/DD/YYYY',
+  })
+  @IsDate()
+  @Transform(({ value }) => new Date(value))
   birthdate: Date;
   @IsEmail()
   email: string;
