@@ -1,3 +1,3 @@
-export enum UsersPath {
+export enum HttpUsersPath {
   Create = 'users/create',
 }

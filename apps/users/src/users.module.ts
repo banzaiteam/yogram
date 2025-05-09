@@ -14,6 +14,7 @@ import {
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
+import { UserModelFactory } from './domain/factory/user-model.factory';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -52,6 +53,6 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersResolver],
+  providers: [UsersService, UsersResolver, UserModelFactory],
 })
 export class UsersModule {}
