@@ -38,7 +38,7 @@ export const getConfiguration = () => {
       entities: [User, Profile],
       migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
       autoLoadEntities: process.env.AUTOLOAD_ENTITIES,
-      synchronize: false,
+      synchronize: process.env.SYNCHRONIZE,
       extra: { ssl: true },
     },
   };
