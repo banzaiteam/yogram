@@ -8,6 +8,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GateService } from '../../libs/gateService';
 import { HttpModule } from '@nestjs/axios';
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     HttpModule,
@@ -15,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
       isGlobal: true,
       load: [getConfiguration],
     }),
+    UsersModule,
     // FIXME move on external module mb
     // GraphQLModule.forRootAsync<ApolloGatewayDriverConfig>({
     //   driver: ApolloGatewayDriver,
