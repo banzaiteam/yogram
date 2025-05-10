@@ -1,23 +1,20 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from 'apps/libs/Users/dto/create-user.dto';
+import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './features/create/command/create-user.command';
 
 @Controller()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Get()
   getHello(): string {
-    return this.usersService.getHello();
+    return 'hello';
   }
 
   @Post('users/create')
   create(@Body() createUserDto: CreateUserDto): void {
-    console.log(
-      '🚀 ~ UsersController ~ create ~ createUserDto:',
-      createUserDto,
-    );
-    this.usersService.create(createUserDto);
+    this.commandBus.execute(new CreateUserCommand(createUserDto));
   }
 
   @Get('users')
