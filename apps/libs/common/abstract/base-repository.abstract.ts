@@ -1,4 +1,10 @@
-import { DataSource, EntityManager } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  EntityTarget,
+  ObjectLiteral,
+  Repository,
+} from 'typeorm';
 
 export abstract class BaseRepository {
   constructor(private readonly dataSource: DataSource) {}
