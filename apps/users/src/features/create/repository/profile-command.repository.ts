@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'apps/libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { Profile } from 'apps/users/src/infrastructure/entity/User.entity';
+import { Profile } from 'apps/users/src/infrastructure/entity/Profile.entity';
 import { IProfileCommandRepository } from 'apps/users/src/interfaces/profile-command.interface';
 import { EntityManager, Repository } from 'typeorm';
 
@@ -17,9 +17,7 @@ export class ProfileCommandRepository
     createProfileDto: CreateUserDto,
     entityManager?: EntityManager,
   ): Promise<Profile> {
-    console.log('🚀 ~ createProfileDto:', createProfileDto);
     const profile = new Profile(createProfileDto);
-    console.log('🚀 ~ profile:', profile);
     return this.profileRepository(entityManager).save(profile);
   }
 

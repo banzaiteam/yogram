@@ -33,4 +33,3 @@ export class User extends BaseEntity {
   })
   profile: Profile;
 }
-export { Profile };

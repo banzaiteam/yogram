@@ -1,5 +1,5 @@
 import { EntityManager } from 'typeorm';
-import { Profile } from '../infrastructure/entity/User.entity';
+import { Profile } from '../infrastructure/entity/Profile.entity';
 
 export abstract class IProfileCommandRepository<C, U> {
   abstract create(
