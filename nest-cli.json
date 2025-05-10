@@ -5,7 +5,21 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/gate/tsconfig.app.json"
+    "tsConfigPath": "apps/gate/tsconfig.app.json",
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "dtoFileNameSuffix": [
+            ".dto.ts",
+            ".entity.ts",
+            ".embedded.ts",
+            ".schema.ts"
+          ],
+          "introspectComments": true
+        }
+      }
+    ]
   },
   "monorepo": true,
   "root": "apps/gate",

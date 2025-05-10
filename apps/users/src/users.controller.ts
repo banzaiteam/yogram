@@ -1,13 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './features/create/command/create-user.command';
 
 @Controller()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly commandBus: CommandBus) {}
 
   @Get()
   getHello(): string {
-    return this.usersService.getHello();
+    return 'hello';
+  }
+
+  @Post('users/create')
+  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+    await this.commandBus.execute(new CreateUserCommand(createUserDto));
   }
 
   @Get('users')

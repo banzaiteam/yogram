@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 export default new DataSource({
   type: 'postgres',
-  host: 'ep-lively-bush-a2mv49a9-pooler.eu-central-1.aws.neon.tech',
+  host: 'ep-red-mouse-a2aq8grc-pooler.eu-central-1.aws.neon.tech',
   port: 5432,
   username: 'neondb_owner',
   password: 'npg_RqNihtGd54IJ',
