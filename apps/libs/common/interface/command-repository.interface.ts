@@ -1,3 +1,3 @@
-export interface ICommandRepository<TModel, TEntity> {
-  save(data: TModel): Promise<TModel>;
+export interface ICommandRepository<TEntity> {
+  save(data: any): Promise<TEntity[]>;
 }
