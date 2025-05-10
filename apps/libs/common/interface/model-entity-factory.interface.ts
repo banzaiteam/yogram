@@ -8,7 +8,7 @@ import { BaseEntity } from '../entity/base.entity';
  * @param {AggregateRoot} TModel - Business model type that extends from cqrs(ddd) AggregateRoot class which allows dispatching events within model.
  * @param {BaseEntity} TEntity - Each dataBase entity should extends from BaseEntity
  */
-export interface IModelEntityConvert<
+export interface IModelEntityFactory<
   TModel extends AggregateRoot,
   TEntity extends BaseEntity,
 > {

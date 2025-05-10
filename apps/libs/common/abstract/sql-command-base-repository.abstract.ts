@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { BaseEntity } from '../entity/base.entity';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ICommandRepository } from '../interface/command-repository.interface';
-import { IModelEntityConvert } from '../interface/model-entity-convert.interface';
+import { IModelEntityConvert } from '../interface/model-entity-factory.interface';
 import { RpcException } from '@nestjs/microservices';
 
 /**

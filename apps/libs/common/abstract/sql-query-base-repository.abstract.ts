@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 import { BaseEntity } from '../entity/base.entity';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { IModelEntityConvert } from '../interface/model-entity-convert.interface';
+import { IModelEntityConvert } from '../interface/model-entity-factory.interface';
 import { IQueryRepository } from '../interface/query-repository.interface';
 
 /**

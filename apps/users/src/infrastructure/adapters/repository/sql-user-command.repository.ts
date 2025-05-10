@@ -2,6 +2,7 @@ import { SqlCommandBaseRepository } from 'apps/libs/common/abstract/sql-command-
 import { UserModel } from 'apps/users/src/domain/models/User.model';
 import { User } from '../../entity/User.entity';
 import { DataSource } from 'typeorm';
+import { UserModelEntityFactory } from 'apps/users/src/domain/factory/user-model-entity.factory';
 
 export class SqlUserCommandRepository extends SqlCommandBaseRepository<
   UserModel,
