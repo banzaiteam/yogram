@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { uuid } from 'uuidv4';
 import { User } from '../../infrastructure/entity/User.entity';
+import { v4 } from 'uuid';
 
 export type ProfileInput = Pick<
   ClassProperties<typeof ProfileModel>,
@@ -28,15 +29,15 @@ export class ProfileModel {
   private _updatedAt: Date;
   @IsOptional()
   private _deletedAt?: Date | null;
-  private _user: User;
+  // private _user: User;
 
   get id() {
     return this._id;
   }
 
-  get user() {
-    return this._user;
-  }
+  // get user() {
+  //   return this._user;
+  // }
 
   get username() {
     return this._username;
@@ -56,7 +57,7 @@ export class ProfileModel {
 
   static create(profileArgs: ProfileInput): ProfileModel {
     const newProfile = new ProfileModel();
-    newProfile._id = uuid();
+    newProfile._id = v4();
     newProfile._userId = profileArgs.userId;
     newProfile._username = profileArgs.username;
     newProfile._createdAt = profileArgs.createdAt;

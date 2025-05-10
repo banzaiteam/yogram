@@ -11,6 +11,7 @@ import {
 import { uuid } from 'uuidv4';
 import { ClassProperties } from 'apps/libs/types/ClassProperties.type';
 import { ProfileModel } from './Profile.model';
+import { v4 } from 'uuid';
 
 export type UserInput = Pick<
   ClassProperties<typeof UserModel>,
@@ -136,7 +137,7 @@ export class UserModel extends AggregateRoot {
   //flow: create user(without profile) -> create profile -> usermodel.assignProfile(newProfile)
   static create(userArgs: UserInput): UserModel {
     const newUser = new UserModel();
-    newUser._id = uuid();
+    newUser._id = v4();
     newUser._firstName = userArgs.firstName;
     newUser._lastName = userArgs.lastName;
     newUser._email = userArgs.email;
@@ -146,7 +147,7 @@ export class UserModel extends AggregateRoot {
     newUser._city = userArgs.city;
     newUser._verified = false;
     newUser._published = true;
-    newUser._description = userArgs?.description;
+    newUser._description = 'ghghghghh';
     newUser._createdAt = new Date();
     newUser._updatedAt = newUser.createdAt;
     newUser._deletedAt = null;

@@ -15,6 +15,14 @@ import {
 import { UsersResolver } from './users.resolver';
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
 import { UserModelFactory } from './domain/factory/user-model.factory';
+import { SqlCommandBaseRepository } from 'apps/libs/common/abstract/sql-command-base-repository.abstract';
+import { SqlUserCommandRepository } from './infrastructure/adapters/repository/sql-user-command.repository';
+import { CreateUserCommand } from './features/create/command/create-user.command';
+import { CreateUserHandler } from './features/create/command/create-user.handler';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './infrastructure/entity/User.entity';
+import { UserModelEntityFactory } from './domain/factory/user-model-entity.factory';
+import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -34,6 +42,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 };
 @Module({
   imports: [
+    CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
@@ -41,6 +50,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
+    TypeOrmModule.forFeature([User]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
@@ -53,6 +63,14 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersResolver, UserModelFactory],
+  providers: [
+    UsersService,
+    UsersResolver,
+    UserModelFactory,
+    SqlUserCommandRepository,
+    CreateUserCommand,
+    UserModelEntityFactory,
+    CreateUserHandler,
+  ],
 })
 export class UsersModule {}
