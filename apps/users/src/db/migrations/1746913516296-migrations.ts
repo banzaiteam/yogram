@@ -1,18 +1,9 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Migrations1746846906996 implements MigrationInterface {
-    name = 'Migrations1746846906996'
+export class Migrations1746913516296 implements MigrationInterface {
+    name = 'Migrations1746913516296'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
-            CREATE TABLE "profiles" (
-                "profile_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-                "username" character varying(30) NOT NULL,
-                "user_id" uuid,
-                CONSTRAINT "REL_9e432b7df0d182f8d292902d1a" UNIQUE ("user_id"),
-                CONSTRAINT "PK_6a23df60690da92fd263eca2e93" PRIMARY KEY ("profile_id")
-            )
-        `);
         await queryRunner.query(`
             CREATE TABLE "users" (
                 "user_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -30,6 +21,16 @@ export class Migrations1746846906996 implements MigrationInterface {
             )
         `);
         await queryRunner.query(`
+            CREATE TABLE "profiles" (
+                "profile_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "username" character varying(30) NOT NULL,
+                "new" uuid NOT NULL,
+                "user_id" uuid,
+                CONSTRAINT "REL_9e432b7df0d182f8d292902d1a" UNIQUE ("user_id"),
+                CONSTRAINT "PK_6a23df60690da92fd263eca2e93" PRIMARY KEY ("profile_id")
+            )
+        `);
+        await queryRunner.query(`
             ALTER TABLE "profiles"
             ADD CONSTRAINT "FK_9e432b7df0d182f8d292902d1a2" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
@@ -40,10 +41,10 @@ export class Migrations1746846906996 implements MigrationInterface {
             ALTER TABLE "profiles" DROP CONSTRAINT "FK_9e432b7df0d182f8d292902d1a2"
         `);
         await queryRunner.query(`
-            DROP TABLE "users"
+            DROP TABLE "profiles"
         `);
         await queryRunner.query(`
-            DROP TABLE "profiles"
+            DROP TABLE "users"
         `);
     }
 

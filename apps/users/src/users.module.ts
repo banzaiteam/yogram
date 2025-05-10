@@ -19,6 +19,8 @@ import { CreateUserHandler } from './features/create/command/create-user.handler
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './infrastructure/entity/User.entity';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UserRepositoryProvider } from './providers/user-repository.provider';
+import { ProfileRepositoryProvider } from './providers/profile-repository.provider';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -64,6 +66,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UsersResolver,
     CreateUserCommand,
     CreateUserHandler,
+    UserRepositoryProvider,
+    ProfileRepositoryProvider,
   ],
 })
 export class UsersModule {}
