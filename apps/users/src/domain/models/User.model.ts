@@ -129,6 +129,10 @@ export class UserModel extends AggregateRoot {
     return this._updatedAt;
   }
 
+  set id(id: string) {
+    this._id = id;
+  }
+
   //flow: create user(without profile) -> create profile -> usermodel.assignProfile(newProfile)
   static create(userArgs: UserInput): UserModel {
     const newUser = new UserModel();
