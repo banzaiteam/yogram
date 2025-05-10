@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
@@ -12,11 +12,13 @@ export class GateService {
     private readonly configService: ConfigService,
   ) {
     // FIXME check env and route path on k8s
-    this.env = this.configService.get('NODE_ENV') === 'DEVELOPMENT';
-    console.log(this.env);
+    this.env =
+      this.configService.get('NODE_ENV') === 'DEVELOPMENT' ||
+      this.configService.get('NODE_ENV') === 'TESTING';
     this.usersHttpService = this.env
       ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
       : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
+    console.log('this.usersHttpService = ', this.usersHttpService);
   }
 
   async usersHttpServicePost(path, payload, headers) {
@@ -33,6 +35,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn(error);
+      throw new InternalServerErrorException(error);
     }
   }
 

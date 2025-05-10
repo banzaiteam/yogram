@@ -2,19 +2,43 @@ import { ForbiddenException, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getConfiguration } from './settings/configuration';
+import {
+  EnvironmentMode,
+  EnvironmentsTypes,
+  getConfiguration,
+} from './settings/configuration';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
 import { GateService } from '../../libs/gateService';
 import { HttpModule } from '@nestjs/axios';
+import { UsersModule } from './users/users.module';
+
+const getEnvFilePath = (env: EnvironmentsTypes) => {
+  const defaultEnvFilePath = [
+    'apps/gate/src/.env.development',
+    'apps/gate/src/.env',
+  ];
+  console.log('.......................................TESTING');
+  if (env === EnvironmentMode.TESTING) {
+    return ['apps/gate/src/.env.test', ...defaultEnvFilePath];
+  }
+  if (env === EnvironmentMode.PRODUCTION) {
+    return ['apps/gate/src/.env'];
+  }
+
+  return defaultEnvFilePath;
+};
+
 @Module({
   imports: [
     HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
+      envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
+    UsersModule,
     // FIXME move on external module mb
     // GraphQLModule.forRootAsync<ApolloGatewayDriverConfig>({
     //   driver: ApolloGatewayDriver,

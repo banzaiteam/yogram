@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Migrations1746731710389 implements MigrationInterface {
-    name = 'Migrations1746731710389'
+export class MigrationsProd1746831804617 implements MigrationInterface {
+    name = 'MigrationsProd1746831804617'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE "profiles" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "createdAt" date NOT NULL DEFAULT now(),
-                "updateAt" date NOT NULL DEFAULT now(),
+                "updatedAt" date NOT NULL DEFAULT now(),
                 "deletedAt" date,
                 "username" character varying(30) NOT NULL,
                 "user_id" uuid NOT NULL,
@@ -19,7 +19,7 @@ export class Migrations1746731710389 implements MigrationInterface {
             CREATE TABLE "users" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "createdAt" date NOT NULL DEFAULT now(),
-                "updateAt" date NOT NULL DEFAULT now(),
+                "updatedAt" date NOT NULL DEFAULT now(),
                 "deletedAt" date,
                 "firstName" character varying(30) NOT NULL,
                 "lastName" character varying(30) NOT NULL,

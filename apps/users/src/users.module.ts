@@ -13,7 +13,14 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
-import { DatabaseModule } from 'apps/libs/common/database/database.module';
+import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
+import { CreateUserCommand } from './features/create/command/create-user.command';
+import { CreateUserHandler } from './features/create/command/create-user.handler';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './infrastructure/entity/User.entity';
+import { CqrsModule } from '@nestjs/cqrs';
+import { UserRepositoryProvider } from './providers/user-repository.provider';
+import { ProfileRepositoryProvider } from './providers/profile-repository.provider';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -21,9 +28,12 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/users/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
+    console.log('TESTING-TESTINGTESTINGTESTINGTESTING');
     return ['apps/users/src/.env.test', ...defaultEnvFilePath];
   }
   if (env === EnvironmentMode.PRODUCTION) {
+    console.log('PRODUCTIONPRODUCTION');
+
     return ['apps/users/src/.env'];
   }
 
@@ -31,6 +41,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 };
 @Module({
   imports: [
+    CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
@@ -38,6 +49,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
+    TypeOrmModule.forFeature([User]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
@@ -50,6 +62,13 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersResolver],
+  providers: [
+    UsersService,
+    UsersResolver,
+    CreateUserCommand,
+    CreateUserHandler,
+    UserRepositoryProvider,
+    ProfileRepositoryProvider,
+  ],
 })
 export class UsersModule {}
