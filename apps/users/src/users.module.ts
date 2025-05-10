@@ -14,15 +14,11 @@ import {
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
-import { UserModelFactory } from './domain/factory/user-model.factory';
-import { SqlCommandBaseRepository } from 'apps/libs/common/abstract/sql-command-base-repository.abstract';
-import { SqlUserCommandRepository } from './infrastructure/adapters/repository/sql-user-command.repository';
 import { CreateUserCommand } from './features/create/command/create-user.command';
 import { CreateUserHandler } from './features/create/command/create-user.handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './infrastructure/entity/User.entity';
-import { UserModelEntityFactory } from './domain/factory/user-model-entity.factory';
-import { CommandBus, CqrsModule } from '@nestjs/cqrs';
+import { CqrsModule } from '@nestjs/cqrs';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -66,10 +62,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   providers: [
     UsersService,
     UsersResolver,
-    UserModelFactory,
-    SqlUserCommandRepository,
     CreateUserCommand,
-    UserModelEntityFactory,
     CreateUserHandler,
   ],
 })
