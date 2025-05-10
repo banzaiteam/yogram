@@ -14,8 +14,6 @@ export class Profile {
   id: string;
   @Column({ type: 'varchar', length: '30' })
   username: string;
-  // @Column({ type: 'uuid', name: 'user_id' })
-  // userId: string;
 
   @OneToOne(() => User, (user) => user.profile, { cascade: true })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
