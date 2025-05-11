@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { BaseRepository } from 'apps/libs/common/abstract/base-repository.abstract';
+import { BaseRepository } from '../../../../../../apps/libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { User } from 'apps/users/src/infrastructure/entity/User.entity';
+import { User } from '../../../../../../apps/users/src/infrastructure/entity/User.entity';
 import { IUserCommandRepository } from 'apps/users/src/interfaces/users-command.interface';
 import { EntityManager, Repository } from 'typeorm';
 

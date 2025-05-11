@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GateService } from 'apps/libs/gateService';
+import { GateService } from '../../../../apps/libs/gateService';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
 

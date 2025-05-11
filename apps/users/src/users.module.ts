@@ -13,7 +13,7 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
-import { DatabaseModule } from 'apps/libs/common/database/database.module';
+import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import { CreateUserCommand } from './features/create/command/create-user.command';
 import { CreateUserHandler } from './features/create/command/create-user.handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,6 +28,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/users/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
+    console.log('TESTING-TESTINGTESTINGTESTINGTESTING');
     return ['apps/users/src/.env.test', ...defaultEnvFilePath];
   }
   if (env === EnvironmentMode.PRODUCTION) {

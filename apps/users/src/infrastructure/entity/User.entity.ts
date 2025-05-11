@@ -1,4 +1,4 @@
-import { BaseEntity } from 'apps/libs/common/entity/base.entity';
+import { BaseEntity } from '../../../../../apps/libs/common/entity/base.entity';
 import { Column, Entity, OneToOne } from 'typeorm';
 import { Profile } from './Profile.entity';
 

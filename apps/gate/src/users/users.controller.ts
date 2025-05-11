@@ -12,9 +12,9 @@ export class UsersController {
   @Post()
   async create(
     @Body() createUserDto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
+    // @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     await this.usersService.create(createUserDto);
-    res.status(201);
+    // res.status(201);
   }
 }
