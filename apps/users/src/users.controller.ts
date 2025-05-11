@@ -13,8 +13,8 @@ export class UsersController {
   }
 
   @Post('users/create')
-  create(@Body() createUserDto: CreateUserDto): void {
-    this.commandBus.execute(new CreateUserCommand(createUserDto));
+  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+    await this.commandBus.execute(new CreateUserCommand(createUserDto));
   }
 
   @Get('users')

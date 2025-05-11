@@ -6,6 +6,7 @@ import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 import { CreateProfileDto } from 'apps/libs/Users/dto/profile/create-profile.dto';
 import { UpdateProfileDto } from 'apps/libs/Users/dto/profile/update-profile.dto';
 import { IProfileCommandRepository } from './interfaces/profile-command.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +40,7 @@ export class UsersService {
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      throw new RpcException(error);
     } finally {
       await queryRunner.release();
     }

@@ -6,7 +6,7 @@ import { UsersService } from 'apps/users/src/users.service';
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(private readonly usersService: UsersService) {}
 
-  async execute({ createUserDto }: CreateUserCommand): Promise<any> {
+  async execute({ createUserDto }: CreateUserCommand): Promise<void> {
     await this.usersService.createUser(createUserDto);
   }
 }
