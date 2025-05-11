@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { UsersService } from '../../users/src/users.service';
 import { DataSource } from 'typeorm';
-import { IUserCommandRepository } from './interfaces/users-command.interface';
-import { IProfileCommandRepository } from './interfaces/profile-command.interface';
+import { IUserCommandRepository } from '../../users/src/interfaces/users-command.interface';
+import { IProfileCommandRepository } from '../../users/src/interfaces/profile-command.interface';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { release } from 'os';
 import { faker } from '@faker-js/faker/.';
