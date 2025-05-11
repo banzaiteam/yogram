@@ -40,7 +40,7 @@ export const getConfiguration = () => {
       migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
       autoLoadEntities: process.env.AUTOLOAD_ENTITIES,
       synchronize: process.env.SYNCHRONIZE,
-      extra: { ssl: false },
+      extra: { ssl: process.env.SSL === 'true' },
       dropSchema: process.env.DROP_SCHEMA,
     },
   };
