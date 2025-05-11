@@ -27,6 +27,7 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.USERS_PORT,
+    USERS_PORT: process.env.USERS_PORT,
     DATABASE: {
       type: process.env.POSTGRES_TYPE,
       host: process.env.POSTGRES_HOST,
@@ -39,7 +40,8 @@ export const getConfiguration = () => {
       migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
       autoLoadEntities: process.env.AUTOLOAD_ENTITIES,
       synchronize: process.env.SYNCHRONIZE,
-      extra: { ssl: true },
+      extra: { ssl: false },
+      dropSchema: process.env.DROP_SCHEMA,
     },
   };
 };

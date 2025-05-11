@@ -39,6 +39,7 @@
     "@apollo/gateway": "^2.10.2",
     "@apollo/server": "^4.12.0",
     "@apollo/subgraph": "^2.10.2",
+    "@faker-js/faker": "^9.7.0",
     "@nestjs/apollo": "^13.1.0",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/common": "^10.0.0",
@@ -103,7 +104,8 @@
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/apps/",
-      "<rootDir>/libs/"
+      "<rootDir>/apps/libs/",
+      "<rootDir>/apps/gate/test"
     ],
     "moduleNameMapper": {
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",

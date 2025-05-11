@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './features/create/command/create-user.command';
 
