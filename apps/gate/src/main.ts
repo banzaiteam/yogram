@@ -13,6 +13,7 @@ async function bootstrap() {
     origin: [
       'https://yogram.ru',
       'http://localhost:5173',
+      'http://localhost:56938',
       'https://localhost:3000',
       'http://localhost:3000',
     ],
