@@ -21,6 +21,7 @@ import { User } from './infrastructure/entity/User.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserRepositoryProvider } from './providers/user-repository.provider';
 import { ProfileRepositoryProvider } from './providers/profile-repository.provider';
+import { Profile } from './infrastructure/entity/Profile.entity';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -44,7 +45,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Profile]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
