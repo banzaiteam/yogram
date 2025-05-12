@@ -19,12 +19,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/gate/src/.env.development',
     'apps/gate/src/.env',
   ];
-  console.log('.......................................TESTING');
   if (env === EnvironmentMode.TESTING) {
     return ['apps/gate/src/.env.test', ...defaultEnvFilePath];
-  }
-  if (env === EnvironmentMode.PRODUCTION) {
-    return ['apps/gate/src/.env'];
   }
 
   return defaultEnvFilePath;
@@ -36,6 +32,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
+      ignoreEnvFile:
+        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+        process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     UsersModule,

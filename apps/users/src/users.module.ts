@@ -21,6 +21,7 @@ import { User } from './infrastructure/entity/User.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserRepositoryProvider } from './providers/user-repository.provider';
 import { ProfileRepositoryProvider } from './providers/profile-repository.provider';
+import { Profile } from './infrastructure/entity/Profile.entity';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -28,15 +29,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/users/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
-    console.log('TESTING-TESTINGTESTINGTESTINGTESTING');
     return ['apps/users/src/.env.test', ...defaultEnvFilePath];
   }
-  if (env === EnvironmentMode.PRODUCTION) {
-    console.log('PRODUCTIONPRODUCTION');
-
-    return ['apps/users/src/.env'];
-  }
-
   return defaultEnvFilePath;
 };
 @Module({
@@ -45,11 +39,13 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
-
+      ignoreEnvFile:
+        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+        process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Profile]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
