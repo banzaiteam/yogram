@@ -16,8 +16,44 @@ spec:
         project: PROJECT
     spec:
       containers:
-         - name: PROJECT
-           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
-           ports:
-             - containerPort: PORT_CONTAINER
+        - name: PROJECT
+          image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+          ports:
+            - containerPort: PORT_CONTAINER
 
+          env:
+            - name: POSTGRES_TYPE
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: POSTGRES_TYPE
+            - name: POSTGRES_MIGRATION_TABLE
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: POSTGRES_MIGRATION_TABLE
+            - name: SYNCHRONIZE
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: SYNCHRONIZE
+            - name: AUTOLOAD_ENTITIES
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: AUTOLOAD_ENTITIES
+            - name: DROP_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: DROP_SCHEMA
+            - name: USERS_PROD_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: USERS_PROD_SERVICE_URL
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: POSTGRES_URL
