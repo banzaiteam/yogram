@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -13,10 +13,12 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  @Exclude()
   @IsString()
   @MinLength(2)
   @MaxLength(30)
   firstName: string;
+  @Exclude()
   @IsString()
   @MinLength(2)
   @MaxLength(30)
@@ -25,6 +27,7 @@ export class CreateUserDto {
   @MinLength(2)
   @MaxLength(30)
   username: string;
+  @Exclude()
   @ApiProperty({
     format: 'MM/DD/YYYY',
   })
@@ -47,14 +50,17 @@ export class CreateUserDto {
     minLowercase: 1,
   })
   password: string;
+  @Exclude()
   @IsOptional()
   @IsString()
   @MaxLength(300)
   description?: string;
+  @Exclude()
   @IsString()
   @MaxLength(30)
   @MinLength(3)
   city: string;
+  @Exclude()
   @IsString()
   @MaxLength(30)
   @MinLength(3)
