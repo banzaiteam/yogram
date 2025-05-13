@@ -1,12 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../../users/src/users.service';
 import { DataSource } from 'typeorm';
-import { IUserCommandRepository } from '../../users/src/interfaces/users-command.interface';
-import { IProfileCommandRepository } from '../../users/src/interfaces/profile-command.interface';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
-import { release } from 'os';
 import { faker } from '@faker-js/faker/.';
-import { RpcException } from '@nestjs/microservices';
+import { IUserCommandRepository } from 'apps/users/src/interfaces/command/user-command.interface';
+import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/profile-command.interface';
 
 const createUserDto: CreateUserDto = {
   firstName: 'Ivans',
@@ -20,12 +18,6 @@ const createUserDto: CreateUserDto = {
   country: 'Prague',
 };
 const userRes = { ...createUserDto, id: faker.string.uuid };
-
-// const datasourceMock = () => jest.fn(()=>{
-//   createQueryRunner: jest.fn().mockImplementation(() => ({
-//     startTransaction: jest.fn(),
-//   })),
-// });
 
 describe('Users Service', () => {
   let service: UsersService;

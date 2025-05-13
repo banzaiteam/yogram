@@ -1,5 +1,5 @@
 import { EntityManager } from 'typeorm';
-import { User } from '../infrastructure/entity/User.entity';
+import { User } from '../../infrastructure/entity/User.entity';
 
 export abstract class IUserCommandRepository<C, U> {
   abstract create(
