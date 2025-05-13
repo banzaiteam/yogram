@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from '../../users/src/users.service';
+import { UsersCommandService } from '../../users/src/users-command.service';
 import { DataSource } from 'typeorm';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { faker } from '@faker-js/faker/.';
@@ -20,11 +20,11 @@ const createUserDto: CreateUserDto = {
 const userRes = { ...createUserDto, id: faker.string.uuid };
 
 describe('Users Service', () => {
-  let service: UsersService;
+  let service: UsersCommandService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UsersService,
+        UsersCommandService,
         {
           provide: DataSource,
           useValue: {
@@ -48,7 +48,7 @@ describe('Users Service', () => {
         },
       ],
     }).compile();
-    service = module.get(UsersService);
+    service = module.get(UsersCommandService);
   });
   it.skip('should to be defined', async () => {
     expect(service).toBeDefined();

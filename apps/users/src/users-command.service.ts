@@ -9,7 +9,7 @@ import { IUserCommandRepository } from './interfaces/command/user-command.interf
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 
 @Injectable()
-export class UsersService {
+export class UsersCommandService {
   constructor(
     private dataSource: DataSource,
     private readonly userCommandRepository: IUserCommandRepository<

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
+import { UsersCommandService } from './users-command.service';
 import { ConfigModule } from '@nestjs/config';
 import {
   EnvironmentMode,
@@ -22,6 +22,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UserCommandRepositoryProvider } from './providers/command/user-command-repository.provider';
 import { Profile } from './infrastructure/entity/Profile.entity';
 import { ProfileCommandRepositoryProvider } from './providers/command/profile-command-repository.provider';
+import { UsersQueryService } from './users-query.service';
+import { UsersQueryRepositoryProvider } from './providers/query/users-query-repository.provider';
+import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
+import { FindUserByIdHandler } from './features/find-one-by-id/query/find-one-by-id.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -59,12 +63,16 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   ],
   controllers: [UsersController],
   providers: [
-    UsersService,
+    UsersQueryService,
+    UsersCommandService,
     UsersResolver,
+    FindUserByIdQuery,
+    FindUserByIdHandler,
     CreateUserCommand,
     CreateUserHandler,
     UserCommandRepositoryProvider,
     ProfileCommandRepositoryProvider,
+    UsersQueryRepositoryProvider,
   ],
 })
 export class UsersModule {}
