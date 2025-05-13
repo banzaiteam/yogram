@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersCommandService } from '../../users/src/users-command.service';
 import { DataSource } from 'typeorm';
-import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { faker } from '@faker-js/faker/.';
-import { IUserCommandRepository } from 'apps/users/src/interfaces/command/user-command.interface';
-import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/profile-command.interface';
+import { IUserCommandRepository } from '../../../apps/users/src/interfaces/command/user-command.interface';
+import { IProfileCommandRepository } from '../../../apps/users/src/interfaces/command/profile-command.interface';
 
 const createUserDto: CreateUserDto = {
   firstName: 'Ivans',
