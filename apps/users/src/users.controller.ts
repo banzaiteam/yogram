@@ -3,7 +3,7 @@ import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './features/create/command/create-user.command';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import { IdDto } from 'apps/libs/common/dto/id.dto';
+import { IdDto } from '../../../apps/libs/common/dto/id.dto';
 import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
 
 @Controller()
