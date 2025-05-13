@@ -35,6 +35,5 @@ export class CreateUserDto {
     minLowercase: 1,
     minSymbols: 1,
   })
-  @MaxLength(30, { message: 'password should have maximum 30 characters' })
   password: string;
 }
