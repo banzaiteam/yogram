@@ -58,7 +58,6 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
     "graphql": "^16.11.0",
-    "node-gyp": "^11.2.0",
     "pg": "^8.15.6",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
