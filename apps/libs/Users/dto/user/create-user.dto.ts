@@ -24,7 +24,7 @@ export class CreateUserDto {
   @MaxLength(30)
   lastName: string;
   @IsString()
-  @MinLength(2)
+  @MinLength(6)
   @MaxLength(30)
   username: string;
   @Exclude()
@@ -44,11 +44,13 @@ export class CreateUserDto {
   })
   @IsNotEmpty()
   @IsStrongPassword({
-    minLength: 4,
+    minLength: 6,
     minNumbers: 1,
     minUppercase: 1,
     minLowercase: 1,
+    minSymbols: 1,
   })
+  @MaxLength(30, { message: 'password can have maximum 30 characters' })
   password: string;
   @Exclude()
   @IsOptional()
