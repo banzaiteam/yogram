@@ -67,7 +67,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
               url,
               willSendRequest({ request, context }) {
                 // FIXME add validate
-                console.log(request);
+                // console.log(request);
                 if (context.headers) {
                   if (context.headers) {
                     console.log(context.headers);
