@@ -1,5 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
@@ -49,6 +53,8 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn(error);
+      throw new InternalServerErrorException(error);
     }
   }
 }
+// todo
