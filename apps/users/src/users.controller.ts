@@ -1,15 +1,21 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './features/create/command/create-user.command';
+import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { IdDto } from '../../../apps/libs/common/dto/id.dto';
+import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
 
 @Controller()
 export class UsersController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return 'hello';
+  @Get('users/:id')
+  async findOneById(@Param() id: IdDto): Promise<ResponseUserDto> {
+    return await this.queryBus.execute(new FindUserByIdQuery(id));
   }
 
   @Post('users/create')

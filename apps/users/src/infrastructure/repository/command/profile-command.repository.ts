@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { BaseRepository } from '../../../../../../apps/libs/common/abstract/base-repository.abstract';
-import { CreateUserDto } from '../../../../../../apps/libs/Users/dto/user/create-user.dto';
-import { UpdateUserDto } from '../../../../../../apps/libs/Users/dto/user/update-user.dto';
-import { Profile } from '../../../../../../apps/users/src/infrastructure/entity/Profile.entity';
-import { IProfileCommandRepository } from 'apps/users/src/interfaces/profile-command.interface';
+import { BaseRepository } from '../../../../../libs/common/abstract/base-repository.abstract';
+import { CreateUserDto } from '../../../../../libs/Users/dto/user/create-user.dto';
+import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dto';
+import { Profile } from '../../entity/Profile.entity';
 import { EntityManager, Repository } from 'typeorm';
+import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/profile-command.interface';
 
 @Injectable()
 export class ProfileCommandRepository
