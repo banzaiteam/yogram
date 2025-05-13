@@ -1,11 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import {
-  IsBoolean,
-  IsDate,
   IsEmail,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsStrongPassword,
   MaxLength,
@@ -13,50 +9,31 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+  @ApiProperty({
+    description: 'username should be 6-30 characters length and unique',
+  })
   @IsString()
-  @MinLength(2)
-  @MaxLength(30)
-  firstName: string;
-  @IsString()
-  @MinLength(2)
-  @MaxLength(30)
-  lastName: string;
-  @IsString()
-  @MinLength(2)
+  @MinLength(6)
   @MaxLength(30)
   username: string;
   @ApiProperty({
-    format: 'MM/DD/YYYY',
+    description: 'email should be unique',
   })
-  @IsDate()
-  @Transform(({ value }) => new Date(value))
-  birthdate: Date;
   @IsEmail()
   email: string;
   @ApiProperty({
     minLength: 4,
     maxLength: 30,
     description:
-      'password should have at least 1 number, 1 lowerCase, 1 upperCase, 1 symbol',
+      'password should be 4-30 characters length and have at least 1 number, 1 lowerCase, 1 upperCase and 1 symbol',
   })
   @IsNotEmpty()
   @IsStrongPassword({
-    minLength: 4,
+    minLength: 6,
     minNumbers: 1,
     minUppercase: 1,
     minLowercase: 1,
+    minSymbols: 1,
   })
   password: string;
-  @IsOptional()
-  @IsString()
-  @MaxLength(300)
-  description?: string;
-  @IsString()
-  @MaxLength(30)
-  @MinLength(3)
-  city: string;
-  @IsString()
-  @MaxLength(30)
-  @MinLength(3)
-  country: string;
 }
