@@ -3,8 +3,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { IdDto } from 'apps/libs/common/dto/id.dto';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { IdDto } from '../../../../apps/libs/common/dto/id.dto';
+import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
