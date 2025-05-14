@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SignupService } from './signup.service';
 import { SignupController } from './signup.controller';
-import { GateService } from 'apps/libs/gateService';
+import { GateService } from '../../../../apps/libs/gateService';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
