@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { GateService } from 'apps/libs/gateService';
-import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
-import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { GateService } from '../../../../apps/libs/gateService';
+import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
+import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
 
 @Injectable()
 export class SignupService {
