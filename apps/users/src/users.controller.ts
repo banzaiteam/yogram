@@ -20,6 +20,7 @@ export class UsersController {
 
   @Post('users/create')
   async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+    console.log('from test.........');
     await this.commandBus.execute(new CreateUserCommand(createUserDto));
   }
 

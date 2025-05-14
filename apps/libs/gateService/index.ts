@@ -27,6 +27,7 @@ export class GateService {
 
   async usersHttpServicePost(path, payload, headers) {
     try {
+      console.log('path======', [this.usersHttpService, path].join('/'));
       const { data } = await lastValueFrom(
         this.httpService.post(
           [this.usersHttpService, path].join('/'),
