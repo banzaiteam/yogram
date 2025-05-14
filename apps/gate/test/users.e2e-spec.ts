@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { UsersModule } from '../../../apps/gate/src/users/users.module';
-import { UsersModule as UsersModuleGate } from '../../users/src/users.module';
 import { AppModule } from '../src/app.module';
 
 const createUserDto = {
