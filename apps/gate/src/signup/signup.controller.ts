@@ -1,9 +1,9 @@
 import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common';
 import { SignupService } from './signup.service';
-import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
+import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 
 @ApiTags('SignUp')
 @Controller('signup')

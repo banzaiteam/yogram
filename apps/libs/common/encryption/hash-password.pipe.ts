@@ -3,7 +3,7 @@ import {
   BadRequestException,
   PipeTransform,
 } from '@nestjs/common';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcrypt';
 
 export class HashPasswordPipe implements PipeTransform {
   async transform(value: object, metadata: ArgumentMetadata) {
@@ -13,7 +13,7 @@ export class HashPasswordPipe implements PipeTransform {
     ) {
       throw new BadRequestException('password was not provided');
     }
-    value['password'] = await argon2.hash(value['password']);
+    value['password'] = await bcrypt.hash(value['password'], 10);
     console.log(
       "🚀 ~ HashPasswordPipe ~ transform ~ value['password']:",
       value['password'],
