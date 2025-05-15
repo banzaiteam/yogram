@@ -19,5 +19,6 @@ export const getConfiguration = () => {
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
+    RMQ_URL: process.env.RMQ_URL,
   };
 };
