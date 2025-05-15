@@ -26,6 +26,10 @@ import { UsersQueryService } from './users-query.service';
 import { UsersQueryRepositoryProvider } from './providers/query/users-query-repository.provider';
 import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
 import { FindUserByIdHandler } from './features/find-one-by-id/query/find-one-by-id.handler';
+import {
+  BindingKeysEnum,
+  RabbitModule,
+} from 'apps/libs/common/message-brokers/rmq/rmq.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -39,6 +43,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 };
 @Module({
   imports: [
+    RabbitModule.register([{ users: [BindingKeysEnum.Users_Verify_One] }]),
     CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
