@@ -1,9 +1,9 @@
 import { Controller } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { SendUserVerifyEmailCommand } from '../features/verifyEmail/command/send-user-verify-email.command';
-import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
-import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
-import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
+import { UsersRoutingKeys } from '../../../../apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
+import { EventSubscribe } from '../../../../apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { IEvent } from '../../../../apps/libs/common/message-brokers/interfaces/event.interface';
 
 @Controller()
 export class MailerController {
