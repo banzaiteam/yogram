@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { DataSource } from 'typeorm';
-import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { CreateProfileDto } from 'apps/libs/Users/dto/profile/create-profile.dto';
-import { UpdateProfileDto } from 'apps/libs/Users/dto/profile/update-profile.dto';
+import { UpdateUserDto } from '../../../apps/libs/Users/dto/user/update-user.dto';
+import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
+import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
 import { RpcException } from '@nestjs/microservices';
 import { IUserCommandRepository } from './interfaces/command/user-command.interface';
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { ResponseUserDto } from '../../../apps/libs/Users/dto/user/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
