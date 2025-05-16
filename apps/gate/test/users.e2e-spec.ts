@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { UsersModule as UsersAppModule } from '../../users/src/users.module';
-import { UsersModule } from '../../gate/src/users/users.module';
+import { UsersModule } from '../src/users/users.module';
 import { AppModule } from '../src/app.module';
 
 const createUserDto = {
-  username: 'mmm',
+  username: 'mmmfffff',
   email: 'retouch226@gmail.com',
-  password: '12O!k',
+  password: '12OKfhf!ll!k',
 };
 
 describe('Users microservice (e2e)', () => {
@@ -23,7 +23,7 @@ describe('Users microservice (e2e)', () => {
     await app.init();
   });
   // localhost:3001/api/v1/
-  it.skip('/ (POST)', async () => {
+  it('/ (POST)', async () => {
     const result = await request(app.getHttpServer())
       .post('/signup')
       .send(createUserDto)
