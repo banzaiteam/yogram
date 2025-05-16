@@ -18,6 +18,13 @@ import { RpcException } from '@nestjs/microservices';
 
 const QUEUE_BINDINGS_LIST = 'QUEUE_BINDINGS_LIST';
 
+/**
+ * RabbitConsumerModule allow consume messages from passed queueBindingsList array
+ * It realize topic hardcoded exchange with exchange1 name
+ * @param queueBindingsList: IQueueBindings[]  the string array of queues and bindingKeys in format [{ queueName:['bindingKey'] }, {}, ...].
+ * example: [{users:['users.verify.*']}, {posts:['posts.verify.#']}]
+ * @returns DynamicModule
+ */
 @Module({
   imports: [],
 })
