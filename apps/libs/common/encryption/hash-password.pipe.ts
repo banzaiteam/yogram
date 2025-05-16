@@ -14,11 +14,6 @@ export class HashPasswordPipe implements PipeTransform {
       throw new BadRequestException('password was not provided');
     }
     value['password'] = await bcrypt.hash(value['password'], 10);
-    console.log(
-      "🚀 ~ HashPasswordPipe ~ transform ~ value['password']:",
-      value['password'],
-    );
-
     return value;
   }
 }
