@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { GateService } from '../../libs/gateService';
+import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
 
 @Controller()
 export class AppController {
@@ -9,7 +10,6 @@ export class AppController {
     private readonly gateService: GateService,
   ) {}
 
-  @Get()
   getHello(): string {
     return this.appService.getHello();
   }

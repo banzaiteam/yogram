@@ -41,5 +41,6 @@ export const getConfiguration = () => {
     autoLoadEntities: process.env.AUTOLOAD_ENTITIES,
     synchronize: process.env.SYNCHRONIZE === 'true',
     dropSchema: process.env.DROP_SCHEMA === 'true',
+    RMQ_URL: process.env.RMQ_URL,
   };
 };

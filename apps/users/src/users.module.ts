@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersController } from './users.controller';
+
 import { UsersCommandService } from './users-command.service';
 import { ConfigModule } from '@nestjs/config';
 import {
@@ -13,7 +13,7 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { UsersResolver } from './users.resolver';
-import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
+import { DatabaseModule } from '../../libs/common/database/database.module';
 import { CreateUserCommand } from './features/create/command/create-user.command';
 import { CreateUserHandler } from './features/create/command/create-user.handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,6 +26,10 @@ import { UsersQueryService } from './users-query.service';
 import { UsersQueryRepositoryProvider } from './providers/query/users-query-repository.provider';
 import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
 import { FindUserByIdHandler } from './features/find-one-by-id/query/find-one-by-id.handler';
+import { UsersController } from './users.controller';
+import { SendVerifyEmailEvent } from './features/create/event/send-verify-email.event';
+import { SendVerifyEmailHandler } from './features/create/event/send-verify-email.handler';
+import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -48,6 +52,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
         process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
+    RabbitProducerModule.register(['users']),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([User, Profile]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
@@ -73,6 +78,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UserCommandRepositoryProvider,
     ProfileCommandRepositoryProvider,
     UsersQueryRepositoryProvider,
+    SendVerifyEmailEvent,
+    SendVerifyEmailHandler,
   ],
 })
 export class UsersModule {}
