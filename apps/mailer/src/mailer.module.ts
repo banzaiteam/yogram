@@ -12,6 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { SendUserVerifyEmailCommand } from './features/verifyEmail/command/send-user-verify-email.command';
 import { SendUserVerifyEmailHandler } from './features/verifyEmail/command/send-user-verify-email.handler';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UsersBindingKeysEnum } from 'apps/users/src/message-brokers/rabbit/users-queue-bindings.constant';
+import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -29,6 +31,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 @Module({
   imports: [
     CqrsModule,
+    RabbitConsumerModule.register([
+      { users: [UsersBindingKeysEnum.Users_Verify_One] },
+    ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
