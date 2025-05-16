@@ -22,7 +22,7 @@ export class MailService implements IMailer {
 
     const subject = 'Yogram account verification';
     const html = `<p>Hello ${userVerifyEmailDto.username},</p>
-        <p>Welcome to our community! Your account is now active.</p>
+        <p>Welcome to our community! You created account but it still need to be verified.</p>
         <p>please click on the activation link <a href=https://gate.yogram.ru/api/v1/auth/email-verify/${token}>verify link</a></p>`;
 
     try {

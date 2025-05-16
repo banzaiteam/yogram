@@ -22,12 +22,10 @@ export class GateService {
     this.usersHttpService = this.env
       ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
       : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
-    console.log('this.usersHttpService = ', this.usersHttpService);
   }
 
   async usersHttpServicePost(path, payload, headers) {
     try {
-      console.log('path======', [this.usersHttpService, path].join('/'));
       const { data } = await lastValueFrom(
         this.httpService.post(
           [this.usersHttpService, path].join('/'),
@@ -58,4 +56,3 @@ export class GateService {
     }
   }
 }
-// todo

@@ -1,21 +1,19 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
-import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.dto';
+import { Controller } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { SendUserVerifyEmailCommand } from '../features/verifyEmail/command/send-user-verify-email.command';
-import { Response } from 'express';
+import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
+import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
 
-@Controller('mail')
+@Controller()
 export class MailerController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @Post()
-  async sendUserVerifyEmail(
-    @Body() userVerifyEmailDto: UserVerifyEmailDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<void> {
+  @EventSubscribe({ routingKey: UsersRoutingKeys.UsersVerifyEmail })
+  async sendUserVerifyEmail(rtKey: string, { payload }: IEvent): Promise<void> {
+    const { to, username } = payload;
     await this.commandBus.execute(
-      new SendUserVerifyEmailCommand(userVerifyEmailDto),
+      new SendUserVerifyEmailCommand({ to, username }),
     );
-    res.status(200);
   }
 }
