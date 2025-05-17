@@ -32,8 +32,6 @@ export class SignupController {
     res.status(201);
   }
 
-  @ApiResponse({ status: 200, description: 'email was verified' })
-  @ApiResponse({ status: 404, description: 'user not found' })
   @Get('email-verify/:token')
   async emailVerify(@Param('token') token: string): Promise<void> {
     await this.signupService.emailVerify(token);
