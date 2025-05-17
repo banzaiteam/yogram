@@ -22,38 +22,28 @@ spec:
             - containerPort: PORT_CONTAINER
 
           env:
-            - name: POSTGRES_TYPE
+            - name: SMTP_USER
               valueFrom:
                 secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: POSTGRES_TYPE
-            - name: POSTGRES_MIGRATION_TABLE
+                  name: mailer-production-config-secret
+                  key: SMTP_USER
+            - name: SMTP_HOST
               valueFrom:
                 secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: POSTGRES_MIGRATION_TABLE
-            - name: SYNCHRONIZE
+                  name: mailer-production-config-secret
+                  key: SMTP_HOST
+            - name: SMTP_PASS
               valueFrom:
                 secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: SYNCHRONIZE
-            - name: AUTOLOAD_ENTITIES
+                  name: mailer-production-config-secret
+                  key: SMTP_PASS
+            - name: SMTP_PORT
               valueFrom:
                 secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: AUTOLOAD_ENTITIES
-            - name: DROP_SCHEMA
+                  name: mailer-production-config-secret
+                  key: SMTP_PORT
+            - name: RMQ_URL
               valueFrom:
                 secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: DROP_SCHEMA
-            - name: USERS_PROD_SERVICE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: USERS_PROD_SERVICE_URL
-            - name: POSTGRES_URL
-              valueFrom:
-                secretKeyRef:
-                  name: users-yogram-production-config-secret
-                  key: POSTGRES_URL
+                  name: mailer-production-config-secret
+                  key: RMQ_URL
