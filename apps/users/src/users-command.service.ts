@@ -48,4 +48,18 @@ export class UsersCommandService {
       await queryRunner.release();
     }
   }
+
+  async emailVerify(email: string): Promise<void> {
+    try {
+      const queryRunner = this.dataSource.createQueryRunner();
+      const findCriteria = { email: email };
+      await this.userCommandRepository.update(
+        findCriteria,
+        { verified: true },
+        queryRunner.manager,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

@@ -19,12 +19,12 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT,
-    FROM_EMAIL: process.env.FROM_EMAIL,
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_USER: process.env.SMTP_USER,
     SMTP_PASS: process.env.SMTP_PASS,
     SMTP_PORT: process.env.SMTP_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     VERIFY_TOKEN_EXPIRES: process.env.VERIFY_TOKEN_EXPIRES,
+    RMQ_URL: process.env.RMQ_URL,
   };
 };

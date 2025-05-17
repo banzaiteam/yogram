@@ -30,6 +30,8 @@ import { UsersController } from './users.controller';
 import { SendVerifyEmailEvent } from './features/create/event/send-verify-email.event';
 import { SendVerifyEmailHandler } from './features/create/event/send-verify-email.handler';
 import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
+import { EmailVerifyCommand } from './features/email-verify/email-verify.command';
+import { EmailVerifyHandler } from './features/email-verify/email-verify.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -80,6 +82,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UsersQueryRepositoryProvider,
     SendVerifyEmailEvent,
     SendVerifyEmailHandler,
+    EmailVerifyCommand,
+    EmailVerifyHandler,
   ],
 })
 export class UsersModule {}

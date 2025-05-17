@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Res, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Res,
+  UsePipes,
+} from '@nestjs/common';
 import { SignupService } from './signup.service';
 import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -22,5 +30,10 @@ export class SignupController {
   ): Promise<void> {
     await this.signupService.create(createUserDto);
     res.status(201);
+  }
+
+  @Get('email-verify/:token')
+  async emailVerify(@Param('token') token: string): Promise<void> {
+    await this.signupService.emailVerify(token);
   }
 }
