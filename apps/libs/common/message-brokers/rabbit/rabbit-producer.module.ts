@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 export const RMQ_PRODUCER_QUEUE_LIST = 'RMQ_PRODUCER_QUEUE_LIST';
 
 /**
- * RabbitProducerModule allow send messages to passed to register static method queue
+ * RabbitProducerModule allow send messages to passed to register static method queues
  * @param queueList: string[]  the string array of queues
  * @returns DynamicModule
  */
