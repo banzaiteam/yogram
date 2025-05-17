@@ -11,6 +11,7 @@ import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
 import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from './users/users.module';
 import { SignupModule } from './signup/signup.module';
+import { AuthModule } from './auth/auth.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -86,6 +87,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     //   inject: [ConfigService],
     // }),
     SignupModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
