@@ -1,4 +1,4 @@
-import amqp, { Channel, ChannelWrapper } from 'amqp-connection-manager';
+import { Channel, connect, ChannelWrapper } from 'amqp-connection-manager';
 import { IEvent } from '../../interfaces/event.interface';
 import { RpcException } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
@@ -37,10 +37,8 @@ export class ProducerService {
   }
 
   async connect() {
-    const url = `amqps://tuldekzv:mpaT6WctNeBfqI8NZQ1cIAh4kOjk3K4B@kebnekaise.lmq.cloudamqp.com/tuldekzv`;
-    const RMQ_URL = this.configService.get('RMQ_URL');
-    // todo RMQ_URL does not work when pass to connect but we get it from configService
-    const connection = amqp.connect(url);
+    const url = this.configService.get<string>('RMQ_URL');
+    const connection = connect(url);
     await connection.connect();
     connection.on('connect', () => console.log('rabbit provider Connected!'));
     connection.on('disconnect', (err) =>

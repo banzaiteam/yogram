@@ -1,7 +1,5 @@
 import { ForbiddenException, Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import {
   EnvironmentMode,
   EnvironmentsTypes,
@@ -10,7 +8,6 @@ import {
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { IntrospectAndCompose, RemoteGraphQLDataSource } from '@apollo/gateway';
-import { GateService } from '../../libs/gateService';
 import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from './users/users.module';
 import { SignupModule } from './signup/signup.module';

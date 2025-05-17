@@ -54,15 +54,11 @@ export class RabbitConsumerModule implements OnModuleInit {
     private readonly queueBindingsList: IQueueBindings[],
     private readonly configService: ConfigService,
   ) {
-    const url: ConnectionUrl = this.configService.get<string>('RMQ_URL');
-    console.log('RMQ_URL', url);
     if (!queueBindingsList.length) {
       throw new RpcException('RabbitConsumerModule queueBindingsList is empty');
     }
-    // todo RMQ_URL does not work when pass to connect but we get it from configService
-    const connection = connect(
-      `amqps://tuldekzv:mpaT6WctNeBfqI8NZQ1cIAh4kOjk3K4B@kebnekaise.lmq.cloudamqp.com/tuldekzv`,
-    );
+    const url: ConnectionUrl = this.configService.get<string>('RMQ_URL');
+    const connection = connect(url);
     connection.on('connect', () =>
       this.logger.log(
         `Inventory Service: Connected to ${this.queueBindingsList[0]}`,
