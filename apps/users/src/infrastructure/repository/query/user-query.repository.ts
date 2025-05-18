@@ -4,19 +4,23 @@ import { IUsersQueryRepository } from '../../../../../../apps/users/src/interfac
 import { EntityManager, Repository } from 'typeorm';
 import { User } from '../../entity/User.entity';
 import { plainToInstance } from 'class-transformer';
-import { IdDto } from '../../../../../../apps/libs/common/dto/id.dto';
 import { UserProfileCriteria } from 'apps/users/src/features/find-by-criteria/query/find-users-by-criteria.query';
+import { RpcException } from '@nestjs/microservices';
+import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
 
 export class UserQueryRepository
   extends BaseRepository
-  implements IUsersQueryRepository<ResponseUserDto>
+  implements IUsersQueryRepository<ResponseLoginDto, ResponseUserDto>
 {
-  async findUserByIdQuery(
-    id: IdDto,
+  async userLoginQuery(
+    email: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseUserDto> {
-    const user = this.userRepository(entityManager).findOneByOrFail(id);
-    return plainToInstance(ResponseUserDto, user);
+  ): Promise<ResponseLoginDto> {
+    const user = await this.userRepository(entityManager).findOneByOrFail({
+      email,
+    });
+    if (!user.verified) throw new RpcException('account is not verified');
+    return plainToInstance(ResponseLoginDto, user);
   }
 
   async findUserByCriteria(
@@ -25,7 +29,6 @@ export class UserQueryRepository
   ): Promise<ResponseUserDto> {
     const user =
       await this.userRepository(entityManager).findOneByOrFail(criteria);
-    console.log('🚀 ~ user:', user);
     return plainToInstance(ResponseUserDto, user);
   }
 
