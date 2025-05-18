@@ -10,6 +10,6 @@ export abstract class IUserCommandRepository<C, U> {
     criteria: object,
     updateUserDto: U,
     entityManager?: EntityManager,
-  ): Promise<void>;
+  ): Promise<User>;
   abstract delete(userId: string): Promise<void>;
 }
