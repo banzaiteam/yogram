@@ -20,5 +20,7 @@ export const getConfiguration = () => {
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
+    ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
+    REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,
   };
 };
