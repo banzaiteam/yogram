@@ -8,8 +8,8 @@ export class LoginGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const body = request.body;
-    console.log('🚀 ~ LoginGuard ~ body:', body);
+    const loginDto = request.body;
+
     return true;
   }
 }

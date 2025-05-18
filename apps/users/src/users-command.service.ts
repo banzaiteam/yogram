@@ -51,15 +51,17 @@ export class UsersCommandService {
 
   async emailVerify(email: string): Promise<void> {
     try {
+      const verifyEmailDto = { verified: true };
       const queryRunner = this.dataSource.createQueryRunner();
-      const findCriteria = { email: email };
+      const findCriteria = { email: email, username: 'username1' };
       await this.userCommandRepository.update(
         findCriteria,
-        { verified: true },
+        verifyEmailDto,
         queryRunner.manager,
       );
     } catch (error) {
       console.log(error);
+      throw new RpcException(error);
     }
   }
 }
