@@ -32,6 +32,9 @@ import { SendVerifyEmailHandler } from './features/create/event/send-verify-emai
 import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { EmailVerifyCommand } from './features/email-verify/email-verify.command';
 import { EmailVerifyHandler } from './features/email-verify/email-verify.handler';
+import { FindUserByCriteriaHandler } from './features/find-by-criteria/query/find-users-by-criteria.handler';
+import { FindUserByCriteriaQuery } from './features/find-by-criteria/query/find-users-by-criteria.query';
+import { UserQueryRepository } from './infrastructure/repository/query/user-query.repository';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -84,6 +87,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SendVerifyEmailHandler,
     EmailVerifyCommand,
     EmailVerifyHandler,
+    FindUserByCriteriaHandler,
+    FindUserByCriteriaQuery,
+    UserQueryRepository,
   ],
 })
 export class UsersModule {}
