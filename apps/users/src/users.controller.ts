@@ -25,10 +25,6 @@ export class UsersController {
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto> {
-    console.log(
-      '🚀 ~ UsersController ~ findUserByCriteriaDto:',
-      findUserByCriteriaDto,
-    );
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );
