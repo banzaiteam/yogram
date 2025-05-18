@@ -24,8 +24,7 @@ import { Profile } from './infrastructure/entity/Profile.entity';
 import { ProfileCommandRepositoryProvider } from './providers/command/profile-command-repository.provider';
 import { UsersQueryService } from './users-query.service';
 import { UsersQueryRepositoryProvider } from './providers/query/users-query-repository.provider';
-import { FindUserByIdQuery } from './features/find-one-by-id/query/find-one-by-id.query';
-import { FindUserByIdHandler } from './features/find-one-by-id/query/find-one-by-id.handler';
+
 import { UsersController } from './users.controller';
 import { SendVerifyEmailEvent } from './features/create/event/send-verify-email.event';
 import { SendVerifyEmailHandler } from './features/create/event/send-verify-email.handler';
@@ -35,6 +34,8 @@ import { EmailVerifyHandler } from './features/email-verify/email-verify.handler
 import { FindUserByCriteriaHandler } from './features/find-by-criteria/query/find-users-by-criteria.handler';
 import { FindUserByCriteriaQuery } from './features/find-by-criteria/query/find-users-by-criteria.query';
 import { UserQueryRepository } from './infrastructure/repository/query/user-query.repository';
+import { UserLoginQuery } from './features/user-login/query/user-login.query';
+import { UserLoginQueryHandler } from './features/user-login/query/user-login.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -76,8 +77,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UsersQueryService,
     UsersCommandService,
     UsersResolver,
-    FindUserByIdQuery,
-    FindUserByIdHandler,
+    UserLoginQuery,
+    UserLoginQueryHandler,
     CreateUserCommand,
     CreateUserHandler,
     UserCommandRepositoryProvider,
