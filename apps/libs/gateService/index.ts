@@ -43,6 +43,8 @@ export class GateService {
   }
 
   async usersHttpServiceGet(path: string, headers) {
+    console.log('this.usersHttpService', this.usersHttpService);
+
     try {
       const url = [this.usersHttpService, path].join('/');
       console.log(url);
