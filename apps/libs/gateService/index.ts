@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
@@ -33,22 +33,21 @@ export class GateService {
       );
       return data;
     } catch (error) {
-      console.warn(error);
-      throw new InternalServerErrorException(error);
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.message, error.response.status);
     }
   }
 
   async usersHttpServiceGet(path: string, headers) {
     try {
       const url = [this.usersHttpService, path].join('/');
-      console.log(url);
       const { data } = await lastValueFrom(
         this.httpService.get(url, { headers }),
       );
       return data;
     } catch (error) {
-      console.warn(error);
-      throw new InternalServerErrorException(error);
+      console.warn('error getAdapter', error);
+      throw new HttpException(error.message, error.response.status);
     }
   }
 }
