@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from '../../../../../../apps/libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
@@ -21,16 +21,16 @@ export class UserCommandRepository
     return await this.userRepository(entityManager).save(user);
   }
   async update(
-    criteria: object,
+    criteria: object, // email | username
     updateUserDto: UpdateUserDto,
     entityManager?: EntityManager,
-  ): Promise<void> {
-    const updated = await this.userRepository(entityManager).update(
-      criteria,
-      updateUserDto,
-    );
-    if (updated.affected < 1)
-      throw new BadRequestException(`some user property was not updated`);
+  ): Promise<User> {
+    const user = (await this.userRepository(entityManager).find(criteria))[0];
+    this.userRepository(entityManager).merge(user, {
+      ...updateUserDto,
+      profile: { ...updateUserDto },
+    });
+    return await this.userRepository(entityManager).save(user);
   }
   delete(userId: string, entityManager?: EntityManager): Promise<void> {
     throw new Error('Method not implemented.');
