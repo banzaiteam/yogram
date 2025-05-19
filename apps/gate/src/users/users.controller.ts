@@ -9,7 +9,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
-import { FindUserByCriteriaDto } from 'apps/libs/Users/dto/user/find-user-criteria.dto';
+import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
 
 @ApiTags('Users')
 @Controller('users')
