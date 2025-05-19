@@ -48,7 +48,7 @@ describe('Users Service', () => {
     expect(service).toBeDefined();
   });
 
-  it.skip('should bla-bla', async () => {
+  it('should bla-bla', async () => {
     const spy = jest.spyOn(service, 'createUser');
     await service.createUser(createUserDto);
     expect(spy).toHaveBeenCalledTimes(1);

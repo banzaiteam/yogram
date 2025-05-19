@@ -1,10 +1,7 @@
-import { Profile } from 'apps/users/src/infrastructure/entity/Profile.entity';
 import { User } from 'apps/users/src/infrastructure/entity/User.entity';
 
-export type UserProfileCriteria = Partial<
-  Pick<User & Profile, 'email' | 'username' | 'id'>
->;
+export type UserCriteria = Partial<Pick<User, 'email' | 'id' | 'verified'>>;
 
 export class FindUserByCriteriaQuery {
-  constructor(public readonly criteria: UserProfileCriteria) {}
+  constructor(public readonly criteria: UserCriteria) {}
 }

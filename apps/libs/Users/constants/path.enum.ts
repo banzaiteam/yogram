@@ -1,5 +1,5 @@
 export enum HttpUsersPath {
   Create = 'users/create',
-  Find = 'users/',
+  FindUserByCriteria = 'users',
   EmailVerify = 'users/email-verify',
 }

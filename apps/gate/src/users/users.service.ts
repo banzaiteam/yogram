@@ -3,17 +3,18 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import path from 'path';
+import { FindUserByCriteriaDto } from 'apps/libs/Users/dto/user/find-user-criteria.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly gateService: GateService) {}
 
-  async find(id: string): Promise<ResponseUserDto> {
-    return await this.gateService.usersHttpServiceGet(
-      path.join(HttpUsersPath.Find, id),
-      {},
-    );
+  async findUserByCriteria(
+    findUserByCriteriaDto: FindUserByCriteriaDto,
+  ): Promise<ResponseUserDto> {
+    const queryString = this.makeQueryStringFromObject(findUserByCriteriaDto);
+    const path = `${HttpUsersPath.FindUserByCriteria}?${queryString}`;
+    return await this.gateService.usersHttpServiceGet(path, {});
   }
 
   async create(createUserDto: CreateUserDto): Promise<void> {
@@ -22,5 +23,12 @@ export class UsersService {
       createUserDto,
       {},
     );
+  }
+
+  makeQueryStringFromObject(query: object): string {
+    const objectWithoutUndefined = JSON.parse(JSON.stringify(query));
+    return Object.entries(objectWithoutUndefined)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
   }
 }

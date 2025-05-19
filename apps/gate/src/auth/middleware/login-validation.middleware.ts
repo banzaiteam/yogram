@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 
 import { validate } from 'class-validator';
-import { LoginDto } from 'apps/libs/Users/dto/user/login.dto';
+import { LoginDto } from '../../../../../apps/libs/Users/dto/user/login.dto';
 
 @Injectable()
 export class LoginValidationMiddleware implements NestMiddleware {
