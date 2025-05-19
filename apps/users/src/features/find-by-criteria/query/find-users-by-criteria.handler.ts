@@ -1,7 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindUserByCriteriaQuery } from './find-users-by-criteria.query';
 import { UserQueryRepository } from 'apps/users/src/infrastructure/repository/query/user-query.repository';
-import { RpcException } from '@nestjs/microservices';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { DataSource } from 'typeorm';
 
@@ -16,15 +15,10 @@ export class FindUserByCriteriaHandler
   async execute({
     criteria,
   }: FindUserByCriteriaQuery): Promise<ResponseUserDto> {
-    try {
-      const queryRunner = this.dataSource.createQueryRunner();
-      return await this.userQueryRepository.findUserByCriteria(
-        criteria,
-        queryRunner.manager,
-      );
-    } catch (error) {
-      console.log('error');
-      throw new RpcException(error);
-    }
+    const queryRunner = this.dataSource.createQueryRunner();
+    return await this.userQueryRepository.findUserByCriteria(
+      criteria,
+      queryRunner.manager,
+    );
   }
 }
