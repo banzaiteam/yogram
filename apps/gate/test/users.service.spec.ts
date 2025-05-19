@@ -7,9 +7,9 @@ import { IUserCommandRepository } from '../../../apps/users/src/interfaces/comma
 import { IProfileCommandRepository } from '../../../apps/users/src/interfaces/command/profile-command.interface';
 
 const createUserDto: CreateUserDto = {
-  username: 'mmm',
-  email: 'retouch226@gmail.com',
-  password: '12O!k',
+  username: 'username1',
+  email: 'retouch@gmail.com',
+  password: '123456Ok!',
 };
 const userRes = { ...createUserDto, id: faker.string.uuid };
 

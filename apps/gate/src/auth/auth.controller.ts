@@ -1,8 +1,8 @@
 import { Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginGuard } from 'apps/gate/common/guards/login.guard';
+import { LoginGuard } from '../../../../apps/gate/common/guards/login.guard';
 import { User } from './decorators/user.decorator';
-import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
+import { ResponseLoginDto } from '../../../../apps/libs/Users/dto/user/response-login.dto';
 import { Response } from 'express';
 
 @Controller('auth')
@@ -16,6 +16,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<ResponseLoginDto> {
     const [access_token, refresh_token] = await this.authService.login(user);
+    res.status(200);
     res.cookie('access_token', access_token, {
       httpOnly: true,
       sameSite: 'strict',
