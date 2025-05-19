@@ -9,7 +9,12 @@ import {
 } from '@nestjs/common';
 import { SignupService } from './signup.service';
 import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 
@@ -19,6 +24,10 @@ export class SignupController {
   constructor(private readonly signupService: SignupService) {}
 
   @ApiResponse({ status: 201, description: 'user was created' })
+  @ApiResponse({
+    status: 409,
+    description: 'user with this email/username already exists',
+  })
   @ApiOperation({
     summary: 'New user registration',
   })
@@ -32,6 +41,7 @@ export class SignupController {
     res.status(201);
   }
 
+  @ApiExcludeEndpoint()
   @Get('email-verify/:token')
   async emailVerify(@Param('token') token: string): Promise<void> {
     await this.signupService.emailVerify(token);
