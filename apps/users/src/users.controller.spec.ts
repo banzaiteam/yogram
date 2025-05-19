@@ -28,7 +28,7 @@ describe('UsersController', () => {
   describe.skip('root', () => {
     it('should return "Hello World!"', () => {
       expect(
-        usersController.findOneById({
+        usersController.findUserByCriteria({
           id: '55a52cd8-31d7-4cb6-a663-73d7004bdd4e',
         }),
       ).toBe('Hello Users!');

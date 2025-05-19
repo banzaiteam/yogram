@@ -1,16 +1,19 @@
-import { IsOptional, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class FindUserByCriteriaDto {
   @IsOptional()
   @IsString()
-  id: string;
+  id?: string;
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  @IsBoolean()
+  verified?: boolean;
   @IsOptional()
   @IsString()
-  username: string;
-  @IsOptional()
-  @IsString()
-  email: string;
-  @IsOptional()
-  @IsString()
-  password: string;
+  email?: string;
 }
