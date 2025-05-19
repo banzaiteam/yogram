@@ -1,9 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
@@ -43,8 +39,6 @@ export class GateService {
   }
 
   async usersHttpServiceGet(path: string, headers) {
-    console.log('this.usersHttpService', this.usersHttpService);
-
     try {
       const url = [this.usersHttpService, path].join('/');
       console.log(url);

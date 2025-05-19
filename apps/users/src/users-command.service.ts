@@ -39,6 +39,7 @@ export class UsersCommandService {
         createProfileDto,
         queryRunner.manager,
       );
+
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
