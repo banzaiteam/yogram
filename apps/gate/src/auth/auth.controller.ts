@@ -1,15 +1,26 @@
 import { Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginGuard } from '../../../../apps/gate/common/guards/login.guard';
 import { User } from './decorators/user.decorator';
 import { ResponseLoginDto } from '../../../../apps/libs/Users/dto/user/response-login.dto';
 import { Response } from 'express';
+import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import { LoginDto } from 'apps/libs/Users/dto/user/login.dto';
+import { LoginGuard } from './guards/login.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiBody({ type: LoginDto })
   @UseGuards(LoginGuard)
+  @ApiOkResponse({
+    headers: {
+      'Set-Cookie': {
+        description: 'access_token/refresh_token',
+        schema: { type: 'string' },
+      },
+    },
+  })
   @Post('login')
   async login(
     @User() user: ResponseLoginDto,

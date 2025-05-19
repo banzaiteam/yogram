@@ -2,8 +2,9 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { HTTP_ERROR, HttpError } from '../../constants/http-exeptions.constant';
 import { BaseExceptionFilter } from '@nestjs/core';
-import { IDatabaseError } from '../database-error.interface';
+
 import { extractFromText } from '../../utils/regex.util';
+import { IDatabaseError } from '../database-error.interface';
 
 @Catch(QueryFailedError)
 export class QueryFailedFilter extends BaseExceptionFilter {
@@ -11,9 +12,6 @@ export class QueryFailedFilter extends BaseExceptionFilter {
   private readonly FIELD_VALUE_REGEX = /\)=\((.*?)\)/;
 
   catch(exception: IDatabaseError, host: ArgumentsHost) {
-    console.log(
-      'QueryFailedError-QueryFailedError-QueryFailedError-QueryFailedError',
-    );
     // console.log('=>(query-failed.filter.ts:14) exception', exception);
     const response = host.switchToHttp().getResponse();
     const { code, detail, table } = exception;
