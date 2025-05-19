@@ -4,8 +4,9 @@ import {
   Inject,
   UnauthorizedException,
 } from '@nestjs/common';
-import { GateService } from '../../../../apps/libs/gateService';
-import { LoginDto } from '../../../../apps/libs/Users/dto/user/login.dto';
+import { GateService } from 'apps/libs/gateService';
+import { LoginDto } from 'apps/libs/Users/dto/user/login.dto';
+
 import * as bcrypt from 'bcrypt';
 
 export class LoginGuard implements CanActivate {

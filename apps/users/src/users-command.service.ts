@@ -1,6 +1,12 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryFailedError } from 'typeorm';
 import { UpdateUserDto } from '../../../apps/libs/Users/dto/user/update-user.dto';
 import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
 import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
@@ -41,6 +47,14 @@ export class UsersCommandService {
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if ((error['code'] = '23505')) {
+          throw new ConflictException();
+        }
+        if ((error['code'] = '23503')) {
+          throw new BadRequestException();
+        }
+      }
       await queryRunner.rollbackTransaction();
       throw new InternalServerErrorException(error);
     } finally {
