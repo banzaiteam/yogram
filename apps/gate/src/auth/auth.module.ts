@@ -6,10 +6,12 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoginValidationMiddleware } from './middleware/login-validation.middleware';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     HttpModule,
+    UsersModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
