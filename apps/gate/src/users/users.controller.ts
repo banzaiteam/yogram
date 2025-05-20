@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import {
@@ -10,6 +19,7 @@ import {
 import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
+import { AuthGuard } from 'apps/gate/common/guards/auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -27,6 +37,7 @@ export class UsersController {
     res.status(201);
   }
 
+  @UseGuards(AuthGuard)
   @ApiResponse({ status: 200, description: 'user found' })
   @ApiResponse({ status: 404, description: 'user not found' })
   @ApiQuery({ name: 'id', required: false, type: 'string' })
