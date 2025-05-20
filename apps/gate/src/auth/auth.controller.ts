@@ -37,8 +37,8 @@ export class AuthController {
   async login(
     @User() user: ResponseLoginDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<ResponseLoginDto> {
-    const [access_token, refresh_token] = await this.authService.login(user);
+  ) {
+    const [access_token, refresh_token] = await this.authService.login(user.id);
     res.cookie('access_token', access_token, {
       httpOnly: true,
       sameSite: 'strict',
@@ -51,6 +51,5 @@ export class AuthController {
       secure: true,
       maxAge: 120 * 1000,
     });
-    return user;
   }
 }
