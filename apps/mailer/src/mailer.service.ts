@@ -20,7 +20,7 @@ export class MailService implements IMailer {
       expiresIn: this.configService.get('VERIFY_TOKEN_EXPIRES'),
     });
     let path: string;
-    if (process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING') {
+    if (process.env.NODE_ENV !== undefined) {
       path = 'http://localhost:3000';
     } else {
       path = 'https://gate.yogram.ru';
