@@ -20,6 +20,7 @@ export class LoginGuard implements CanActivate {
       `users/login/${loginDto.email}`,
       {},
     );
+    console.log('🚀 ~ LoginGuard ~ canActivate ~ user:', user);
     if (user && (await bcrypt.compare(loginDto.password, user.password))) {
       delete user.password;
       request.user = user;
