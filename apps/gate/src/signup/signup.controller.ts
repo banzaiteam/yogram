@@ -17,12 +17,14 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 
 @ApiTags('SignUp')
 @Controller('signup')
 export class SignupController {
   constructor(private readonly signupService: SignupService) {}
 
+  @Public()
   @ApiResponse({ status: 201, description: 'user was created' })
   @ApiResponse({
     status: 409,
@@ -41,6 +43,7 @@ export class SignupController {
     res.status(201);
   }
 
+  @Public()
   @ApiExcludeEndpoint()
   @Get('email-verify/:token')
   async emailVerify(@Param('token') token: string): Promise<void> {
