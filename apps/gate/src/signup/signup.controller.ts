@@ -43,6 +43,7 @@ export class SignupController {
     res.status(201);
   }
 
+  @Public()
   @ApiExcludeEndpoint()
   @Get('email-verify/:token')
   async emailVerify(@Param('token') token: string): Promise<void> {

@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,16 +9,27 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
-import { ResponseLoginDto } from '../../../../apps/libs/Users/dto/user/response-login.dto';
 import { Response } from 'express';
-import { ApiBody, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiHeader,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { LoginDto } from '../../../../apps/libs/Users/dto/user/login.dto';
 import { LoginGuard } from './guards/login.guard';
 import { Public } from 'apps/gate/common/decorators/public.decorator';
+import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @ApiBody({ type: LoginDto })
@@ -37,21 +49,55 @@ export class AuthController {
   })
   @Post('login')
   async login(
-    @User() user: ResponseLoginDto,
+    @User() user: LoggedUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const [access_token, refresh_token] = await this.authService.login(user.id);
+    const [access_token, refresh_token] = await this.authService.login(user);
     res.cookie('access_token', access_token, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: 'strict',
       secure: true,
-      maxAge: 60 * 1000,
+      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
     });
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
-      maxAge: 120 * 1000,
+      maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
+    });
+    return user;
+  }
+
+  @ApiHeader({
+    name: 'Authorization',
+    description: ' Authorization with bearer token',
+  })
+  @ApiOperation({
+    summary: 'Refresh access token',
+  })
+  @ApiOkResponse({
+    headers: {
+      'Set-Cookie': {
+        description: 'access_token',
+        schema: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'not Unauthorized',
+  })
+  @Get('refresh')
+  async refresh(
+    @User('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const access_token = await this.authService.refresh(id);
+    res.cookie('access_token', access_token, {
+      httpOnly: false,
+      sameSite: 'strict',
+      secure: true,
+      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
     });
   }
 }
