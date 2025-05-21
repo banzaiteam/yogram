@@ -11,7 +11,6 @@ import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
 import { Response } from 'express';
 import {
-  ApiBearerAuth,
   ApiBody,
   ApiHeader,
   ApiOkResponse,
@@ -20,8 +19,8 @@ import {
 } from '@nestjs/swagger';
 import { LoginDto } from '../../../../apps/libs/Users/dto/user/login.dto';
 import { LoginGuard } from './guards/login.guard';
-import { Public } from 'apps/gate/common/decorators/public.decorator';
-import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
