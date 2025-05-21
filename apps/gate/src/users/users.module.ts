@@ -24,5 +24,6 @@ import { AuthGuard } from 'apps/gate/common/guards/auth.guard';
     GateService,
     { provide: 'APP_GUARD', useClass: AuthGuard },
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}
