@@ -5,7 +5,7 @@ import { HttpModule } from '@nestjs/axios';
 import { GateService } from '../../../../apps/libs/gateService';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from 'apps/gate/common/guards/auth.guard';
+import { AuthGuard } from '../../../../apps/gate/common/guards/auth.guard';
 
 @Module({
   imports: [

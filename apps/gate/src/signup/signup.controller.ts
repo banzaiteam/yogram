@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
-import { Public } from 'apps/gate/common/decorators/public.decorator';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 
 @ApiTags('SignUp')
 @Controller('signup')
