@@ -73,7 +73,7 @@ describe('AuthGuard', () => {
         expect(err).toEqual(new UnauthorizedException());
       }
     });
-    it.skip('should throw UnauthorizedException because of jwt', async () => {
+    it('should throw UnauthorizedException because of jwt', async () => {
       try {
         const mockExecutionContext = createMock<ExecutionContext>();
         const mmm = jest
