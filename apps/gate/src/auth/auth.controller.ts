@@ -13,11 +13,13 @@ import { Response } from 'express';
 import { ApiBody, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
 import { LoginDto } from '../../../../apps/libs/Users/dto/user/login.dto';
 import { LoginGuard } from './guards/login.guard';
+import { Public } from 'apps/gate/common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @ApiBody({ type: LoginDto })
   @UseGuards(LoginGuard)
   @HttpCode(HttpStatus.OK)
