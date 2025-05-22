@@ -37,6 +37,16 @@ spec:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
                   key: VERIFY_TOKEN_EXPIRES
+            - name: ACCESS_TOKEN_EXPIRES
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: ACCESS_TOKEN_EXPIRES
+            - name: REFRESH_TOKEN_EXPIRES
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: REFRESH_TOKEN_EXPIRES
             - name: NODE_ENV
               valueFrom:
                 secretKeyRef:
