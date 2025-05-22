@@ -1,10 +1,15 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
-import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExcludeEndpoint,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
-import { IdDto } from '../../../../apps/libs/common/dto/id.dto';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
+import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -22,8 +27,15 @@ export class UsersController {
     res.status(201);
   }
 
-  @Get(':id')
-  async find(@Param() { id }: IdDto): Promise<ResponseUserDto> {
-    return await this.usersService.find(id);
+  @ApiResponse({ status: 200, description: 'user found' })
+  @ApiResponse({ status: 404, description: 'user not found' })
+  @ApiQuery({ name: 'id', required: false, type: 'string' })
+  @ApiQuery({ name: 'verified', required: false, type: 'boolean' })
+  @ApiQuery({ name: 'email', required: false, type: 'string' })
+  @Get('findone-criteria')
+  async findUserByCriteria(
+    @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
+  ): Promise<ResponseUserDto> {
+    return await this.usersService.findUserByCriteria(findUserByCriteriaDto);
   }
 }

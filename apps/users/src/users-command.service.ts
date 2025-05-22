@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryFailedError } from 'typeorm';
 import { UpdateUserDto } from '../../../apps/libs/Users/dto/user/update-user.dto';
 import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
 import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
-import { RpcException } from '@nestjs/microservices';
 import { IUserCommandRepository } from './interfaces/command/user-command.interface';
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 import { ResponseUserDto } from '../../../apps/libs/Users/dto/user/response-user.dto';
@@ -42,24 +47,29 @@ export class UsersCommandService {
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if ((error['code'] = '23505')) {
+          throw new ConflictException();
+        }
+        if ((error['code'] = '23503')) {
+          throw new BadRequestException();
+        }
+      }
       await queryRunner.rollbackTransaction();
-      throw new RpcException(error);
+      throw new InternalServerErrorException(error);
     } finally {
       await queryRunner.release();
     }
   }
 
   async emailVerify(email: string): Promise<void> {
-    try {
-      const queryRunner = this.dataSource.createQueryRunner();
-      const findCriteria = { email: email };
-      await this.userCommandRepository.update(
-        findCriteria,
-        { verified: true },
-        queryRunner.manager,
-      );
-    } catch (error) {
-      console.log(error);
-    }
+    const verifyEmailDto = { verified: true };
+    const queryRunner = this.dataSource.createQueryRunner();
+    const findCriteria = { email: email };
+    await this.userCommandRepository.update(
+      findCriteria,
+      verifyEmailDto,
+      queryRunner.manager,
+    );
   }
 }
