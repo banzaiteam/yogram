@@ -2,7 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 
+const createUserDto: CreateUserDto = {
+  username: 'username1',
+  email: 'retouch@gmail.com',
+  password: '123456Ok!',
+};
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
@@ -15,10 +21,11 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it.skip('/ (GET)', () => {
+  it.skip('/ (POST)', () => {
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!GATE');
+      .post('/users')
+      .send(createUserDto)
+      .expect(201);
+    // .expect('Hello World!GATE');
   });
 });

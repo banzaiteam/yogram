@@ -8,4 +8,6 @@ export class ResponseUserDto {
   username: string;
   @Expose()
   email: string;
+  @Expose()
+  verified: boolean;
 }

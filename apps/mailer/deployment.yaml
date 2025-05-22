@@ -42,6 +42,16 @@ spec:
                 secretKeyRef:
                   name: mailer-production-config-secret
                   key: SMTP_PORT
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mailer-production-config-secret
+                  key: JWT_SECRET
+            - name: VERIFY_TOKEN_EXPIRES
+              valueFrom:
+                secretKeyRef:
+                  name: mailer-production-config-secret
+                  key: VERIFY_TOKEN_EXPIRES
             - name: RMQ_URL
               valueFrom:
                 secretKeyRef:

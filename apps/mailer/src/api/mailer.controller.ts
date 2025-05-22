@@ -12,6 +12,10 @@ export class MailerController {
   @EventSubscribe({ routingKey: UsersRoutingKeys.UsersVerifyEmail })
   async sendUserVerifyEmail(rtKey: string, { payload }: IEvent): Promise<void> {
     const { to, username } = payload;
+    console.log(
+      `🚀 ~ MailerController ~ sendUserVerifyEmail ~  { to, username }:`,
+      { to, username },
+    );
     await this.commandBus.execute(
       new SendUserVerifyEmailCommand({ to, username }),
     );
