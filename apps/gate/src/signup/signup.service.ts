@@ -21,14 +21,9 @@ export class SignupService {
 
   async emailVerify(token: string): Promise<void> {
     let email: object;
-    try {
-      email = await this.jwtService.verifyAsync(token);
-      delete email['iat'];
-      delete email['exp'];
-    } catch (err) {
-      throw new InternalServerErrorException(err);
-    }
-
+    email = await this.jwtService.verifyAsync(token);
+    delete email['iat'];
+    delete email['exp'];
     await this.gateService.usersHttpServicePost(
       HttpUsersPath.EmailVerify,
       email['email'],

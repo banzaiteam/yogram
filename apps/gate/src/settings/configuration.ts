@@ -23,5 +23,6 @@ export const getConfiguration = () => {
     ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,
     url: process.env.POSTGRES_URL,
+    RESEND_EMAIL_VERIFY_PAGE: process.env.RESEND_EMAIL_VERIFY_PAGE,
   };
 };

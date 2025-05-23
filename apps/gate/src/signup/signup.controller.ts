@@ -18,11 +18,16 @@ import {
 import { Response } from 'express';
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { TokenExpiredError } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('SignUp')
 @Controller('signup')
 export class SignupController {
-  constructor(private readonly signupService: SignupService) {}
+  constructor(
+    private readonly signupService: SignupService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
   @ApiResponse({ status: 201, description: 'user was created' })
@@ -46,7 +51,13 @@ export class SignupController {
   @Public()
   @ApiExcludeEndpoint()
   @Get('email-verify/:token')
-  async emailVerify(@Param('token') token: string): Promise<void> {
-    await this.signupService.emailVerify(token);
+  async emailVerify(@Param('token') token: string, @Res() res: Response) {
+    try {
+      await this.signupService.emailVerify(token);
+    } catch (err) {
+      if (err instanceof TokenExpiredError) {
+        res.redirect(this.configService.get('resend_verify_email_page'));
+      }
+    }
   }
 }
