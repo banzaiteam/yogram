@@ -14,6 +14,7 @@ import { IUserCommandRepository } from './interfaces/command/user-command.interf
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 import { ResponseUserDto } from '../../../apps/libs/Users/dto/user/response-user.dto';
 import { plainToInstance } from 'class-transformer';
+import { UserCriteria } from './features/find-by-criteria/query/find-users-by-criteria.query';
 
 @Injectable()
 export class UsersCommandService {
@@ -60,6 +61,19 @@ export class UsersCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async reCreateNotVerifiedUser(
+    criteria: UserCriteria,
+    updateUserDto: UpdateUserDto,
+  ): Promise<ResponseUserDto> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const user = await this.userCommandRepository.update(
+      criteria,
+      updateUserDto,
+      queryRunner.manager,
+    );
+    return plainToInstance(ResponseUserDto, user);
   }
 
   async emailVerify(email: string): Promise<void> {

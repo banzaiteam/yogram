@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import {
@@ -10,6 +19,7 @@ import {
 import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
+import { Public } from 'apps/gate/common/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -27,6 +37,7 @@ export class UsersController {
     res.status(201);
   }
 
+  @Public()
   @ApiResponse({ status: 200, description: 'user found' })
   @ApiResponse({ status: 404, description: 'user not found' })
   @ApiQuery({ name: 'id', required: false, type: 'string' })
@@ -36,6 +47,10 @@ export class UsersController {
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto> {
-    return await this.usersService.findUserByCriteria(findUserByCriteriaDto);
+    const user = await this.usersService.findUserByCriteria(
+      findUserByCriteriaDto,
+    );
+    if (!user) throw new NotFoundException();
+    return user;
   }
 }

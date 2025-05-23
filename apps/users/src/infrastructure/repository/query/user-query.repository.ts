@@ -34,7 +34,8 @@ export class UserQueryRepository
         where: criteria,
       })
     )[0];
-    if (!user) throw new NotFoundException();
+    if (!user) return null;
+    // if (!user) throw new NotFoundException();
     const mappedUser = {
       id: user.id,
       email: user.email,
