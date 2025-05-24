@@ -27,5 +27,6 @@ export const getConfiguration = () => {
     RECAPTCHA_HOSTNAME: process.env.RECAPTCHA_HOSTNAME,
     RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
     RECAPTCHA_URL: process.env.RECAPTCHA_URL,
+    FORGOT_PASSWORD_TOKEN_EXPIRES: process.env.FORGOT_PASSWORD_TOKEN,
   };
 };

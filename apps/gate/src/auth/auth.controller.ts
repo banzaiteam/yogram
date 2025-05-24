@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -22,6 +23,7 @@ import { LoginGuard } from './guards/login.guard';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -98,5 +100,16 @@ export class AuthController {
       secure: true,
       maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
     });
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body() email: EmailDto): Promise<void> {
+    await this.authService.forgotPassword(email);
+  }
+
+  @Post('restore-password')
+  async restorePassword(@Body() email: EmailDto) {
+    await this.authService.restorePassword(email);
   }
 }

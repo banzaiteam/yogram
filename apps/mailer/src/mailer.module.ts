@@ -14,6 +14,9 @@ import { SendUserVerifyEmailHandler } from './features/verifyEmail/command/send-
 import { CqrsModule } from '@nestjs/cqrs';
 import { UsersBindingKeysEnum } from 'apps/users/src/message-brokers/rabbit/users-queue-bindings.constant';
 import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
+import { MailerBindingKeysEnum } from 'apps/libs/Mailer/constants';
+import { SendEmailCommand } from './features/sendEmail/command/send-email.command';
+import { SendEmailHandler } from './features/sendEmail/command/send-email.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -33,6 +36,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     CqrsModule,
     RabbitConsumerModule.register([
       { users: [UsersBindingKeysEnum.Users_Verify_One] },
+      { mailer: [MailerBindingKeysEnum.SendEmailOne] },
     ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -66,6 +70,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   ],
   controllers: [MailerController],
   providers: [
+    SendEmailCommand,
+    SendEmailHandler,
     MailService,
     SendUserVerifyEmailCommand,
     SendUserVerifyEmailHandler,
