@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import {
   ApiExcludeEndpoint,
+  ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
@@ -38,10 +39,12 @@ export class UsersController {
   }
 
   @Public()
+  @ApiOperation({
+    summary: 'Find one user by email or id',
+  })
   @ApiResponse({ status: 200, description: 'user found' })
   @ApiResponse({ status: 404, description: 'user not found' })
   @ApiQuery({ name: 'id', required: false, type: 'string' })
-  @ApiQuery({ name: 'verified', required: false, type: 'boolean' })
   @ApiQuery({ name: 'email', required: false, type: 'string' })
   @Get('findone-criteria')
   async findUserByCriteria(

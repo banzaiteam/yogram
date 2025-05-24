@@ -11,8 +11,8 @@ export class FindUserByCriteriaDto {
     if (value === 'false') return false;
     return value;
   })
-  @IsBoolean()
-  verified?: boolean;
+  // @IsBoolean()
+  // verified?: boolean;
   @IsOptional()
   @IsString()
   email?: string;

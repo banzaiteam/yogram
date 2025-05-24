@@ -17,14 +17,18 @@ export class UsersController {
   ) {}
 
   @Get('users/login/:email')
-  async userLogin(@Param() email: string): Promise<ResponseLoginDto> {
+  async userLogin(@Param() email: string): Promise<ResponseLoginDto | null> {
     return await this.queryBus.execute(new UserLoginQuery(email['email']));
   }
 
   @Get('users')
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
-  ): Promise<ResponseUserDto> {
+  ): Promise<ResponseUserDto | null> {
+    console.log(
+      '🚀 ~ UsersController ~ findUserByCriteriaDto:',
+      findUserByCriteriaDto,
+    );
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );

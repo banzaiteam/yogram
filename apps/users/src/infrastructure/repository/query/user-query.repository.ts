@@ -28,7 +28,7 @@ export class UserQueryRepository
   async findUserByCriteria(
     criteria: UserCriteria,
     entityManager?: EntityManager,
-  ): Promise<ResponseUserDto> {
+  ): Promise<ResponseUserDto | null> {
     const user = (
       await this.userRepository(entityManager).find({
         where: criteria,
