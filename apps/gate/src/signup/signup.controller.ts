@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Res,
@@ -20,6 +22,7 @@ import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-p
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -56,8 +59,33 @@ export class SignupController {
       await this.signupService.emailVerify(token);
     } catch (err) {
       if (err instanceof TokenExpiredError) {
-        res.redirect(this.configService.get('resend_verify_email_page'));
+        res.redirect(303, this.configService.get('resend_verify_email_page'));
       }
     }
+  }
+
+  @ApiOperation({
+    summary: 'Send verify email on user request',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'ok email was sent',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'user was not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'user is already verified',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'verify email was not sent',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Post('send-verify-email')
+  async SendVerifyEmail(@Body() email: EmailDto) {
+    await this.signupService.sendVerifyEmail(email);
   }
 }

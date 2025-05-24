@@ -11,7 +11,7 @@ export class UsersService {
 
   async findUserByCriteria(
     findUserByCriteriaDto: FindUserByCriteriaDto,
-  ): Promise<ResponseUserDto> {
+  ): Promise<ResponseUserDto | null> {
     const queryString = this.makeQueryStringFromObject(findUserByCriteriaDto);
     const path = `${HttpUsersPath.FindUserByCriteria}?${queryString}`;
     return await this.gateService.usersHttpServiceGet(path, {});

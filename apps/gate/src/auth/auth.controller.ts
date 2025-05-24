@@ -37,7 +37,7 @@ export class AuthController {
   @ApiOkResponse({
     headers: {
       'Set-Cookie': {
-        description: 'access_token/refresh_token',
+        description: 'access_token without httpOnly/refresh_token httpOnly',
         schema: { type: 'string' },
       },
     },
