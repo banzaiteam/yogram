@@ -24,5 +24,8 @@ export const getConfiguration = () => {
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,
     url: process.env.POSTGRES_URL,
     RESEND_EMAIL_VERIFY_PAGE: process.env.RESEND_EMAIL_VERIFY_PAGE,
+    RECAPTCHA_HOSTNAME: process.env.RECAPTCHA_HOSTNAME,
+    RECAPTCHA_SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY,
+    RECAPTCHA_URL: process.env.RECAPTCHA_URL,
   };
 };
