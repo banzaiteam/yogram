@@ -7,5 +7,5 @@ export const getForgotPasswordTemplate = (username: string, token: string) => {
   }
   return `<p>Hello ${username},</p>
         <p>Please click the link if you want to change your password. Link will live for 24 hours</p>
-        <a href=${path}/api/v1/auth/password-update/${token}>update password</a>`;
+        <a href=${path}/api/v1/auth/restore-page/${token}>update password</a>`;
 };

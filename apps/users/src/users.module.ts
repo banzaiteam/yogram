@@ -36,6 +36,8 @@ import { FindUserByCriteriaQuery } from './features/find-by-criteria/query/find-
 import { UserQueryRepository } from './infrastructure/repository/query/user-query.repository';
 import { UserLoginQuery } from './features/user-login/query/user-login.query';
 import { UserLoginQueryHandler } from './features/user-login/query/user-login.handler';
+import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
+import { UpdateUserByCriteriaHandler } from './features/update/command/update-user-by-criteria.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -91,6 +93,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     FindUserByCriteriaHandler,
     FindUserByCriteriaQuery,
     UserQueryRepository,
+    UpdateUserByCriteriaCommand,
+    UpdateUserByCriteriaHandler,
   ],
 })
 export class UsersModule {}

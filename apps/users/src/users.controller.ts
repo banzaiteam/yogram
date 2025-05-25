@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './features/create/command/create-user.command';
@@ -8,6 +16,9 @@ import { FindUserByCriteriaDto } from '../../../apps/libs/Users/dto/user/find-us
 import { FindUserByCriteriaQuery } from './features/find-by-criteria/query/find-users-by-criteria.query';
 import { UserLoginQuery } from './features/user-login/query/user-login.query';
 import { ResponseLoginDto } from '../../../apps/libs/Users/dto/user/response-login.dto';
+import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
+import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
+import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
 
 @Controller()
 export class UsersController {
@@ -43,5 +54,17 @@ export class UsersController {
   async emailVerify(@Body() email: string): Promise<void> {
     const parsedEmail = Object.keys(email)[0];
     await this.commandBus.execute(new EmailVerifyCommand(parsedEmail));
+  }
+
+  @Patch('users/update')
+  async update(
+    @Body()
+    payload: UpdateUserCriteria & UpdateUserDto,
+  ): Promise<void> {
+    const criteria = payload['criteria'];
+    const updateUserDto = payload['updateUserDto'];
+    return await this.commandBus.execute(
+      new UpdateUserByCriteriaCommand(criteria, updateUserDto),
+    );
   }
 }

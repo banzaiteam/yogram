@@ -4,15 +4,22 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
+  Param,
+  Patch,
   Post,
+  Redirect,
   Res,
+  UnauthorizedException,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
 import { Response } from 'express';
 import {
   ApiBody,
+  ApiExcludeEndpoint,
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
@@ -24,6 +31,9 @@ import { Public } from '../../../../apps/gate/common/decorators/public.decorator
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
+import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
+import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
+import { TokenExpiredError } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
@@ -94,6 +104,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const access_token = await this.authService.refresh(id);
+    res.status(200);
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',
@@ -102,14 +113,92 @@ export class AuthController {
     });
   }
 
-  @Public()
+  // send forgotPassword email to user email
+  @ApiHeader({
+    name: 'Authorization',
+    description: ' Authorization with bearer token',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'email was sent succesfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'user with this email was not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'user was not verified',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'forgot password email was not sent',
+  })
+  @ApiOperation({
+    summary: 'Send forgotPassword email to the user email',
+    description: 'call when user entered email on forgotPassword page',
+  })
+  //recaptcha
+  @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
     await this.authService.forgotPassword(email);
   }
 
-  @Post('restore-password')
-  async restorePassword(@Body() email: EmailDto) {
-    await this.authService.restorePassword(email);
+  // forgot password email redirect it to this endpoint to check token and redirect user to the page where he can enter new password
+  @Public()
+  @ApiExcludeEndpoint()
+  @Get('restore-page/:token')
+  async restorePage(@Param('token') token: string, @Res() res: Response) {
+    try {
+      const email = await this.authService.restorePage(token);
+      res.redirect(
+        303,
+        [this.configService.get('RESTORE_PASSWORD_PAGE'), email.email].join(
+          '/',
+        ),
+      ); // restore-password page
+    } catch (err) {
+      if (err instanceof TokenExpiredError) {
+        // if invalid/expired token we redirect to the sendForgotPassword email page
+        res.redirect(
+          303,
+          this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
+        );
+        throw new UnauthorizedException();
+      }
+    }
+  }
+
+  // save new password and redirect to the login page
+  @ApiHeader({
+    name: 'Authorization',
+    description: ' Authorization with bearer token',
+  })
+  @ApiOperation({
+    summary: 'save new password and redirect to the login page',
+    description: 'call when user entered new password',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'user`s password was updated successfully',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'user password was not updated',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'user was not found',
+  })
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(HashPasswordPipe)
+  @Patch('restore-password')
+  async restorePassword(
+    @Body() restorePasswordDto: RestorePasswordDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    await this.authService.restorePassword(restorePasswordDto);
+    res.redirect(303, this.configService.get('LOGIN_PAGE'));
   }
 }

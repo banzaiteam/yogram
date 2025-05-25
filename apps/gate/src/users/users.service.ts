@@ -4,6 +4,8 @@ import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from 'apps/libs/Users/dto/user/find-user-criteria.dto';
+import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
+import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +23,17 @@ export class UsersService {
     await this.gateService.usersHttpServicePost(
       HttpUsersPath.Create,
       createUserDto,
+      {},
+    );
+  }
+
+  async update(
+    criteria: UpdateUserCriteria,
+    updateUserDto: UpdateUserDto,
+  ): Promise<void> {
+    return await this.gateService.usersHttpServicePatch(
+      HttpUsersPath.UpdateUserByCriteria,
+      { criteria, updateUserDto },
       {},
     );
   }
