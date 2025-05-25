@@ -15,6 +15,7 @@ import { IProfileCommandRepository } from './interfaces/command/profile-command.
 import { ResponseUserDto } from '../../../apps/libs/Users/dto/user/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { UserCriteria } from './features/find-by-criteria/query/find-users-by-criteria.query';
+import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 
 @Injectable()
 export class UsersCommandService {
@@ -50,7 +51,9 @@ export class UsersCommandService {
     } catch (error) {
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
-          throw new ConflictException();
+          throw new ConflictException(
+            'user with this email/username already exists',
+          );
         }
         if ((error['code'] = '23503')) {
           throw new BadRequestException();
@@ -61,6 +64,20 @@ export class UsersCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async updateUser(
+    criteria: UpdateUserCriteria,
+    updateUserDto: UpdateUserDto,
+  ): Promise<ResponseUserDto> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const updatedUser = await this.userCommandRepository.update(
+      criteria,
+      updateUserDto,
+      queryRunner.manager,
+    );
+    if (!updatedUser) throw new NotFoundException();
+    return plainToInstance(ResponseUserDto, updatedUser);
   }
 
   async reCreateNotVerifiedUser(

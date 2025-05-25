@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import {
   ApiExcludeEndpoint,
+  ApiHeader,
   ApiOperation,
   ApiQuery,
   ApiResponse,
@@ -38,7 +39,10 @@ export class UsersController {
     res.status(201);
   }
 
-  @Public()
+  @ApiHeader({
+    name: 'Authorization',
+    description: ' Authorization with bearer token',
+  })
   @ApiOperation({
     summary: 'Find one user by email or id',
   })
@@ -46,7 +50,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'user not found' })
   @ApiQuery({ name: 'id', required: false, type: 'string' })
   @ApiQuery({ name: 'email', required: false, type: 'string' })
-  @Get('findone-criteria')
+  @Get('findone-by')
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto> {

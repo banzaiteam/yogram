@@ -1,12 +1,6 @@
-import { IsEmail, IsString } from 'class-validator';
+import { PartialType, PickType } from '@nestjs/swagger';
+import { CreateUserDto } from './create-user.dto';
 
-export class RestorePasswordDto {
-  @IsEmail()
-  to: string;
-  @IsString()
-  username: string;
-  @IsString()
-  template: string;
-  @IsString()
-  subject: string;
-}
+export class RestorePasswordDto extends PartialType(
+  PickType(CreateUserDto, ['email', 'password']),
+) {}

@@ -11,8 +11,13 @@ import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
 import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
 import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
 import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
-import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
+
 import { getForgotPasswordTemplate } from './html-templates/forgot-password.template';
+import { RestorePasswordEmailDto } from 'apps/libs/Users/dto/user/restore-password-email.dto';
+import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
+import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
+import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
+import { User } from './decorators/user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +59,7 @@ export class AuthService {
   async forgotPassword(email: EmailDto) {
     const user = await this.usersService.findUserByCriteria(email);
     if (!user) {
-      throw new UnauthorizedException('user was not found');
+      throw new UnauthorizedException('User with this email doesnt exist');
     }
     if (!user.verified) throw new BadRequestException('user is not verified');
     const payload = { email: user.email };
@@ -64,7 +69,7 @@ export class AuthService {
 
     const template = getForgotPasswordTemplate(user.username, token);
     const subject = 'Yogram password restore';
-    let restorePasswordDto: RestorePasswordDto = {
+    let restorePasswordDto: RestorePasswordEmailDto = {
       to: user.email,
       username: user.username,
       template,
@@ -82,7 +87,15 @@ export class AuthService {
     }
   }
 
-  restorePassword(email: EmailDto) {
-    throw new Error('Method not implemented.');
+  async restorePage(token: string) {
+    return await this.jwtService.verifyAsync(token);
+  }
+
+  async restorePassword(restorePasswordDto: RestorePasswordDto): Promise<void> {
+    const criteria: UpdateUserCriteria = { email: restorePasswordDto.email };
+    const updateUserDto: UpdateUserDto = {
+      password: restorePasswordDto.password,
+    };
+    return this.usersService.update(criteria, updateUserDto);
   }
 }
