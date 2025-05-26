@@ -17,7 +17,10 @@ import { RestorePasswordEmailDto } from 'apps/libs/Users/dto/user/restore-passwo
 import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { User } from './decorators/user.decorator';
+import { GateService } from 'apps/libs/gateService';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +29,8 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly producerService: ProducerService,
+    private readonly gateService: GateService,
+    private readonly httpService: HttpService,
   ) {}
 
   async login(user: LoggedUserDto): Promise<string[]> {
@@ -97,5 +102,27 @@ export class AuthService {
       password: restorePasswordDto.password,
     };
     return this.usersService.update(criteria, updateUserDto);
+  }
+
+  async google(code: string, res: Response) {
+    const tokenResponse = await this.gateService.httpServicePost(
+      'https://oauth2.googleapis.com/token',
+      {
+        code: code,
+        client_id: this.configService.get('GOOGLE_CLIENT_ID'),
+        client_secret: this.configService.get('GOOGLE_CLIENT_SECRET'),
+        redirect_uri: this.configService.get('GOOGLE_REDIRECT_URI'),
+        grant_type: 'authorization_code',
+      },
+      {},
+    );
+    const accessToken = tokenResponse.access_token;
+    const userResponse = await lastValueFrom(
+      this.httpService.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+    );
+    const user = userResponse.data;
+    console.log('🚀 ~ AuthService ~ google ~ user:', user);
   }
 }

@@ -23,7 +23,11 @@ import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/ra
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, { provide: 'GateService', useClass: GateService }],
+  providers: [
+    AuthService,
+    { provide: 'GateService', useClass: GateService },
+    GateService,
+  ],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
