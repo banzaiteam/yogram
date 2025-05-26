@@ -32,5 +32,9 @@ export const getConfiguration = () => {
       process.env.SEND_RESTORE_PASSWORD_EMAIL_PAGE,
     LOGIN_PAGE: process.env.LOGIN_PAGE,
     RESTORE_PASSWORD_PAGE: process.env.RESTORE_PASSWORD_PAGE,
+    GOOGLE_OAUTH_URI: process.env.GOOGLE_OAUTH_URI,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
   };
 };

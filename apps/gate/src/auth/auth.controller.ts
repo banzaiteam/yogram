@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -198,5 +199,17 @@ export class AuthController {
   ): Promise<void> {
     await this.authService.restorePassword(restorePasswordDto);
     res.redirect(303, this.configService.get('LOGIN_PAGE'));
+  }
+
+  @Public()
+  @Get('google')
+  async googleOauth(@Res() res: Response) {
+    res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
+  }
+
+  @Public()
+  @Get('google/callback')
+  async googleAuthRedirect(@Query('code') code: string, @Res() res: Response) {
+    return await this.authService.google(code, res);
   }
 }
