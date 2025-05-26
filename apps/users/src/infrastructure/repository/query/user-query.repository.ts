@@ -25,6 +25,7 @@ export class UserQueryRepository
     return plainToInstance(ResponseLoginDto, user);
   }
 
+  // find only by id or email
   async findUserByCriteria(
     criteria: UserCriteria,
     entityManager?: EntityManager,
@@ -36,6 +37,25 @@ export class UserQueryRepository
     )[0];
     if (!user) return null;
     // if (!user) throw new NotFoundException();
+    const mappedUser = {
+      id: user.id,
+      email: user.email,
+      verified: user.verified,
+      username: user.profile.username,
+    };
+    return plainToInstance(ResponseUserDto, mappedUser);
+  }
+
+  async findUserByUsername(
+    username: string,
+    entityManager?: EntityManager,
+  ): Promise<ResponseUserDto> {
+    const user = await this.userRepository(entityManager)
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.profile', 'profile')
+      .where('profile.username = :username', { username })
+      .getOne();
+    if (!user) return null;
     const mappedUser = {
       id: user.id,
       email: user.email,

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
-import { DataSource, QueryFailedError } from 'typeorm';
+import { DataSource, QueryFailedError, QueryRunner } from 'typeorm';
 import { UpdateUserDto } from '../../../apps/libs/Users/dto/user/update-user.dto';
 import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
 import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
@@ -20,6 +20,13 @@ import { IProviderCommandRepository } from './interfaces/command/provider-comman
 import { CreateProviderDto } from 'apps/libs/Users/dto/provider/create-provider.dto';
 import { UpdateProviderDto } from 'apps/libs/Users/dto/provider/update-provider.dto';
 import { OauthProviders } from 'apps/libs/Users/constants/oauth-providers.enum';
+import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
+import { v4 } from 'uuid';
+import { IUsersQueryRepository } from './interfaces/query/user-query.interface';
+import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
+import { genRandomNumbersString } from 'apps/libs/common/utils/gen-random-numbers.util';
+import { CreateUserByProviderDto } from 'apps/libs/Users/dto/user/create-user-by-provider.dto';
+import { genUserName } from './utils/gen-username.util';
 
 @Injectable()
 export class UsersCommandService {
@@ -36,6 +43,10 @@ export class UsersCommandService {
     private readonly providerCommandRepository: IProviderCommandRepository<
       CreateProviderDto,
       UpdateProviderDto
+    >,
+    private readonly userQueryRepository: IUsersQueryRepository<
+      ResponseLoginDto,
+      ResponseUserDto
     >,
   ) {}
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
@@ -84,6 +95,82 @@ export class UsersCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async createUserGoogle(
+    googleSignupDto: GoogleSignupDto,
+  ): Promise<ResponseUserDto> {
+    // form user does not exists so create provider entity and merge to the form user
+    if (!googleSignupDto.user) {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.startTransaction();
+      try {
+        const userId = v4();
+        let username = googleSignupDto.username;
+        const useR = await this.userQueryRepository.findUserByUsername(
+          googleSignupDto.username,
+          queryRunner.manager,
+        );
+        // if user with username from provider already exists we should generate the new one
+        // if user from provider hasnt username we generate it from provider email
+        if (useR || !username) {
+          const isUsername = googleSignupDto.username ? true : false;
+          const usernameFromUsernameOrEmail: string = isUsername
+            ? googleSignupDto.username
+            : googleSignupDto.email.substring(
+                0,
+                googleSignupDto.email.indexOf('@'),
+              );
+          username = await genUserName(
+            usernameFromUsernameOrEmail,
+            queryRunner,
+            this.userQueryRepository,
+          );
+        }
+        // create user
+        const createUserDto: CreateUserByProviderDto = {
+          email: googleSignupDto.email,
+          username,
+        };
+        const user = await this.userCommandRepository.create(
+          createUserDto,
+          queryRunner.manager,
+        );
+        // create profile
+        const createProfileDto: CreateProfileDto = {
+          user,
+          username: createUserDto.username,
+        };
+        await this.profileCommandRepository.create(
+          createProfileDto,
+          queryRunner.manager,
+        );
+        // create provider
+        const createProviderDto: CreateProviderDto = {
+          email: googleSignupDto.email,
+          username: username,
+          providerId: googleSignupDto.providerId,
+          type: OauthProviders.Google,
+          user,
+        };
+        await this.providerCommandRepository.create(
+          createProviderDto,
+          queryRunner.manager,
+        );
+
+        await queryRunner.commitTransaction();
+      } catch (error) {
+        console.log('🚀 ~ UsersCommandService ~ error:', error);
+        await queryRunner.rollbackTransaction();
+        throw new InternalServerErrorException(error);
+      } finally {
+        await queryRunner.release();
+      }
+    }
+    // form user exists so merge it to the provider entity
+    else {
+    }
+    return;
   }
 
   async updateUser(

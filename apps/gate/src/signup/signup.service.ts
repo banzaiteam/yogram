@@ -13,6 +13,8 @@ import { UsersService } from '../users/users.service';
 import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
 import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
 import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.dto';
+import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
+import { MergeProviderUserDto } from 'apps/libs/Users/dto/user/merge-provider-user.dto';
 
 @Injectable()
 export class SignupService {
@@ -62,5 +64,14 @@ export class SignupService {
     } catch (err) {
       throw new InternalServerErrorException('verify email was not sent');
     }
+  }
+
+  async signUpGoogle(googleSignupDto: GoogleSignupDto): Promise<void> {
+    console.log('signUpGoogle', googleSignupDto);
+    await this.gateService.usersHttpServicePost(
+      HttpUsersPath.CreateWithGoogle,
+      googleSignupDto,
+      {},
+    );
   }
 }

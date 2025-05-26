@@ -19,6 +19,8 @@ import { ResponseLoginDto } from '../../../apps/libs/Users/dto/user/response-log
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
+import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
+import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
 
 @Controller()
 export class UsersController {
@@ -65,6 +67,15 @@ export class UsersController {
     const updateUserDto = payload['updateUserDto'];
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, updateUserDto),
+    );
+  }
+
+  @Post('users/google')
+  async createWithGoogle(
+    @Body() googleSignupDto: GoogleSignupDto,
+  ): Promise<void> {
+    return this.commandBus.execute(
+      new CreateUserGoogleCommand(googleSignupDto),
     );
   }
 }

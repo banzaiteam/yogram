@@ -21,6 +21,8 @@ import { GateService } from 'apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { Response } from 'express';
+import { SignupService } from '../signup/signup.service';
+import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +33,7 @@ export class AuthService {
     private readonly producerService: ProducerService,
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
+    private readonly signupService: SignupService,
   ) {}
 
   async login(user: LoggedUserDto): Promise<string[]> {
@@ -122,7 +125,20 @@ export class AuthService {
         headers: { Authorization: `Bearer ${accessToken}` },
       }),
     );
-    const user = userResponse.data;
-    console.log('🚀 ~ AuthService ~ google ~ user:', user);
+    const userData = userResponse.data;
+    const user = await this.usersService.findUserByCriteria({
+      email: userData.email,
+    });
+    // todo need to check if we have a googleId(need func findByProviderId) in the Provider, if yes need to compare with userData, if equel need login
+    // if we have not classically registrated user we should create it from google's provider data(gen username, assign email)
+    // but if we have should merge form user to provider
+    if (!user) {
+      const googleSignupDto: GoogleSignupDto = {
+        providerId: userData.sub,
+        username: userData.name,
+        email: userData.email,
+      };
+      await this.signupService.signUpGoogle(googleSignupDto);
+    }
   }
 }

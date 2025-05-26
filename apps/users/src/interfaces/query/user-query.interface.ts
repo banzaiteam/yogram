@@ -12,4 +12,9 @@ export abstract class IUsersQueryRepository<U, R> {
     criteria: UserCriteria,
     entityManager?: EntityManager,
   ): Promise<R>;
+
+  abstract findUserByUsername(
+    username: string,
+    entityManager?: EntityManager,
+  ): Promise<R>;
 }

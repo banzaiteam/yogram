@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { UsersCommandService } from './users-command.service';
 import { ConfigModule } from '@nestjs/config';
 import {
@@ -18,13 +17,11 @@ import { CreateUserCommand } from './features/create/command/create-user.command
 import { CreateUserHandler } from './features/create/command/create-user.handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './infrastructure/entity/User.entity';
-import { CqrsModule } from '@nestjs/cqrs';
 import { UserCommandRepositoryProvider } from './providers/command/user-command-repository.provider';
 import { Profile } from './infrastructure/entity/Profile.entity';
 import { ProfileCommandRepositoryProvider } from './providers/command/profile-command-repository.provider';
 import { UsersQueryService } from './users-query.service';
 import { UsersQueryRepositoryProvider } from './providers/query/users-query-repository.provider';
-
 import { UsersController } from './users.controller';
 import { SendVerifyEmailEvent } from './features/create/event/send-verify-email.event';
 import { SendVerifyEmailHandler } from './features/create/event/send-verify-email.handler';
@@ -40,6 +37,9 @@ import { UpdateUserByCriteriaCommand } from './features/update/command/update-us
 import { UpdateUserByCriteriaHandler } from './features/update/command/update-user-by-criteria.handler';
 import { ProviderCommandRepositoryProvider } from './providers/command/provider-command-repository.provider';
 import { Provider } from './infrastructure/entity/Provider.entity';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
+import { CreateUserGoogleHandler } from './features/create-google/command/create-user-google.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -98,6 +98,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UpdateUserByCriteriaCommand,
     UpdateUserByCriteriaHandler,
     ProviderCommandRepositoryProvider,
+    CreateUserGoogleCommand,
+    CreateUserGoogleHandler,
   ],
 })
 export class UsersModule {}
