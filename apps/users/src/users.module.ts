@@ -38,6 +38,8 @@ import { UserLoginQuery } from './features/user-login/query/user-login.query';
 import { UserLoginQueryHandler } from './features/user-login/query/user-login.handler';
 import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
 import { UpdateUserByCriteriaHandler } from './features/update/command/update-user-by-criteria.handler';
+import { ProviderCommandRepositoryProvider } from './providers/command/provider-command-repository.provider';
+import { Provider } from './infrastructure/entity/Provider.entity';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -62,7 +64,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     }),
     RabbitProducerModule.register(['users']),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([User, Profile]),
+    TypeOrmModule.forFeature([User, Profile, Provider]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
@@ -95,6 +97,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UserQueryRepository,
     UpdateUserByCriteriaCommand,
     UpdateUserByCriteriaHandler,
+    ProviderCommandRepositoryProvider,
   ],
 })
 export class UsersModule {}

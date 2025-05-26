@@ -1,6 +1,7 @@
 import { BaseEntity } from '../../../../../apps/libs/common/entity/base.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { Profile } from './Profile.entity';
+import { Provider } from './Provider.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -11,14 +12,20 @@ export class User extends BaseEntity {
   @Column({ type: 'boolean' })
   verified: boolean = false;
 
-  constructor(entity: Partial<User>) {
-    super();
-    Object.assign(this, entity);
-  }
-
   @OneToOne(() => Profile, (profile) => profile.user, {
     eager: true,
     cascade: true,
   })
   profile: Profile;
+
+  @OneToMany(() => Provider, (provider) => provider.user, {
+    eager: true,
+    cascade: true,
+  })
+  providers: Provider[];
+
+  constructor(entity: Partial<User>) {
+    super();
+    Object.assign(this, entity);
+  }
 }
