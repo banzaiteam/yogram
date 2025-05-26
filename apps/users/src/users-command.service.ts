@@ -16,6 +16,10 @@ import { ResponseUserDto } from '../../../apps/libs/Users/dto/user/response-user
 import { plainToInstance } from 'class-transformer';
 import { UserCriteria } from './features/find-by-criteria/query/find-users-by-criteria.query';
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
+import { IProviderCommandRepository } from './interfaces/command/provider-command.interface';
+import { CreateProviderDto } from 'apps/libs/Users/dto/provider/create-provider.dto';
+import { UpdateProviderDto } from 'apps/libs/Users/dto/provider/update-provider.dto';
+import { OauthProviders } from 'apps/libs/Users/constants/oauth-providers.enum';
 
 @Injectable()
 export class UsersCommandService {
@@ -28,6 +32,10 @@ export class UsersCommandService {
     private readonly profileCommandRepository: IProfileCommandRepository<
       CreateProfileDto,
       UpdateProfileDto
+    >,
+    private readonly providerCommandRepository: IProviderCommandRepository<
+      CreateProviderDto,
+      UpdateProviderDto
     >,
   ) {}
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
@@ -46,6 +54,18 @@ export class UsersCommandService {
         createProfileDto,
         queryRunner.manager,
       );
+
+      Object.keys(OauthProviders).forEach(async (key) => {
+        const providerDto: CreateProviderDto = {
+          user,
+          type: OauthProviders[key],
+        };
+        await this.providerCommandRepository.create(
+          providerDto,
+          queryRunner.manager,
+        );
+      });
+
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
