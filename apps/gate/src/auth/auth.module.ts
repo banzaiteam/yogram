@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoginValidationMiddleware } from './middleware/login-validation.middleware';
 import { UsersModule } from '../users/users.module';
 import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
+import { SignupService } from '../signup/signup.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/ra
     AuthService,
     { provide: 'GateService', useClass: GateService },
     GateService,
+    SignupService,
   ],
 })
 export class AuthModule implements NestModule {
