@@ -30,4 +30,12 @@ export class UsersQueryService {
       queryRunner.manager,
     );
   }
+
+  async findUserByProviderId(providerId: string): Promise<ResponseUserDto> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    return await this.userQueryRepository.findUserByProviderId(
+      providerId,
+      queryRunner.manager,
+    );
+  }
 }

@@ -27,6 +27,8 @@ import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
 import { genRandomNumbersString } from 'apps/libs/common/utils/gen-random-numbers.util';
 import { CreateUserByProviderDto } from 'apps/libs/Users/dto/user/create-user-by-provider.dto';
 import { genUserName } from './utils/gen-username.util';
+import { Response } from 'express';
+import { UsersQueryService } from './users-query.service';
 
 @Injectable()
 export class UsersCommandService {
@@ -44,10 +46,7 @@ export class UsersCommandService {
       CreateProviderDto,
       UpdateProviderDto
     >,
-    private readonly userQueryRepository: IUsersQueryRepository<
-      ResponseLoginDto,
-      ResponseUserDto
-    >,
+    private readonly usersQueryService: UsersQueryService,
   ) {}
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -99,7 +98,9 @@ export class UsersCommandService {
 
   async createUserGoogle(
     googleSignupDto: GoogleSignupDto,
+    res: Response,
   ): Promise<ResponseUserDto> {
+    console.log('🚀 ~ UsersCommandService ~ googleSignupDto:', googleSignupDto);
     // form user does not exists so create provider entity and merge to the form user
     if (!googleSignupDto.user) {
       const queryRunner = this.dataSource.createQueryRunner();
@@ -107,13 +108,17 @@ export class UsersCommandService {
       try {
         const userId = v4();
         let username = googleSignupDto.username;
-        const useR = await this.userQueryRepository.findUserByUsername(
-          googleSignupDto.username,
-          queryRunner.manager,
+        const userWithUserName =
+          await this.usersQueryService.findUserByCriteria({
+            username: googleSignupDto.username,
+          });
+        console.log(
+          '🚀 ~ UsersCommandService ~ userWithUserName:',
+          userWithUserName,
         );
-        // if user with username from provider already exists we should generate the new one
+        // if any user with username from provider already exists we should generate the new one
         // if user from provider hasnt username we generate it from provider email
-        if (useR || !username) {
+        if (userWithUserName || !username) {
           const isUsername = googleSignupDto.username ? true : false;
           const usernameFromUsernameOrEmail: string = isUsername
             ? googleSignupDto.username
@@ -124,13 +129,15 @@ export class UsersCommandService {
           username = await genUserName(
             usernameFromUsernameOrEmail,
             queryRunner,
-            this.userQueryRepository,
+            this.usersQueryService,
           );
+          console.log('🚀 ~ UsersCommandService ~ username:', username);
         }
         // create user
         const createUserDto: CreateUserByProviderDto = {
           email: googleSignupDto.email,
           username,
+          verified: true,
         };
         const user = await this.userCommandRepository.create(
           createUserDto,
@@ -157,18 +164,22 @@ export class UsersCommandService {
           createProviderDto,
           queryRunner.manager,
         );
-
         await queryRunner.commitTransaction();
+        console.log('userrrrrrrr====', user);
+
+        return plainToInstance(ResponseUserDto, user);
       } catch (error) {
         console.log('🚀 ~ UsersCommandService ~ error:', error);
         await queryRunner.rollbackTransaction();
         throw new InternalServerErrorException(error);
       } finally {
         await queryRunner.release();
+        // todo redirect to restore password page
       }
     }
     // form user exists so merge it to the provider entity
     else {
+      console.log('createUserGoogle else!!!!');
     }
     return;
   }

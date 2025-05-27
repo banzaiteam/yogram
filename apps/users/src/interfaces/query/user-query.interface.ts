@@ -1,6 +1,5 @@
 import { EntityManager } from 'typeorm';
 import { UserCriteria } from '../../features/find-by-criteria/query/find-users-by-criteria.query';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 
 export abstract class IUsersQueryRepository<U, R> {
   abstract userLoginQuery(
@@ -15,6 +14,11 @@ export abstract class IUsersQueryRepository<U, R> {
 
   abstract findUserByUsername(
     username: string,
+    entityManager?: EntityManager,
+  ): Promise<R>;
+
+  abstract findUserByProviderId(
+    providerId: string,
     entityManager?: EntityManager,
   ): Promise<R>;
 }

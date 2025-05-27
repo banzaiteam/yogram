@@ -15,6 +15,7 @@ import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-ro
 import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.dto';
 import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
 import { MergeProviderUserDto } from 'apps/libs/Users/dto/user/merge-provider-user.dto';
+import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 
 @Injectable()
 export class SignupService {
@@ -66,9 +67,10 @@ export class SignupService {
     }
   }
 
-  async signUpGoogle(googleSignupDto: GoogleSignupDto): Promise<void> {
-    console.log('signUpGoogle', googleSignupDto);
-    await this.gateService.usersHttpServicePost(
+  async signUpGoogle(
+    googleSignupDto: GoogleSignupDto,
+  ): Promise<ResponseUserDto> {
+    return await this.gateService.usersHttpServicePost(
       HttpUsersPath.CreateWithGoogle,
       googleSignupDto,
       {},

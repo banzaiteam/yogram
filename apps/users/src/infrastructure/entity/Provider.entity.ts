@@ -7,8 +7,8 @@ import { User } from './User.entity';
 export class Provider extends BaseEntity {
   @Column({ type: 'enum', enum: OauthProviders })
   type: OauthProviders;
-  @Column({ type: 'decimal', nullable: true })
-  providerId: number;
+  @Column({ type: 'varchar', nullable: true })
+  providerId: string;
   @Column({ type: 'varchar', nullable: true })
   email: string;
   @Column({ type: 'varchar', nullable: true })

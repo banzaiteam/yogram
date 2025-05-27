@@ -25,23 +25,30 @@ export class UserQueryRepository
     return plainToInstance(ResponseLoginDto, user);
   }
 
-  // find only by id or email
+  // find only by userId or email, or username or provider
   async findUserByCriteria(
     criteria: UserCriteria,
     entityManager?: EntityManager,
   ): Promise<ResponseUserDto | null> {
-    const user = (
-      await this.userRepository(entityManager).find({
-        where: criteria,
+    const user = await this.userRepository(entityManager)
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.profile', 'profile')
+      .innerJoinAndSelect('users.providers', 'provider')
+      .where('profile.username = :username', { username: criteria?.username })
+      .orWhere('users.email = :email', { email: criteria?.email })
+      .orWhere('provider.providerId = :providerId', {
+        providerId: criteria?.providerId,
       })
-    )[0];
+      .getOne();
+    console.log('🚀 ~ user:', user);
     if (!user) return null;
-    // if (!user) throw new NotFoundException();
     const mappedUser = {
       id: user.id,
       email: user.email,
       verified: user.verified,
       username: user.profile.username,
+      providers: user.providers,
+      profile: user.profile,
     };
     return plainToInstance(ResponseUserDto, mappedUser);
   }
@@ -49,7 +56,7 @@ export class UserQueryRepository
   async findUserByUsername(
     username: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseUserDto> {
+  ): Promise<ResponseUserDto | null> {
     const user = await this.userRepository(entityManager)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')
@@ -61,7 +68,31 @@ export class UserQueryRepository
       email: user.email,
       verified: user.verified,
       username: user.profile.username,
+      providers: user.providers,
     };
+    return plainToInstance(ResponseUserDto, mappedUser);
+  }
+
+  async findUserByProviderId(
+    providerId: string,
+    entityManager?: EntityManager,
+  ): Promise<ResponseUserDto | null> {
+    const user = await this.userRepository(entityManager)
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.providers', 'provider')
+      .innerJoinAndSelect('users.profile', 'profile')
+      .where('provider.providerId = :providerId', { providerId })
+      .getOne();
+    if (!user) return null;
+    console.log('🚀 ~ user:', user);
+    const mappedUser = {
+      id: user.id,
+      email: user.email,
+      verified: user.verified,
+      username: user.profile.username,
+      providers: user.providers,
+    };
+    console.log('🚀 ~ mappedUser:', mappedUser);
     return plainToInstance(ResponseUserDto, mappedUser);
   }
 

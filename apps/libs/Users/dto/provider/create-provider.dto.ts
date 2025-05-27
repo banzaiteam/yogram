@@ -10,8 +10,8 @@ import { User } from 'apps/users/src/infrastructure/entity/User.entity';
 
 export class CreateProviderDto {
   @IsOptional()
-  @IsNumber()
-  providerId?: number;
+  @IsString()
+  providerId?: string;
   @IsOptional()
   @IsEmail()
   email?: string;
