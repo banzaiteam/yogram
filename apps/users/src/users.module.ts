@@ -40,6 +40,10 @@ import { Provider } from './infrastructure/entity/Provider.entity';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
 import { CreateUserGoogleHandler } from './features/create-google/command/create-user-google.handler';
+import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/find-user-by-providerId.query';
+import { FindUserByProviderIdHandler } from './features/find-by-providerid/query/find-user-by-providerId.handler';
+import { ProviderQueryService } from './provider-query.service';
+import { ProviderQueryRepositoryProvider } from './providers/query/provider-query-repository.provider';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -100,6 +104,10 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ProviderCommandRepositoryProvider,
     CreateUserGoogleCommand,
     CreateUserGoogleHandler,
+    FindUserByProviderIdQuery,
+    FindUserByProviderIdHandler,
+    ProviderQueryService,
+    ProviderQueryRepositoryProvider,
   ],
 })
 export class UsersModule {}

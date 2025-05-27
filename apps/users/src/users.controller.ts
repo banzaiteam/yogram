@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -21,12 +22,17 @@ import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
 import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
 import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
+import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/find-user-by-providerId.query';
+import { Response } from 'express';
+import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
+import { ProviderQueryService } from './provider-query.service';
 
 @Controller()
 export class UsersController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly providerQueryService: ProviderQueryService,
   ) {}
 
   @Get('users/login/:email')
@@ -45,6 +51,23 @@ export class UsersController {
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );
+  }
+
+  @Get('users/findone/:providerid')
+  async findUserByProviderId(
+    @Param('providerid') providerId: string,
+  ): Promise<ResponseUserDto | null> {
+    console.log('🚀 ~ UsersController ~ providerId:', providerId);
+    return await this.queryBus.execute(
+      new FindUserByProviderIdQuery(providerId),
+    );
+  }
+
+  @Get('users/provider/:providerId')
+  async findProviderByProviderId(
+    @Param('providerId') providerId: string,
+  ): Promise<ResponseProviderDto | null> {
+    return await this.providerQueryService.findProviderByProviderId(providerId);
   }
 
   @Post('users/create')
@@ -73,9 +96,11 @@ export class UsersController {
   @Post('users/google')
   async createWithGoogle(
     @Body() googleSignupDto: GoogleSignupDto,
-  ): Promise<void> {
-    return this.commandBus.execute(
-      new CreateUserGoogleCommand(googleSignupDto),
+    @Res() res: Response,
+  ): Promise<ResponseUserDto> {
+    console.log('🚀 ~ UsersController ~ googleSignupDto:', googleSignupDto);
+    return await this.commandBus.execute(
+      new CreateUserGoogleCommand(googleSignupDto, res),
     );
   }
 }

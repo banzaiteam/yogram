@@ -209,7 +209,25 @@ export class AuthController {
 
   @Public()
   @Get('google/callback')
-  async googleAuthRedirect(@Query('code') code: string, @Res() res: Response) {
-    return await this.authService.google(code, res);
+  async googleAuthRedirect(
+    @Query('code') code: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const [access_token, refresh_token, userResponse] =
+      await this.authService.google(code, res);
+    res.status(200);
+    res.cookie('access_token', access_token, {
+      httpOnly: false,
+      sameSite: 'strict',
+      secure: true,
+      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
+    });
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: true,
+      maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
+    });
+    return userResponse;
   }
 }

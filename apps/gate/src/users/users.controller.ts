@@ -39,6 +39,7 @@ export class UsersController {
     res.status(201);
   }
 
+  @Public()
   @ApiHeader({
     name: 'Authorization',
     description: ' Authorization with bearer token',

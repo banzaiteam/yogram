@@ -6,6 +6,7 @@ import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from 'apps/libs/Users/dto/user/find-user-criteria.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
+import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,21 @@ export class UsersService {
   ): Promise<ResponseUserDto | null> {
     const queryString = this.makeQueryStringFromObject(findUserByCriteriaDto);
     const path = `${HttpUsersPath.FindUserByCriteria}?${queryString}`;
+    return await this.gateService.usersHttpServiceGet(path, {});
+  }
+
+  async findUserByProviderId(
+    providerId: string,
+  ): Promise<ResponseUserDto | null> {
+    const path = `${HttpUsersPath.FindUserByProviderId}/${providerId}`;
+    console.log('🚀 ~ UsersService ~ path:', path);
+    return await this.gateService.usersHttpServiceGet(path, {});
+  }
+
+  async findProviderByProviderId(
+    providerId: string,
+  ): Promise<ResponseProviderDto | null> {
+    const path = `${HttpUsersPath.FindProviderByProviderId}/${providerId}`;
     return await this.gateService.usersHttpServiceGet(path, {});
   }
 

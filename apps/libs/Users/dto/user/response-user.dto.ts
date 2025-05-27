@@ -1,4 +1,6 @@
+import { Provider } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
+import { ResponseProfileDto } from './response-profile.dto';
 
 @Exclude()
 export class ResponseUserDto {
@@ -10,4 +12,8 @@ export class ResponseUserDto {
   email: string;
   @Expose()
   verified: boolean;
+  @Expose()
+  providers: Provider[];
+  @Expose()
+  profile: ResponseProfileDto;
 }
