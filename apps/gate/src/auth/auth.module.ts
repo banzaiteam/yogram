@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoginValidationMiddleware } from './middleware/login-validation.middleware';
 import { UsersModule } from '../users/users.module';
-import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
+import { RabbitProducerModule } from '../../../../apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
 

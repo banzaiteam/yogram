@@ -6,8 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
-import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
-import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
+import { RabbitProducerModule } from '../../../../apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 
 @Module({
   imports: [
