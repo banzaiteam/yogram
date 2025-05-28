@@ -3,16 +3,18 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 export const verifyRecaptcha = async (
   token: string,
   httpService: HttpService,
+  configService: ConfigService,
 ) => {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  const verifyUrl = process.env.RECAPCHA_URL;
+  const secretKey = configService.get('RECAPTCHA_SECRET_KEY');
+  const verifyUrl = configService.get('RECAPTCHA_URL');
   const minimumScore = 0.5;
-  const expectedHostname = process.env.RECAPTCHA_HOSTNAME;
+  const expectedHostname = configService.get('RECAPTCHA_HOSTNAME');
 
   try {
     const response = await lastValueFrom(

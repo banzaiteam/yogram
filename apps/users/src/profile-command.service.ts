@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, EntityManager } from 'typeorm';
-import { ResponseProfileDto } from 'apps/libs/Users/dto/user/response-profile.dto';
+import { EntityManager } from 'typeorm';
+import { ResponseProfileDto } from '../../../apps/libs/Users/dto/user/response-profile.dto';
 import { plainToInstance } from 'class-transformer';
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
-import { CreateProfileDto } from 'apps/libs/Users/dto/profile/create-profile.dto';
-import { UpdateProfileDto } from 'apps/libs/Users/dto/profile/update-profile.dto';
+import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
+import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
 
 @Injectable()
 export class ProfileCommandService {

@@ -1,9 +1,5 @@
-import { genRandomNumbersString } from 'apps/libs/common/utils/gen-random-numbers.util';
+import { genRandomNumbersString } from '../../../../apps/libs/common/utils/gen-random-numbers.util';
 import { QueryRunner } from 'typeorm';
-
-import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import { IUsersQueryRepository } from '../interfaces/query/user-query.interface';
 import { UsersQueryService } from '../users-query.service';
 
 export const genUserName = async (

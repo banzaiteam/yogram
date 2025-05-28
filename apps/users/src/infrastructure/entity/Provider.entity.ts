@@ -1,5 +1,5 @@
-import { BaseEntity } from 'apps/libs/common/entity/base.entity';
-import { OauthProviders } from 'apps/libs/Users/constants/oauth-providers.enum';
+import { BaseEntity } from '../../../../../apps/libs/common/entity/base.entity';
+import { OauthProviders } from '../../../../../apps/libs/Users/constants/oauth-providers.enum';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './User.entity';
 

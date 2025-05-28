@@ -7,23 +7,18 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
+import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
-import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
-import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
-
+import { ProducerService } from '../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
+import { UsersRoutingKeys } from '../../../../apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
 import { getForgotPasswordTemplate } from './html-templates/forgot-password.template';
-import { RestorePasswordEmailDto } from 'apps/libs/Users/dto/user/restore-password-email.dto';
-import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
-import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
-import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { GateService } from 'apps/libs/gateService';
+import { RestorePasswordEmailDto } from '../../../../apps/libs/Users/dto/user/restore-password-email.dto';
+import { RestorePasswordDto } from '../../../../apps/libs/Users/dto/user/restore-password.dto';
+import { UpdateUserCriteria } from '../../../../apps/libs/Users/dto/user/update-user-criteria.dto';
+import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.dto';
+import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
-import { Response } from 'express';
 import { SignupService } from '../signup/signup.service';
-import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { GoogleOauth } from './oauth/google.oauth';
 
 @Injectable()

@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
-import { IProviderQueryRepository } from './interfaces/query/provider-query.interface';
-import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
+import { ResponseProviderDto } from '../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { IProviderCommandRepository } from './interfaces/command/provider-command.interface';
-import { CreateProviderDto } from 'apps/libs/Users/dto/provider/create-provider.dto';
-import { UpdateProviderDto } from 'apps/libs/Users/dto/provider/update-provider.dto';
+import { CreateProviderDto } from '../../../apps/libs/Users/dto/provider/create-provider.dto';
+import { UpdateProviderDto } from '../../../apps/libs/Users/dto/provider/update-provider.dto';
 import { ProviderUpdateCriteria } from './infrastructure/repository/command/provider-command.repository';
 import { plainToInstance } from 'class-transformer';
 

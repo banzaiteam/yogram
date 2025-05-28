@@ -34,6 +34,7 @@ import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dt
 import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
+import { RecaptchaGuard } from 'apps/gate/common/guards/recapcha.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -143,7 +144,7 @@ export class AuthController {
     summary: 'Send forgotPassword email to the user email',
     description: 'call when user entered email on forgotPassword page',
   })
-  //recaptcha
+  @UseGuards(RecaptchaGuard)
   @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {

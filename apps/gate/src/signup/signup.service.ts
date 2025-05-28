@@ -10,13 +10,9 @@ import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.
 import { JwtService } from '@nestjs/jwt';
 import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
 import { UsersService } from '../users/users.service';
-import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
-import { UsersRoutingKeys } from 'apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
-import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.dto';
-import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
-import { MergeProviderUserDto } from 'apps/libs/Users/dto/user/merge-provider-user.dto';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import { GoogleResponse } from 'apps/users/src/users-command.service';
+import { ProducerService } from '../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
+import { UsersRoutingKeys } from '../../../../apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
+import { UserVerifyEmailDto } from '../../../../apps/libs/Users/dto/user/user-verify-email.dto';
 
 @Injectable()
 export class SignupService {
