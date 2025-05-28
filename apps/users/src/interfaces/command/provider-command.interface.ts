@@ -1,11 +1,15 @@
 import { EntityManager } from 'typeorm';
-import { Provider } from '../../infrastructure/entity/Provider.entity';
+import { ProviderUpdateCriteria } from '../../infrastructure/repository/command/provider-command.repository';
 
-export abstract class IProviderCommandRepository<C, U> {
+export abstract class IProviderCommandRepository<C, U, R> {
   abstract create(
     createProviderDto: C,
     entityManager?: EntityManager,
-  ): Promise<Provider>;
-  abstract update(updateProvidereDto: U): Promise<Provider>;
+  ): Promise<R>;
+  abstract update(
+    criteria: ProviderUpdateCriteria,
+    updateProvidereDto: U,
+    entityManager?: EntityManager,
+  ): Promise<R>;
   abstract delete(userId: string): Promise<void>;
 }

@@ -16,6 +16,7 @@ import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.d
 import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
 import { MergeProviderUserDto } from 'apps/libs/Users/dto/user/merge-provider-user.dto';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { GoogleResponse } from 'apps/users/src/users-command.service';
 
 @Injectable()
 export class SignupService {
@@ -65,15 +66,5 @@ export class SignupService {
     } catch (err) {
       throw new InternalServerErrorException('verify email was not sent');
     }
-  }
-
-  async signUpGoogle(
-    googleSignupDto: GoogleSignupDto,
-  ): Promise<ResponseUserDto> {
-    return await this.gateService.usersHttpServicePost(
-      HttpUsersPath.CreateWithGoogle,
-      googleSignupDto,
-      {},
-    );
   }
 }

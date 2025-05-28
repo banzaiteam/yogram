@@ -9,6 +9,10 @@ export class GoogleSignupDto {
   @IsEmail()
   email: string;
   @IsOptional()
-  @ValidateNested()
-  user?: MergeProviderUserDto;
+  // @ValidateNested()
+  user?: {
+    id: string;
+    email: string;
+    username: string;
+  };
 }

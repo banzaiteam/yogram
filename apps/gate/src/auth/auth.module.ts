@@ -9,6 +9,7 @@ import { LoginValidationMiddleware } from './middleware/login-validation.middlew
 import { UsersModule } from '../users/users.module';
 import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { SignupService } from '../signup/signup.service';
+import { GoogleOauth } from './oauth/google.oauth';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SignupService } from '../signup/signup.service';
     { provide: 'GateService', useClass: GateService },
     GateService,
     SignupService,
+    GoogleOauth,
   ],
 })
 export class AuthModule implements NestModule {

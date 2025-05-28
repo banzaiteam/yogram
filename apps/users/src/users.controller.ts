@@ -26,6 +26,7 @@ import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/f
 import { Response } from 'express';
 import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
 import { ProviderQueryService } from './provider-query.service';
+import { GoogleResponse } from './users-command.service';
 
 @Controller()
 export class UsersController {
@@ -81,6 +82,7 @@ export class UsersController {
     await this.commandBus.execute(new EmailVerifyCommand(parsedEmail));
   }
 
+  // find user by id, username or email and update
   @Patch('users/update')
   async update(
     @Body()
@@ -96,9 +98,8 @@ export class UsersController {
   @Post('users/google')
   async createWithGoogle(
     @Body() googleSignupDto: GoogleSignupDto,
-    @Res() res: Response,
-  ): Promise<ResponseUserDto> {
-    console.log('🚀 ~ UsersController ~ googleSignupDto:', googleSignupDto);
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<GoogleResponse> {
     return await this.commandBus.execute(
       new CreateUserGoogleCommand(googleSignupDto, res),
     );

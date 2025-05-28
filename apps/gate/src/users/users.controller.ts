@@ -2,8 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   Res,
@@ -22,6 +25,8 @@ import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
 import { Public } from 'apps/gate/common/decorators/public.decorator';
+import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
+import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -45,13 +50,39 @@ export class UsersController {
     description: ' Authorization with bearer token',
   })
   @ApiOperation({
-    summary: 'Find one user by email or id',
+    summary: 'Find user by id | email | username and update it',
   })
-  @ApiResponse({ status: 200, description: 'user found' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 200, description: 'user updated' })
+  @ApiResponse({ status: 404, description: 'user not found' })
+  @Patch()
+  async update(
+    @Body()
+    payload: UpdateUserCriteria & UpdateUserDto,
+  ): Promise<void> {
+    const criteria = payload['criteria'];
+    const updateUserDto = payload['updateUserDto'];
+    return await this.usersService.update(criteria, updateUserDto);
+  }
+
+  @ApiHeader({
+    name: 'Authorization',
+    description: ' Authorization with bearer token',
+  })
+  @ApiOperation({
+    summary: 'Find one user by id, email, username or providerId',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'user found',
+    type: ResponseUserDto,
+  })
   @ApiResponse({ status: 404, description: 'user not found' })
   @ApiQuery({ name: 'id', required: false, type: 'string' })
   @ApiQuery({ name: 'email', required: false, type: 'string' })
-  @Get('findone-by')
+  @ApiQuery({ name: 'username', required: false, type: 'string' })
+  @ApiQuery({ name: 'providerId', required: false, type: 'string' })
+  @Get('findone')
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto> {
