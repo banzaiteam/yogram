@@ -1,11 +1,15 @@
 import { EntityManager } from 'typeorm';
-import { Profile } from '../../infrastructure/entity/Profile.entity';
+import { ProfileUpdateCriteria } from '../../infrastructure/repository/command/profile-command.repository';
 
-export abstract class IProfileCommandRepository<C, U> {
+export abstract class IProfileCommandRepository<C, U, R> {
   abstract create(
     createProfileDto: C,
     entityManager?: EntityManager,
-  ): Promise<Profile>;
-  abstract update(updateProfileDto: U): Promise<Profile>;
+  ): Promise<R>;
+  abstract update(
+    criteria: ProfileUpdateCriteria,
+    updateProfileDto: U,
+    entityManager?: EntityManager,
+  ): Promise<R>;
   abstract delete(userId: string): Promise<void>;
 }

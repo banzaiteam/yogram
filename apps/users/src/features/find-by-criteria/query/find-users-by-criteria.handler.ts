@@ -14,7 +14,7 @@ export class FindUserByCriteriaHandler
   ) {}
   async execute({
     criteria,
-  }: FindUserByCriteriaQuery): Promise<ResponseUserDto> {
+  }: FindUserByCriteriaQuery): Promise<ResponseUserDto | null> {
     console.log('🚀 ~ criteria:', criteria);
     const queryRunner = this.dataSource.createQueryRunner();
     return await this.userQueryRepository.findUserByCriteria(

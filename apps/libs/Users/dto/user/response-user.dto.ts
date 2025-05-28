@@ -1,4 +1,6 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { ResponseProfileDto } from './response-profile.dto';
+import { ResponseProviderDto } from '../provider/response-provider.dto';
 
 @Exclude()
 export class ResponseUserDto {
@@ -10,4 +12,8 @@ export class ResponseUserDto {
   email: string;
   @Expose()
   verified: boolean;
+  // @Exclude()
+  // providers: ResponseProviderDto[];
+  @Expose()
+  profile: ResponseProfileDto;
 }
