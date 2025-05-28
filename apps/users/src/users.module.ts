@@ -44,6 +44,8 @@ import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/f
 import { FindUserByProviderIdHandler } from './features/find-by-providerid/query/find-user-by-providerId.handler';
 import { ProviderQueryService } from './provider-query.service';
 import { ProviderQueryRepositoryProvider } from './providers/query/provider-query-repository.provider';
+import { ProviderCommandService } from './provider-command.service';
+import { ProfileCommandService } from './profile-command.service';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -108,6 +110,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     FindUserByProviderIdHandler,
     ProviderQueryService,
     ProviderQueryRepositoryProvider,
+    ProviderCommandService,
+    ProfileCommandService,
   ],
 })
 export class UsersModule {}

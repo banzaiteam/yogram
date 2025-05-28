@@ -33,6 +33,7 @@ import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
 import { RestorePasswordDto } from 'apps/libs/Users/dto/user/restore-password.dto';
 import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
 import { TokenExpiredError } from '@nestjs/jwt';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('auth')
 export class AuthController {
@@ -52,6 +53,7 @@ export class AuthController {
         schema: { type: 'string' },
       },
     },
+    type: LoggedUserDto,
   })
   @ApiResponse({
     status: 404,
@@ -61,8 +63,11 @@ export class AuthController {
   async login(
     @User() user: LoggedUserDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
-    const [access_token, refresh_token] = await this.authService.login(user);
+  ): Promise<LoggedUserDto> {
+    const access_token = await this.authService.genAccessToken({ id: user.id });
+    const refresh_token = await this.authService.genRefreshToken({
+      id: user.id,
+    });
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',
@@ -102,6 +107,7 @@ export class AuthController {
     @User('id') id: string,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log('🚀 ~ AuthController ~ id:', id);
     const access_token = await this.authService.refresh(id);
     res.status(200);
     res.cookie('access_token', access_token, {
@@ -169,6 +175,7 @@ export class AuthController {
     }
   }
 
+  @Public()
   // save new password and redirect to the login page
   @ApiHeader({
     name: 'Authorization',
@@ -202,20 +209,41 @@ export class AuthController {
   }
 
   @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    headers: {
+      'Set-Cookie': {
+        description: 'access_token without httpOnly/refresh_token httpOnly',
+        schema: { type: 'string' },
+      },
+    },
+    type: LoggedUserDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'user was not created/logged in',
+  })
+  @ApiOperation({
+    summary: 'Signup/login with google',
+    description:
+      'if user didnt register with form, usual user account will be created and logged in. If user have account he will be logged in',
+  })
+  @Public()
   @Get('google')
   async googleOauth(@Res() res: Response) {
     res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
   }
 
   @Public()
+  @ApiExcludeEndpoint()
   @Get('google/callback')
   async googleAuthRedirect(
     @Query('code') code: string,
     @Res({ passthrough: true }) res: Response,
-  ) {
-    const [access_token, refresh_token, userResponse] =
-      await this.authService.google(code, res);
-    res.status(200);
+  ): Promise<LoggedUserDto> {
+    const [access_token, refresh_token, user] =
+      await this.authService.google(code);
+    console.log('🚀 ~ AuthController ~ user:', user);
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',
@@ -228,6 +256,6 @@ export class AuthController {
       secure: true,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
-    return userResponse;
+    return plainToInstance(LoggedUserDto, user);
   }
 }

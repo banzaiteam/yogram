@@ -59,6 +59,7 @@ const setAppPipes = (app: INestApplication) => {
     new ValidationPipe({
       transform: true,
       stopAtFirstError: true,
+      whitelist: true,
       exceptionFactory: (errors) => {
         const customErrors = [];
         console.log(errors, 'pipe');

@@ -24,6 +24,7 @@ import { Response } from 'express';
 import { SignupService } from '../signup/signup.service';
 import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { GoogleOauth } from './oauth/google.oauth';
 
 @Injectable()
 export class AuthService {
@@ -35,15 +36,8 @@ export class AuthService {
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
     private readonly signupService: SignupService,
+    private readonly googleOauth: GoogleOauth,
   ) {}
-
-  async login(user: LoggedUserDto): Promise<string[]> {
-    const payloadAccess = { id: user.id };
-    const payloadRefresh = { id: user.id };
-    const access_token = await this.genAccessToken(payloadAccess);
-    const refresh_token = await this.genRefreshToken(payloadRefresh);
-    return [access_token, refresh_token];
-  }
 
   async genAccessToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
@@ -108,69 +102,18 @@ export class AuthService {
     return this.usersService.update(criteria, updateUserDto);
   }
 
-  async google(code: string, res: Response) {
-    const tokenResponse = await this.gateService.httpServicePost(
-      'https://oauth2.googleapis.com/token',
-      {
-        code: code,
-        client_id: this.configService.get('GOOGLE_CLIENT_ID'),
-        client_secret: this.configService.get('GOOGLE_CLIENT_SECRET'),
-        redirect_uri: this.configService.get('GOOGLE_REDIRECT_URI'),
-        grant_type: 'authorization_code',
-      },
-      {},
-    );
-    const accessToken = tokenResponse.access_token;
-    const userResponse = await lastValueFrom(
-      this.httpService.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }),
-    );
-    const userData = userResponse.data;
-    console.log('🚀 ~ AuthService ~ google ~ userData:', userData);
-    // todo replace with function findProviderBySUB
-    const userByProviderId = await this.usersService.findUserByProviderId(
-      userData.sub,
-    );
-    const provider = await this.usersService.findProviderByProviderId('1234');
-    console.log('🚀 ~ provider:', provider);
-    // todo need to check if we have a googleId(need func findByProviderId) in the Provider, if yes need to compare with userData, if equel need login
-    // if we have not classically registered user we should create it from google's provider data(gen username, assign email)
-    // but if we have should merge form user to provider
-    if (!provider) {
-      const user = await this.usersService.findUserByCriteria({
-        email: userData.email,
-      });
-      console.log('auth: no provider');
+  async google(code: string) {
+    const user = await this.googleOauth.performOAuth(code);
+    return await this.externalLogin(user);
+  }
 
-      let googleSignupDto: GoogleSignupDto;
-      if (!user) {
-        console.log('auth: no user');
-        googleSignupDto = {
-          providerId: userData.sub,
-          username: userData.name,
-          email: userData.email,
-        };
-      } else {
-        console.log('auth: user exists');
-        googleSignupDto = {
-          providerId: userData.sub,
-          username: userData.name,
-          email: userData.email,
-          user: { email: userData.email, username: userData.name },
-        };
-      }
-      const res = await this.signupService.signUpGoogle(googleSignupDto);
-      console.log('🚀 ~ AuthService ~ google ~ res:', res);
-      // Login
-    } else {
-      console.log('auth: provider exists we login');
-      const userResponse: ResponseUserDto = userByProviderId;
-      const payloadAccess = { id: userByProviderId.id };
-      const payloadRefresh = { id: userByProviderId.id };
-      const access_token = await this.genAccessToken(payloadAccess);
-      const refresh_token = await this.genRefreshToken(payloadRefresh);
-      return [access_token, refresh_token, userResponse];
-    }
+  async externalLogin(user: LoggedUserDto) {
+    console.log('🚀 ~ AuthService ~ externalLogin ~ user:', user);
+    console.log('externalLogin');
+    const payloadAccess = { id: user.id };
+    const payloadRefresh = { id: user.id };
+    const access_token = await this.genAccessToken(payloadAccess);
+    const refresh_token = await this.genRefreshToken(payloadRefresh);
+    return [access_token, refresh_token, user];
   }
 }

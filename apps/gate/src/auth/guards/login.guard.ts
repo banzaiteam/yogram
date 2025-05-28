@@ -21,11 +21,17 @@ export class LoginGuard implements CanActivate {
       {},
     );
     console.log('🚀 ~ LoginGuard ~ canActivate ~ user:', user);
-    if (user && (await bcrypt.compare(loginDto.password, user.password))) {
-      delete user.password;
-      request.user = user;
-      return true;
+    if (user && user.password) {
+      if (await bcrypt.compare(loginDto.password, user.password)) {
+        delete user.password;
+        request.user = user;
+        return true;
+      }
+      throw new UnauthorizedException('invalid login/password');
+    } else {
+      throw new UnauthorizedException(
+        'you created account using oAuth2, please create new password using forgotPassword',
+      );
     }
-    throw new UnauthorizedException('invalid login/password');
   }
 }

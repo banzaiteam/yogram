@@ -36,10 +36,12 @@ export class UserQueryRepository
       .innerJoinAndSelect('users.providers', 'provider')
       .where('profile.username = :username', { username: criteria?.username })
       .orWhere('users.email = :email', { email: criteria?.email })
+      .orWhere('users.id = :id', { id: criteria?.id })
       .orWhere('provider.providerId = :providerId', {
         providerId: criteria?.providerId,
       })
       .getOne();
+    // const user = await this.userRepository(entityManager).find(criteria))[0]
     console.log('🚀 ~ user:', user);
     if (!user) return null;
     const mappedUser = {

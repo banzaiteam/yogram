@@ -84,6 +84,7 @@ export class GateService {
   }
 
   async httpServiceGet(path: string, headers) {
+    console.log('🚀 ~ GateService ~ httpServiceGet ~ path:', path);
     try {
       const { data } = await lastValueFrom(
         this.httpService.get(path, { headers }),

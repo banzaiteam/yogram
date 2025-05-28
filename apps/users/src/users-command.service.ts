@@ -29,6 +29,10 @@ import { CreateUserByProviderDto } from 'apps/libs/Users/dto/user/create-user-by
 import { genUserName } from './utils/gen-username.util';
 import { Response } from 'express';
 import { UsersQueryService } from './users-query.service';
+import { ProviderCommandService } from './provider-command.service';
+import { ProfileCommandService } from './profile-command.service';
+
+export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
 @Injectable()
 export class UsersCommandService {
@@ -38,16 +42,11 @@ export class UsersCommandService {
       CreateUserDto,
       UpdateUserDto
     >,
-    private readonly profileCommandRepository: IProfileCommandRepository<
-      CreateProfileDto,
-      UpdateProfileDto
-    >,
-    private readonly providerCommandRepository: IProviderCommandRepository<
-      CreateProviderDto,
-      UpdateProviderDto
-    >,
+    private readonly profileCommandService: ProfileCommandService,
+    private readonly providerCommandService: ProviderCommandService,
     private readonly usersQueryService: UsersQueryService,
   ) {}
+
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.startTransaction();
@@ -60,7 +59,7 @@ export class UsersCommandService {
         user,
         username: createUserDto.username,
       };
-      await this.profileCommandRepository.create(
+      await this.profileCommandService.create(
         createProfileDto,
         queryRunner.manager,
       );
@@ -70,7 +69,7 @@ export class UsersCommandService {
           user,
           type: OauthProviders[key],
         };
-        await this.providerCommandRepository.create(
+        await this.providerCommandService.create(
           providerDto,
           queryRunner.manager,
         );
@@ -99,26 +98,20 @@ export class UsersCommandService {
   async createUserGoogle(
     googleSignupDto: GoogleSignupDto,
     res: Response,
-  ): Promise<ResponseUserDto> {
-    console.log('🚀 ~ UsersCommandService ~ googleSignupDto:', googleSignupDto);
+  ): Promise<GoogleResponse> {
     // form user does not exists so create provider entity and merge to the form user
     if (!googleSignupDto.user) {
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        const userId = v4();
         let username = googleSignupDto.username;
-        const userWithUserName =
+        const userWithTheSameUserName =
           await this.usersQueryService.findUserByCriteria({
             username: googleSignupDto.username,
           });
-        console.log(
-          '🚀 ~ UsersCommandService ~ userWithUserName:',
-          userWithUserName,
-        );
         // if any user with username from provider already exists we should generate the new one
         // if user from provider hasnt username we generate it from provider email
-        if (userWithUserName || !username) {
+        if (userWithTheSameUserName || !username) {
           const isUsername = googleSignupDto.username ? true : false;
           const usernameFromUsernameOrEmail: string = isUsername
             ? googleSignupDto.username
@@ -131,7 +124,6 @@ export class UsersCommandService {
             queryRunner,
             this.usersQueryService,
           );
-          console.log('🚀 ~ UsersCommandService ~ username:', username);
         }
         // create user
         const createUserDto: CreateUserByProviderDto = {
@@ -148,7 +140,7 @@ export class UsersCommandService {
           user,
           username: createUserDto.username,
         };
-        await this.profileCommandRepository.create(
+        await this.profileCommandService.create(
           createProfileDto,
           queryRunner.manager,
         );
@@ -160,28 +152,46 @@ export class UsersCommandService {
           type: OauthProviders.Google,
           user,
         };
-        await this.providerCommandRepository.create(
+        await this.providerCommandService.create(
           createProviderDto,
           queryRunner.manager,
         );
         await queryRunner.commitTransaction();
-        console.log('userrrrrrrr====', user);
-
-        return plainToInstance(ResponseUserDto, user);
+        const fullUser = await this.usersQueryService.findUserByCriteria({
+          email: createUserDto.email,
+        });
+        return {
+          user: plainToInstance(ResponseUserDto, fullUser),
+          created: true,
+        };
       } catch (error) {
         console.log('🚀 ~ UsersCommandService ~ error:', error);
         await queryRunner.rollbackTransaction();
         throw new InternalServerErrorException(error);
       } finally {
         await queryRunner.release();
-        // todo redirect to restore password page
       }
     }
     // form user exists so merge it to the provider entity
     else {
-      console.log('createUserGoogle else!!!!');
+      // update provider's username, email, providerId
+      const queryRunner = this.dataSource.createQueryRunner();
+      const providerUpdateDto: UpdateProviderDto = {
+        username: googleSignupDto.user.username,
+        email: googleSignupDto.user.email,
+        providerId: googleSignupDto.providerId,
+      };
+
+      await this.providerCommandService.update(
+        { userId: googleSignupDto.user.id, type: 'google' },
+        providerUpdateDto,
+        queryRunner.manager,
+      );
+      const user = await this.usersQueryService.findUserByCriteria({
+        providerId: googleSignupDto.providerId,
+      });
+      return { user };
     }
-    return;
   }
 
   async updateUser(
@@ -196,19 +206,6 @@ export class UsersCommandService {
     );
     if (!updatedUser) throw new NotFoundException();
     return plainToInstance(ResponseUserDto, updatedUser);
-  }
-
-  async reCreateNotVerifiedUser(
-    criteria: UserCriteria,
-    updateUserDto: UpdateUserDto,
-  ): Promise<ResponseUserDto> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    const user = await this.userCommandRepository.update(
-      criteria,
-      updateUserDto,
-      queryRunner.manager,
-    );
-    return plainToInstance(ResponseUserDto, user);
   }
 
   async emailVerify(email: string): Promise<void> {
