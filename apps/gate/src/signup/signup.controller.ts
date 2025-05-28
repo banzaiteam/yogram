@@ -22,7 +22,7 @@ import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-p
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
+import { EmailDto } from '../../../../apps/libs/Users/dto/user/email.dto';
 
 @ApiTags('SignUp')
 @Controller('signup')

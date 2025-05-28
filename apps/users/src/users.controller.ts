@@ -17,14 +17,14 @@ import { FindUserByCriteriaDto } from '../../../apps/libs/Users/dto/user/find-us
 import { FindUserByCriteriaQuery } from './features/find-by-criteria/query/find-users-by-criteria.query';
 import { UserLoginQuery } from './features/user-login/query/user-login.query';
 import { ResponseLoginDto } from '../../../apps/libs/Users/dto/user/response-login.dto';
-import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
-import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
+import { UpdateUserCriteria } from '../../../apps/libs/Users/dto/user/update-user-criteria.dto';
+import { UpdateUserDto } from '../../../apps/libs/Users/dto/user/update-user.dto';
 import { UpdateUserByCriteriaCommand } from './features/update/command/update-user-by-criteria.command';
-import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
+import { GoogleSignupDto } from '../../../apps/libs/Users/dto/user/google-signup.dto';
 import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
 import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/find-user-by-providerId.query';
 import { Response } from 'express';
-import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
+import { ResponseProviderDto } from '../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { ProviderQueryService } from './provider-query.service';
 import { GoogleResponse } from './users-command.service';
 

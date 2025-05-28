@@ -1,12 +1,6 @@
-import {
-  IsEmail,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { OauthProviders } from '../../constants/oauth-providers.enum';
-import { User } from 'apps/users/src/infrastructure/entity/User.entity';
+import { User } from '../../../../../apps/users/src/infrastructure/entity/User.entity';
 
 export class CreateProviderDto {
   @IsOptional()

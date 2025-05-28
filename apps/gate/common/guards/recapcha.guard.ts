@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { verifyRecaptcha } from '../utils/verify-recapcha';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RecaptchaGuard implements CanActivate {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['x-recaptcha-token'];
@@ -17,6 +21,6 @@ export class RecaptchaGuard implements CanActivate {
       throw new BadRequestException('Recaptcha token is required');
     }
 
-    return await verifyRecaptcha(token, this.httpService);
+    return await verifyRecaptcha(token, this.httpService, this.configService);
   }
 }

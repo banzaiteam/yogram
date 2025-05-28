@@ -1,16 +1,16 @@
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { GateService } from 'apps/libs/gateService';
+import { GateService } from '../../../../../apps/libs/gateService';
 import { lastValueFrom } from 'rxjs';
 import { OauthUserCredentialsDto } from './dto/oauth-user-credentials.dto';
 import { UsersService } from '../../users/users.service';
-import { GoogleSignupDto } from 'apps/libs/Users/dto/user/google-signup.dto';
+import { GoogleSignupDto } from '../../../../../apps/libs/Users/dto/user/google-signup.dto';
 import { plainToInstance } from 'class-transformer';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
+import { HttpUsersPath } from '../../../../../apps/libs/Users/constants/path.enum';
 import { IOauth } from './interfaces/oauth.interface';
-import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
+import { LoggedUserDto } from '../../../../../apps/libs/Users/dto/user/logged-user.dto';
 
 @Injectable()
 export class GoogleOauth implements IOauth {
