@@ -4,6 +4,8 @@ import { SendUserVerifyEmailCommand } from '../features/verifyEmail/command/send
 import { UsersRoutingKeys } from '../../../../apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
 import { EventSubscribe } from '../../../../apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
 import { IEvent } from '../../../../apps/libs/common/message-brokers/interfaces/event.interface';
+import { MailerRoutingKeysEnum } from '../../../../apps/libs/Mailer/constants';
+import { SendEmailCommand } from '../features/sendEmail/command/send-email.command';
 
 @Controller()
 export class MailerController {
@@ -12,12 +14,13 @@ export class MailerController {
   @EventSubscribe({ routingKey: UsersRoutingKeys.UsersVerifyEmail })
   async sendUserVerifyEmail(rtKey: string, { payload }: IEvent): Promise<void> {
     const { to, username } = payload;
-    console.log(
-      `🚀 ~ MailerController ~ sendUserVerifyEmail ~  { to, username }:`,
-      { to, username },
-    );
     await this.commandBus.execute(
       new SendUserVerifyEmailCommand({ to, username }),
     );
+  }
+
+  @EventSubscribe({ routingKey: MailerRoutingKeysEnum.SendEmail })
+  async sendEmail(rtKey: string, { payload }: IEvent): Promise<void> {
+    await this.commandBus.execute(new SendEmailCommand(payload));
   }
 }

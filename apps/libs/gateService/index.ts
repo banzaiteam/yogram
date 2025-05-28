@@ -38,11 +38,56 @@ export class GateService {
     }
   }
 
+  async usersHttpServicePatch(path, payload, headers) {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.patch(
+          [this.usersHttpService, path].join('/'),
+          payload,
+          {
+            headers,
+          },
+        ),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.message, error.response.status);
+    }
+  }
+
   async usersHttpServiceGet(path: string, headers) {
     try {
       const url = [this.usersHttpService, path].join('/');
       const { data } = await lastValueFrom(
         this.httpService.get(url, { headers }),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error getAdapter', error);
+      throw new HttpException(error.message, error.response.status);
+    }
+  }
+
+  async httpServicePost(path, payload, headers) {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.post(path, payload, {
+          headers,
+        }),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.message, error.response.status);
+    }
+  }
+
+  async httpServiceGet(path: string, headers) {
+    console.log('🚀 ~ GateService ~ httpServiceGet ~ path:', path);
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.get(path, { headers }),
       );
       return data;
     } catch (error) {
