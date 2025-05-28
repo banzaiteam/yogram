@@ -49,7 +49,8 @@ export class UsersController {
     description: ' Authorization with bearer token',
   })
   @ApiOperation({
-    summary: 'Find user by id | email | username and update it',
+    summary:
+      'Find user by id | email | username and update it. If update by email/username automatically update provider',
   })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 200, description: 'user updated' })

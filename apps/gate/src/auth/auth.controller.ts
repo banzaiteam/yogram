@@ -144,7 +144,7 @@ export class AuthController {
     summary: 'Send forgotPassword email to the user email',
     description: 'call when user entered email on forgotPassword page',
   })
-  @UseGuards(RecaptchaGuard)
+  // @UseGuards(RecaptchaGuard)
   @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
