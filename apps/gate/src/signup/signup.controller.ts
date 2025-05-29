@@ -64,6 +64,7 @@ export class SignupController {
     }
   }
 
+  @Public()
   @ApiOperation({
     summary: 'Send verify email on user request',
   })

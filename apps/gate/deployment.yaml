@@ -107,6 +107,11 @@ spec:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
                   key: RMQ_URL
+            - name: FORGOT_PASSWORD_TOKEN_EXPIRES
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: FORGOT_PASSWORD_TOKEN_EXPIRES
             - name: NODE_ENV
               valueFrom:
                 secretKeyRef:
