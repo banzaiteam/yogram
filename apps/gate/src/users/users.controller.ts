@@ -23,9 +23,9 @@ import {
 import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
-import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Users')
 @Controller('users')
@@ -43,7 +43,6 @@ export class UsersController {
     res.status(201);
   }
 
-  @Public()
   @ApiHeader({
     name: 'Authorization',
     description: ' Authorization with bearer token',
@@ -90,6 +89,6 @@ export class UsersController {
       findUserByCriteriaDto,
     );
     if (!user) throw new NotFoundException();
-    return user;
+    return plainToInstance(ResponseUserDto, user);
   }
 }

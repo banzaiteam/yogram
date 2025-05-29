@@ -57,8 +57,12 @@ export class AuthController {
     type: LoggedUserDto,
   })
   @ApiResponse({
+    status: 401,
+    description: 'invalid login/password or not verified',
+  })
+  @ApiResponse({
     status: 404,
-    description: 'invalid login/password of not verified',
+    description: 'user does not exist',
   })
   @Post('login')
   async login(

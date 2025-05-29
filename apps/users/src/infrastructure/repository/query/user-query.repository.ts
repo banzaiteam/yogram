@@ -15,7 +15,7 @@ export class UserQueryRepository
   async userLoginQuery(
     email: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseLoginDto> {
+  ): Promise<ResponseLoginDto | null> {
     const user = await this.userRepository(entityManager).findOneBy({
       email,
     });
