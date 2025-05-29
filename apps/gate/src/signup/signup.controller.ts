@@ -57,13 +57,17 @@ export class SignupController {
   async emailVerify(@Param('token') token: string, @Res() res: Response) {
     try {
       await this.signupService.emailVerify(token);
+      res.redirect(303, this.configService.get('LOGIN_PAGE'));
     } catch (err) {
       if (err instanceof TokenExpiredError) {
-        res.redirect(303, this.configService.get('resend_verify_email_page'));
+        // redirect to 'send-verify-email' where unauthorized user should enter email to resend verification email
+        res.redirect(303, this.configService.get('RESEND_EMAIL_VERIFY_PAGE'));
       }
     }
   }
 
+  // if verify email link expired should be redirected here
+  @Public()
   @ApiOperation({
     summary: 'Send verify email on user request',
   })

@@ -15,7 +15,7 @@ export class UserQueryRepository
   async userLoginQuery(
     email: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseLoginDto> {
+  ): Promise<ResponseLoginDto | null> {
     const user = await this.userRepository(entityManager).findOneBy({
       email,
     });
@@ -30,6 +30,7 @@ export class UserQueryRepository
     criteria: UserCriteria,
     entityManager?: EntityManager,
   ): Promise<ResponseUserDto | null> {
+    console.log('🚀 ~ criteria:', criteria);
     const user = await this.userRepository(entityManager)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')
