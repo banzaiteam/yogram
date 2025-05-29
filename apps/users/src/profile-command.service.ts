@@ -5,6 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 import { CreateProfileDto } from '../../../apps/libs/Users/dto/profile/create-profile.dto';
 import { UpdateProfileDto } from '../../../apps/libs/Users/dto/profile/update-profile.dto';
+import { ProfileUpdateCriteria } from './infrastructure/repository/command/profile-command.repository';
 
 @Injectable()
 export class ProfileCommandService {
@@ -20,7 +21,6 @@ export class ProfileCommandService {
     createProfileDto: CreateProfileDto,
     entityManager?: EntityManager,
   ): Promise<ResponseProfileDto> {
-    console.log('ProfileCommandService create');
     return await this.profileCommandRepository.create(
       createProfileDto,
       entityManager,
@@ -28,16 +28,15 @@ export class ProfileCommandService {
   }
 
   async update(
-    criteria: object,
+    criteria: ProfileUpdateCriteria,
     updateProfileDto: UpdateProfileDto,
     entityManager?: EntityManager,
   ): Promise<ResponseProfileDto> {
-    const user = await this.profileCommandRepository.update(
+    const updateProfile = await this.profileCommandRepository.update(
       criteria,
       updateProfileDto,
       entityManager,
     );
-    console.log('🚀 ~ ProfileCommandService ~ user:', user);
-    return plainToInstance(ResponseProfileDto, user);
+    return plainToInstance(ResponseProfileDto, updateProfile);
   }
 }

@@ -51,6 +51,10 @@ export class GoogleOauth implements IOauth {
 
   async performOAuth(code: string): Promise<LoggedUserDto> {
     const userCredentials = await this.getUserCredentials(code);
+    console.log(
+      '🚀 ~ GoogleOauth ~ performOAuth ~ userCredentials:',
+      userCredentials,
+    );
     const provider = await this.usersService.findProviderByProviderId(
       userCredentials.providerId,
     );
@@ -76,7 +80,7 @@ export class GoogleOauth implements IOauth {
         };
         // If user already have FORM REGISTRATION but push GOOGLE SIGN, we merge user’s db data to provider
       } else {
-        console.log('auth: user exists');
+        console.log('auth: user exists', user);
         googleSignupDto = {
           providerId: userCredentials.providerId,
           username: userCredentials.username,

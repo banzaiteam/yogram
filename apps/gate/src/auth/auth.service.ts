@@ -59,7 +59,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User with this email doesnt exist');
     }
-    if (!user.verified) throw new BadRequestException('user is not verified');
+    // if (!user.verified) throw new BadRequestException('user is not verified');
     const payload = { email: user.email };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('FORGOT_PASSWORD_TOKEN_EXPIRES'),
