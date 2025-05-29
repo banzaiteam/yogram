@@ -6,7 +6,6 @@ import {
   Patch,
   Post,
   Query,
-  Res,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -23,7 +22,6 @@ import { UpdateUserByCriteriaCommand } from './features/update/command/update-us
 import { GoogleSignupDto } from '../../../apps/libs/Users/dto/user/google-signup.dto';
 import { CreateUserGoogleCommand } from './features/create-google/command/create-user-google.command';
 import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/find-user-by-providerId.query';
-import { Response } from 'express';
 import { ResponseProviderDto } from '../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { ProviderQueryService } from './provider-query.service';
 import { GoogleResponse } from './users-command.service';
@@ -45,10 +43,6 @@ export class UsersController {
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto | null> {
-    console.log(
-      '🚀 ~ UsersController ~ findUserByCriteriaDto:',
-      findUserByCriteriaDto,
-    );
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );
@@ -58,7 +52,6 @@ export class UsersController {
   async findUserByProviderId(
     @Param('providerid') providerId: string,
   ): Promise<ResponseUserDto | null> {
-    console.log('🚀 ~ UsersController ~ providerId:', providerId);
     return await this.queryBus.execute(
       new FindUserByProviderIdQuery(providerId),
     );
@@ -98,10 +91,9 @@ export class UsersController {
   @Post('users/google')
   async createWithGoogle(
     @Body() googleSignupDto: GoogleSignupDto,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<GoogleResponse> {
     return await this.commandBus.execute(
-      new CreateUserGoogleCommand(googleSignupDto, res),
+      new CreateUserGoogleCommand(googleSignupDto),
     );
   }
 }

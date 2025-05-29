@@ -22,8 +22,6 @@ export class ProviderCommandService {
     createProviderDto: CreateProviderDto,
     entityManager?: EntityManager,
   ): Promise<ResponseProviderDto> {
-    console.log('ProviderCommandService create');
-
     return await this.providerCommandRepository.create(
       createProviderDto,
       entityManager,
@@ -34,13 +32,12 @@ export class ProviderCommandService {
     criteria: ProviderUpdateCriteria,
     updateProvidereDto: UpdateProviderDto,
     entityManager?: EntityManager,
-  ): Promise<ResponseProviderDto> {
-    const user = await this.providerCommandRepository.update(
+  ): Promise<ResponseProviderDto | null> {
+    const updatedProvider = await this.providerCommandRepository.update(
       criteria,
       updateProvidereDto,
       entityManager,
     );
-    console.log('🚀 ~ ProviderCommandService ~ user:', user);
-    return plainToInstance(ResponseProviderDto, user);
+    return plainToInstance(ResponseProviderDto, updatedProvider);
   }
 }

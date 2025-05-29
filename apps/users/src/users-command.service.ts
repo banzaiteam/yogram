@@ -89,7 +89,6 @@ export class UsersCommandService {
 
   async createUserGoogle(
     googleSignupDto: GoogleSignupDto,
-    res: Response,
   ): Promise<GoogleResponse> {
     // form user does not exists so create provider entity and merge to the form user
     if (!googleSignupDto.user) {
@@ -196,7 +195,6 @@ export class UsersCommandService {
       updateUserDto,
       queryRunner.manager,
     );
-    if (!updatedUser) throw new NotFoundException();
     return plainToInstance(ResponseUserDto, updatedUser);
   }
 

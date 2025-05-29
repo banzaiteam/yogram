@@ -48,6 +48,7 @@ export class SignupService {
     if (!user) {
       throw new UnauthorizedException('user was not found');
     }
+
     if (user.verified)
       throw new BadRequestException('user is already verified');
     const userVerifyEmailDto: UserVerifyEmailDto = {
