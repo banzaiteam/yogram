@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseRepository } from '../../../../../libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from '../../../../../libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dto';
@@ -45,7 +45,7 @@ export class ProfileCommandRepository
         }),
       )
       .getOne();
-    if (!profile) return null;
+    if (!profile) throw new NotFoundException();
     this.profileRepository(entityManager).merge(profile, {
       ...updateProfileDto,
     });

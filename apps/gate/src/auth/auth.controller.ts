@@ -124,10 +124,7 @@ export class AuthController {
   }
 
   // send forgotPassword email to user email
-  @ApiHeader({
-    name: 'Authorization',
-    description: ' Authorization with bearer token',
-  })
+  @Public()
   @ApiResponse({
     status: 200,
     description: 'email was sent succesfully',

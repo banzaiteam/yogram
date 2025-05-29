@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseRepository } from '../../../../../../apps/libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
 import { User } from '../../../../../../apps/users/src/infrastructure/entity/User.entity';
-import { Brackets, EntityManager, FindManyOptions, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { IUserCommandRepository } from 'apps/users/src/interfaces/command/user-command.interface';
 import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
 
@@ -21,13 +21,12 @@ export class UserCommandRepository
     const user = new User(createUserDto);
     return await this.userRepository(entityManager).save(user);
   }
+
   async update(
     criteria: UpdateUserCriteria, // id | email | username
     updateUserDto: UpdateUserDto,
     entityManager?: EntityManager,
   ): Promise<User> {
-    console.log('🚀 ~ updateUserDto:', updateUserDto);
-    // const user = (await this.userRepository(entityManager).find(criteria))[0];
     const user = await this.userRepository(entityManager)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')
@@ -36,39 +35,25 @@ export class UserCommandRepository
       .orWhere('users.id = :id', { id: criteria?.id })
       .orWhere('users.email = :email', { email: criteria?.email })
       .getOne();
-    console.log('🚀 ~ user:', user);
-    if (!user) return null;
-    if (
-      Object.keys(criteria).includes('username') ||
-      Object.keys(criteria).includes('email')
-    ) {
-    }
+
+    if (!user) throw new NotFoundException();
     const providers = user.providers.filter((provider) => {
       if (provider.providerId !== null) {
-        console.log('in filter.......');
         const keys = Object.keys(provider);
-        console.log('🚀 ~ providers ~ keys:', keys);
         for (let key of keys) {
-          console.log('looog = ', key);
-
           if (updateUserDto.hasOwnProperty(key)) {
-            console.log(
-              `!!!!provider =${provider[key]} , update = ${updateUserDto[key]}`,
-            );
-
             provider[key] = updateUserDto[key];
           }
         }
         return provider;
       }
     });
-    console.log('🚀 ~ providers ~ providers:', providers);
+
     const merged = this.userRepository(entityManager).merge(user, {
       ...updateUserDto,
       profile: { ...updateUserDto },
       providers,
     });
-    console.log('🚀 ~ merged ~ merged:', merged);
     return await this.userRepository(entityManager).save(user);
   }
   delete(userId: string, entityManager?: EntityManager): Promise<void> {

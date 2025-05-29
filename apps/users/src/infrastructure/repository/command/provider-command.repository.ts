@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseRepository } from '../../../../../libs/common/abstract/base-repository.abstract';
 import { Brackets, EntityManager, Repository } from 'typeorm';
 import { IProviderCommandRepository } from 'apps/users/src/interfaces/command/provider-command.interface';
@@ -6,7 +6,6 @@ import { CreateProviderDto } from 'apps/libs/Users/dto/provider/create-provider.
 import { Provider } from '../../entity/Provider.entity';
 import { UpdateProviderDto } from 'apps/libs/Users/dto/provider/update-provider.dto';
 import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -26,7 +25,6 @@ export class ProviderCommandRepository
     entityManager?: EntityManager,
   ): Promise<ResponseProviderDto> {
     const provider = new Provider(createProviderDto);
-    console.log('🚀 ~ provider:', provider);
     return plainToInstance(
       ResponseProviderDto,
       this.providerRepository(entityManager).save(provider),
@@ -37,9 +35,7 @@ export class ProviderCommandRepository
     criteria: ProviderUpdateCriteria,
     updateProviderDto: UpdateProviderDto,
     entityManager?: EntityManager,
-  ): Promise<ResponseProviderDto> {
-    console.log('🚀 ~ updateProviderDto:', updateProviderDto);
-    console.log('🚀 ~ criteria:', criteria);
+  ): Promise<ResponseProviderDto | null> {
     const provider = await this.providerRepository(entityManager)
       .createQueryBuilder('providers')
       .innerJoin('providers.user', 'user')
@@ -48,7 +44,7 @@ export class ProviderCommandRepository
         new Brackets((qb) => {
           qb.where('user.id = :userId', { userId: criteria?.userId })
             .orWhere('providers.providerId = :providerId', {
-              providerId: '1',
+              providerId: criteria?.providerId,
             })
             .orWhere('user.email = :email', {
               email: criteria?.email,
@@ -56,18 +52,14 @@ export class ProviderCommandRepository
         }),
       )
       .getOne();
-    console.log('🚀 ~ provider:', provider);
+    if (!provider) throw new NotFoundException();
     this.providerRepository(entityManager).merge(provider, {
       ...updateProviderDto,
     });
     await this.providerRepository(entityManager).save(provider);
-    // const updated = await this.providerRepository(entityManager).update(
-    //   criteria,
-    //   updateProviderDto,
-    // );
-    // console.log('🚀 ~ updated:', updated);
     return plainToInstance(ResponseProviderDto, provider);
   }
+
   delete(userId: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
