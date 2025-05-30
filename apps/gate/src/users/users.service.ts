@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { GateService } from '../../../../apps/libs/gateService';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
@@ -17,7 +17,9 @@ export class UsersService {
   ): Promise<ResponseUserDto | null> {
     const queryString = this.makeQueryStringFromObject(findUserByCriteriaDto);
     const path = `${HttpUsersPath.FindUserByCriteria}?${queryString}`;
-    return await this.gateService.usersHttpServiceGet(path, {});
+    const user = await this.gateService.usersHttpServiceGet(path, {});
+    if (!user) throw new NotFoundException('user not found');
+    return user;
   }
 
   async findUserByProviderId(

@@ -30,7 +30,6 @@ export class UserQueryRepository
     criteria: UserCriteria,
     entityManager?: EntityManager,
   ): Promise<ResponseUserDto | null> {
-    console.log('🚀 ~ criteria:', criteria);
     const user = await this.userRepository(entityManager)
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')
