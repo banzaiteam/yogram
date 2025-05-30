@@ -22,13 +22,16 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
-    if (!token) throw new UnauthorizedException();
+    if (!token) throw new UnauthorizedException('No Bearer token');
     try {
       const accessToken = token.split(' ')[1];
-      request.user = await this.jwtService.verifyAsync(accessToken.trim());
+      let payload = await this.jwtService.verifyAsync(accessToken.trim());
+      delete payload.iat;
+      delete payload.exp;
+      request.user = payload;
       return true;
     } catch (err) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }
