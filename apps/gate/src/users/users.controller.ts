@@ -88,7 +88,6 @@ export class UsersController {
     const user = await this.usersService.findUserByCriteria(
       findUserByCriteriaDto,
     );
-    if (!user) throw new NotFoundException();
     return plainToInstance(ResponseUserDto, user);
   }
 }

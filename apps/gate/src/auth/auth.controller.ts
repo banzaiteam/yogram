@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -15,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import {
   ApiBody,
   ApiExcludeEndpoint,
@@ -259,5 +260,13 @@ export class AuthController {
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
     return plainToInstance(LoggedUserDto, user);
+  }
+
+  @Get('/me')
+  async getUser(
+    @User('id') id: string,
+    @Req() req: Request,
+  ): Promise<LoggedUserDto> {
+    return await this.authService.authMe(id);
   }
 }

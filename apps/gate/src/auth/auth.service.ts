@@ -20,6 +20,7 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
+import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -56,9 +57,9 @@ export class AuthService {
 
   async forgotPassword(email: EmailDto) {
     const user = await this.usersService.findUserByCriteria(email);
-    if (!user) {
-      throw new UnauthorizedException('User with this email doesnt exist');
-    }
+    // if (!user) {
+    //   throw new UnauthorizedException('User with this email doesnt exist');
+    // }
     // if (!user.verified) throw new BadRequestException('user is not verified');
     const payload = { email: user.email };
     const token = await this.jwtService.signAsync(payload, {
@@ -110,5 +111,9 @@ export class AuthService {
     const access_token = await this.genAccessToken(payloadAccess);
     const refresh_token = await this.genRefreshToken(payloadRefresh);
     return [access_token, refresh_token, user];
+  }
+
+  async authMe(id: string): Promise<ResponseUserDto> {
+    return await this.usersService.findUserByCriteria({ id });
   }
 }
