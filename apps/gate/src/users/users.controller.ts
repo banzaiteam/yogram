@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Patch,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -45,6 +54,7 @@ export class UsersController {
     const user = await this.usersService.findUserByCriteria(
       findUserByCriteriaDto,
     );
+    if (!user) throw new NotFoundException();
     return plainToInstance(ResponseUserDto, user);
   }
 }
