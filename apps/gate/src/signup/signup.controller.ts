@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Res,
@@ -11,18 +9,15 @@ import {
 } from '@nestjs/common';
 import { SignupService } from './signup.service';
 import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
-import {
-  ApiExcludeEndpoint,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EmailDto } from '../../../../apps/libs/Users/dto/user/email.dto';
+import { SendVerifyEmailSwagger } from './decorators/swagger/send-verify-email-swagger.decorator';
+import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -33,14 +28,7 @@ export class SignupController {
   ) {}
 
   @Public()
-  @ApiResponse({ status: 201, description: 'user was created' })
-  @ApiResponse({
-    status: 409,
-    description: 'user with this email/username already exists',
-  })
-  @ApiOperation({
-    summary: 'New user registration',
-  })
+  @SignUpSwagger()
   @UsePipes(HashPasswordPipe)
   @Post()
   async signUp(
@@ -68,26 +56,7 @@ export class SignupController {
 
   // if verify email link expired should be redirected here
   @Public()
-  @ApiOperation({
-    summary: 'Send verify email on user request',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'ok email was sent',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'user was not found',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'user is already verified',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'verify email was not sent',
-  })
-  @HttpCode(HttpStatus.OK)
+  @SendVerifyEmailSwagger()
   @Post('send-verify-email')
   async SendVerifyEmail(@Body() email: EmailDto) {
     await this.signupService.sendVerifyEmail(email);

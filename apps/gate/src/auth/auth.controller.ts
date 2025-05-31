@@ -2,13 +2,10 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Patch,
   Post,
   Query,
-  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -16,16 +13,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
-import { Request, Response } from 'express';
-import {
-  ApiBody,
-  ApiExcludeEndpoint,
-  ApiHeader,
-  ApiOkResponse,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
-import { LoginDto } from '../../../../apps/libs/Users/dto/user/login.dto';
+import { Response } from 'express';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { LoginGuard } from './guards/login.guard';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
@@ -36,6 +25,12 @@ import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-p
 import { TokenExpiredError } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
 import { RecaptchaGuard } from 'apps/gate/common/guards/recapcha.guard';
+import { AuthMeSwagger } from './decorators/swagger/auth-me-swagger.decorator';
+import { GoogleSwagger } from './decorators/swagger/google-swagger.decorator';
+import { RestorePasswordSwagger } from './decorators/swagger/restore-password-swagger.decorator';
+import { ForgotPasswordSwagger } from './decorators/swagger/forgot-password-swagger.decorator';
+import { RefreshSwagger } from './decorators/swagger/refresh-swagger.decorator';
+import { LoginSwagger } from './decorators/swagger/login-swagger.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -45,26 +40,8 @@ export class AuthController {
   ) {}
 
   @Public()
-  @ApiBody({ type: LoginDto })
   @UseGuards(LoginGuard)
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({
-    headers: {
-      'Set-Cookie': {
-        description: 'access_token without httpOnly/refresh_token httpOnly',
-        schema: { type: 'string' },
-      },
-    },
-    type: LoggedUserDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'invalid login/password or not verified',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'user does not exist',
-  })
+  @LoginSwagger()
   @Post('login')
   async login(
     @User() user: LoggedUserDto,
@@ -89,25 +66,7 @@ export class AuthController {
     return user;
   }
 
-  @ApiHeader({
-    name: 'Authorization',
-    description: ' Authorization with bearer token',
-  })
-  @ApiOperation({
-    summary: 'Refresh access token',
-  })
-  @ApiOkResponse({
-    headers: {
-      'Set-Cookie': {
-        description: 'access_token',
-        schema: { type: 'string' },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'not Unauthorized',
-  })
+  @RefreshSwagger()
   @Get('refresh')
   async refresh(
     @User('id') id: string,
@@ -126,28 +85,8 @@ export class AuthController {
 
   // send forgotPassword email to user email
   @Public()
-  @ApiResponse({
-    status: 200,
-    description: 'email was sent succesfully',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'user with this email was not found',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'user was not verified',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'forgot password email was not sent',
-  })
-  @ApiOperation({
-    summary: 'Send forgotPassword email to the user email',
-    description: 'call when user entered email on forgotPassword page',
-  })
+  @ForgotPasswordSwagger()
   // @UseGuards(RecaptchaGuard)
-  @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
     await this.authService.forgotPassword(email);
@@ -178,29 +117,9 @@ export class AuthController {
     }
   }
 
-  @Public()
   // save new password and redirect to the login page
-  @ApiHeader({
-    name: 'Authorization',
-    description: ' Authorization with bearer token',
-  })
-  @ApiOperation({
-    summary: 'save new password and redirect to the login page',
-    description: 'call when user entered new password',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'user`s password was updated successfully',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'user password was not updated',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'user was not found',
-  })
-  @HttpCode(HttpStatus.OK)
+  @Public()
+  @RestorePasswordSwagger()
   @UsePipes(HashPasswordPipe)
   @Patch('restore-password')
   async restorePassword(
@@ -212,26 +131,7 @@ export class AuthController {
   }
 
   @Public()
-  @HttpCode(HttpStatus.OK)
-  @ApiOkResponse({
-    headers: {
-      'Set-Cookie': {
-        description: 'access_token without httpOnly/refresh_token httpOnly',
-        schema: { type: 'string' },
-      },
-    },
-    type: LoggedUserDto,
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'user was not created/logged in',
-  })
-  @ApiOperation({
-    summary: 'Signup/login with google',
-    description:
-      'if user didnt register with form, usual user account will be created and logged in. If user have account he will be logged in',
-  })
-  @Public()
+  @GoogleSwagger()
   @Get('google')
   async googleOauth(@Res() res: Response) {
     res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
@@ -262,11 +162,9 @@ export class AuthController {
     return plainToInstance(LoggedUserDto, user);
   }
 
+  @AuthMeSwagger()
   @Get('/me')
-  async getUser(
-    @User('id') id: string,
-    @Req() req: Request,
-  ): Promise<LoggedUserDto> {
+  async getUser(@User('id') id: string): Promise<LoggedUserDto> {
     return await this.authService.authMe(id);
   }
 }
