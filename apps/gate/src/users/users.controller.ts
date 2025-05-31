@@ -5,12 +5,10 @@ import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
-import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
-import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { FindUserByCriteriaSwagger } from './decorators/swagger/find-one-by-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
-import { UpdateUserWithCriteriaDto } from 'apps/libs/Users/dto/user/update-user-with-criteria.dto';
+import { UpdateUserWithCriteriaDto } from '../../../../apps/libs/Users/dto/user/update-user-with-criteria.dto';
 
 @ApiTags('Users')
 @Controller('users')

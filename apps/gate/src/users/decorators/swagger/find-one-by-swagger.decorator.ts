@@ -6,7 +6,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { ResponseUserDto } from '../../../../../../apps/libs/Users/dto/user/response-user.dto';
 
 export function FindUserByCriteriaSwagger() {
   return applyDecorators(
