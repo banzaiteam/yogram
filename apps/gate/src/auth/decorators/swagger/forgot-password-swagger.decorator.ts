@@ -12,10 +12,6 @@ export function ForgotPasswordSwagger() {
       description: 'user with this email was not found',
     }),
     ApiResponse({
-      status: 400,
-      description: 'user was not verified',
-    }),
-    ApiResponse({
       status: 500,
       description: 'forgot password email was not sent',
     }),
