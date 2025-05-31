@@ -1,7 +1,7 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
-import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
-import { LoginDto } from 'apps/libs/Users/dto/user/login.dto';
+import { LoggedUserDto } from '../../../../../../apps/libs/Users/dto/user/logged-user.dto';
+import { LoginDto } from '../../../../../../apps/libs/Users/dto/user/login.dto';
 
 export function LoginSwagger() {
   return applyDecorators(
