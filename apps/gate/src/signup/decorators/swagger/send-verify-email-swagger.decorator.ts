@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { EmailDto } from 'apps/libs/Users/dto/user/email.dto';
+import { EmailDto } from '../../../../../../apps/libs/Users/dto/user/email.dto';
 
 export function SendVerifyEmailSwagger() {
   return applyDecorators(
