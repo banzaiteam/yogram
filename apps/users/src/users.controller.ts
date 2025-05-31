@@ -43,6 +43,8 @@ export class UsersController {
   async findUserByCriteria(
     @Query() findUserByCriteriaDto: FindUserByCriteriaDto,
   ): Promise<ResponseUserDto | null> {
+    console.log('findUserByCriteria.....');
+
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );
