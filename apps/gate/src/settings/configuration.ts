@@ -19,6 +19,7 @@ export const getConfiguration = () => {
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
+    POSTS_PORT: process.env.POSTS_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,

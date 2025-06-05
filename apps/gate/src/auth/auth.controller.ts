@@ -24,7 +24,6 @@ import { RestorePasswordDto } from '../../../../apps/libs/Users/dto/user/restore
 import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
-import { RecaptchaGuard } from 'apps/gate/common/guards/recapcha.guard';
 import { AuthMeSwagger } from './decorators/swagger/auth-me-swagger.decorator';
 import { GoogleSwagger } from './decorators/swagger/google-swagger.decorator';
 import { RestorePasswordSwagger } from './decorators/swagger/restore-password-swagger.decorator';
@@ -37,7 +36,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Public()
   @UseGuards(LoginGuard)
@@ -46,16 +45,10 @@ export class AuthController {
   async login(
     @User() user: LoggedUserDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<LoggedUserDto> {
-    const access_token = await this.authService.genAccessToken({ id: user.id });
+  ): Promise<{ accessToken: string }> {
+    const accessToken = await this.authService.genAccessToken({ id: user.id });
     const refresh_token = await this.authService.genRefreshToken({
       id: user.id,
-    });
-    res.cookie('access_token', access_token, {
-      httpOnly: false,
-      sameSite: 'strict',
-      secure: true,
-      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
     });
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
@@ -63,24 +56,15 @@ export class AuthController {
       secure: true,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
-    return user;
+    return { accessToken };
   }
 
   @RefreshSwagger()
   @Get('refresh')
-  async refresh(
-    @User('id') id: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async refresh(@User('id') id: string) {
     console.log('🚀 ~ AuthController ~ id:', id);
-    const access_token = await this.authService.refresh(id);
-    res.status(200);
-    res.cookie('access_token', access_token, {
-      httpOnly: false,
-      sameSite: 'strict',
-      secure: true,
-      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
-    });
+    const accessToken = await this.authService.refresh(id);
+    return { accessToken };
   }
 
   // send forgotPassword email to user email
