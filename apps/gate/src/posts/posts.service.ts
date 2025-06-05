@@ -1,0 +1,17 @@
+import { Injectable } from '@nestjs/common';
+import { GateService } from '../../../libs/gateService';
+import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
+import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
+
+@Injectable()
+export class PostsService {
+  constructor(private readonly gateService: GateService) { }
+  async create(createPostDto: CreatePostDto): Promise<void> {
+    await this.gateService.requestHttpServicePost(
+      'POSTS',
+      HttpPostsPath.Create,
+      createPostDto,
+      {},
+    );
+  }
+}

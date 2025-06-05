@@ -114,4 +114,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ProfileCommandService,
   ],
 })
-export class UsersModule {}
+export class UsersModule { }

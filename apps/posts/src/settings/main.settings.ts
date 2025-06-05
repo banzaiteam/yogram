@@ -3,7 +3,6 @@ import {
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentsTypes } from './configuration';
 import { HttpExceptionFilter } from './exeption.filter';
@@ -12,48 +11,29 @@ const APP_PREFIX = '/api/v1';
 
 export const applyAppSettings = (
   app: INestApplication,
-): { port: number; env: string } => {
-  const { port, env } = getEnv(app);
+): { port: number; env: string; host: string } => {
+  const { port, env, host } = getEnv(app);
 
   setAppPrefix(app, APP_PREFIX);
 
-  setSwagger(app, APP_PREFIX);
+  // setSwagger(app, APP_PREFIX);
 
   setAppPipes(app);
 
   setAppExceptionsFilters(app);
-  return { port, env };
+  return { port, env, host };
 };
 
 const getEnv = (app: INestApplication) => {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
   const env = configService.get<EnvironmentsTypes>('NODE_ENV');
-  return { port, env };
+  const host = '0.0.0.0';
+  return { port, env, host };
 };
 
 const setAppPrefix = (app: INestApplication, prefix: string) => {
   app.setGlobalPrefix(prefix);
-};
-
-const setSwagger = (app: INestApplication, prefix: string) => {
-  // if (env !== EnvironmentMode.PRODUCTION) {
-  const swaggerPath = prefix + '/swagger';
-
-  const config = new DocumentBuilder()
-    .setTitle('YoGram')
-    .setDescription(
-      'API for control YoGram | baseApi path=> https://gate.yogram.ru/api/v1',
-    )
-    .setVersion('1.1')
-    .addBearerAuth()
-    .addBasicAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(swaggerPath, app, document, {
-    customSiteTitle: 'YoGram Swagger',
-  });
 };
 
 const setAppPipes = (app: INestApplication) => {
