@@ -26,7 +26,6 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.POSTS_PORT,
-    POSTS_PORT: process.env.POSTS_PORT,
     url: process.env.POSTGRES_URL,
     type: process.env.POSTGRES_TYPE,
     host: process.env.POSTGRES_HOST,
