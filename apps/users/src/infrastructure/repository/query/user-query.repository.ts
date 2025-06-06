@@ -4,8 +4,8 @@ import { IUsersQueryRepository } from '../../../../../../apps/users/src/interfac
 import { EntityManager, Repository } from 'typeorm';
 import { User } from '../../entity/User.entity';
 import { plainToInstance } from 'class-transformer';
-import { UserCriteria } from 'apps/users/src/features/find-by-criteria/query/find-users-by-criteria.query';
-import { ResponseLoginDto } from 'apps/libs/Users/dto/user/response-login.dto';
+import { UserCriteria } from '../../../../../../apps/users/src/features/find-by-criteria/query/find-users-by-criteria.query';
+import { ResponseLoginDto } from '../../../../../../apps/libs/Users/dto/user/response-login.dto';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 export class UserQueryRepository

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -6,9 +6,11 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../../../apps/gate/common/guards/auth.guard';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    forwardRef(() => AuthModule),
     HttpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

@@ -43,6 +43,7 @@ export class SignupController {
   @ApiExcludeEndpoint()
   @Get('email-verify/:token')
   async emailVerify(@Param('token') token: string, @Res() res: Response) {
+    console.log('🚀 ~ SignupController ~ emailVerify ~ emailVerify:');
     try {
       await this.signupService.emailVerify(token);
       res.redirect(303, this.configService.get('LOGIN_PAGE'));

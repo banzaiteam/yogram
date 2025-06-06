@@ -1,4 +1,4 @@
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EmailDto } from '../../../../../../apps/libs/Users/dto/user/email.dto';
 
@@ -8,6 +8,7 @@ export function SendVerifyEmailSwagger() {
     ApiOperation({
       summary: 'Send verify email on user request',
     }),
+    HttpCode(HttpStatus.OK),
     ApiResponse({
       status: 200,
       description: 'ok email was sent',

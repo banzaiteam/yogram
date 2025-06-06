@@ -18,7 +18,7 @@ export const getConfiguration = () => {
       Object.assign(acc, {
         [u + '_SERVICE_URL']:
           process.env.NODE_ENV === 'DEVELOPMENT' ||
-            process.env.NODE_ENV === 'TESTING'
+          process.env.NODE_ENV === 'TESTING'
             ? `http://localhost:${process.env[u + '_PORT']}/api/v1`
             : `${process.env[u + '_PROD_SERVICE_URL']}/api/v1`,
       });
@@ -53,5 +53,9 @@ export const getConfiguration = () => {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
     ...SERVICES_URLS,
+    REDIS_HOST: process.env.REDIS_HOST,
+    REDIS_PORT: process.env.REDIS_PORT,
+    REDIS_USER: process.env.REDIS_USER,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD,
   };
 };

@@ -6,9 +6,11 @@ import { GateService } from '../../../libs/gateService';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../common/guards/auth.guard';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     HttpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -26,4 +28,4 @@ import { AuthGuard } from '../../common/guards/auth.guard';
   ],
   exports: [PostsService],
 })
-export class PostsModule { }
+export class PostsModule {}

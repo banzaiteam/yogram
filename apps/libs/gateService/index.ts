@@ -61,7 +61,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -79,7 +79,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -92,7 +92,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error getAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -106,7 +106,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -119,7 +119,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error getAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 }

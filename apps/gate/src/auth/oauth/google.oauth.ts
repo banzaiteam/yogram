@@ -93,10 +93,6 @@ export class GoogleOauth implements IOauth {
         googleSignupDto,
         {},
       );
-      console.log(
-        '🚀 ~ GoogleOauth ~ performOAuth ~ userResponse:',
-        userResponse,
-      );
       if (userResponse.created) {
         await this.createPassword(userResponse.user.email);
       }

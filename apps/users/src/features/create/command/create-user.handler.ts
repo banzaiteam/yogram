@@ -1,9 +1,9 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from './create-user.command';
 import { UsersCommandService } from '../../../users-command.service';
-import { UserVerifyEmailDto } from 'apps/libs/Users/dto/user/user-verify-email.dto';
+import { UserVerifyEmailDto } from '../../../../../../apps/libs/Users/dto/user/user-verify-email.dto';
 import { SendVerifyEmailEvent } from '../event/send-verify-email.event';
-import { UsersQueryService } from 'apps/users/src/users-query.service';
+import { UsersQueryService } from '../../../../../../apps/users/src/users-query.service';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
