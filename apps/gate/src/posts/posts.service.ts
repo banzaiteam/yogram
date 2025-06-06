@@ -7,7 +7,7 @@ import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
 export class PostsService {
   constructor(private readonly gateService: GateService) { }
   async create(createPostDto: CreatePostDto): Promise<void> {
-    await this.gateService.requestHttpServicePost(
+    return await this.gateService.requestHttpServicePost(
       'POSTS',
       HttpPostsPath.Create,
       createPostDto,
