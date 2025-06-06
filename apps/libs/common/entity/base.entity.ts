@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+// TODO better timestemp or time;
 @Entity()
 export class BaseEntity {
   @PrimaryGeneratedColumn('uuid')
