@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { GateService } from '../../../libs/gateService';
-import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
-import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
+import { HttpPostsPath } from '../../../libs/Posts/constants/path.enum';
+import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
 
 @Injectable()
 export class PostsService {
