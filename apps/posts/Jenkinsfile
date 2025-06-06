@@ -3,11 +3,11 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 3913
+        PORT = 3914
         NAMESPACE = "yogram-ru"
         REGISTRY_HOSTNAME = "idogmat"
         PROJECT = "posts-yogram"
-        SERVICE="posts-yogram"
+        SERVICE="posts"
         REGISTRY = "registry.hub.docker.com"
         DEPLOYMENT_NAME = "posts-yogram-deployment"
         IMAGE_NAME = "${env.BUILD_ID}_${env.ENV_TYPE}_${env.GIT_COMMIT}"
