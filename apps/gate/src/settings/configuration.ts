@@ -12,6 +12,20 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
+  const SERVICES_NAMES = ['USERS', 'POSTS'];
+  const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
+    (acc, u) => {
+      Object.assign(acc, {
+        [u + '_SERVICE_URL']:
+          process.env.NODE_ENV === 'DEVELOPMENT' ||
+            process.env.NODE_ENV === 'TESTING'
+            ? `http://localhost:${process.env[u + '_PORT']}/api/v1`
+            : `${process.env[u + '_PROD_SERVICE_URL']}/api/v1`,
+      });
+      return acc;
+    },
+    {},
+  );
   console.log(process.env.NODE_ENV?.trim(), 'NODE_ENV--');
   return {
     NODE_ENV: (Environments.includes(process.env.NODE_ENV?.trim())
@@ -19,6 +33,7 @@ export const getConfiguration = () => {
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
+    POSTS_PORT: process.env.POSTS_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,
@@ -37,5 +52,6 @@ export const getConfiguration = () => {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+    ...SERVICES_URLS,
   };
 };

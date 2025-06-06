@@ -12,6 +12,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from './users/users.module';
 import { SignupModule } from './signup/signup.module';
 import { AuthModule } from './auth/auth.module';
+import { PostsModule } from './posts/posts.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -37,6 +38,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     UsersModule,
+    PostsModule,
     // FIXME move on external module mb// CRUSH GATE IF USERS SERVICE IS NOT WORKING
     // GraphQLModule.forRootAsync<ApolloGatewayDriverConfig>({
     //   driver: ApolloGatewayDriver,
@@ -92,4 +94,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

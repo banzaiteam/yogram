@@ -33,7 +33,7 @@ export class AuthService {
     private readonly httpService: HttpService,
     private readonly signupService: SignupService,
     private readonly googleOauth: GoogleOauth,
-  ) {}
+  ) { }
 
   async genAccessToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
@@ -68,7 +68,7 @@ export class AuthService {
 
     const template = getForgotPasswordTemplate(user.username, token);
     const subject = 'Yogram password restore';
-    let restorePasswordDto: RestorePasswordEmailDto = {
+    const restorePasswordDto: RestorePasswordEmailDto = {
       to: user.email,
       username: user.username,
       template,
