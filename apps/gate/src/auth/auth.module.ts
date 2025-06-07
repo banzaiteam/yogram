@@ -16,7 +16,7 @@ import { RabbitProducerModule } from '../../../../apps/libs/common/message-broke
 import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
 import { SessionProvider } from './session/session.provider';
-import { RedisModule } from 'apps/libs/common/redis/redis.module';
+import { RedisModule } from '../../../../apps/libs/common/redis/redis.module';
 import { RefreshGuard } from './guards/refresh.guard';
 
 @Module({
