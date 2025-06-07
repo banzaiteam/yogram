@@ -73,6 +73,8 @@ export class AuthController {
     return { accessToken };
   }
 
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
   @Get('devices')
   async getAllUserDevices(@User('id') id: string, @Req() req: Request) {
     const allUsersDevices = await this.authService.getAllUserDevices(
@@ -83,12 +85,16 @@ export class AuthController {
     return allUsersDevices;
   }
 
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
   @Get('logout')
   async deviceLogout(@Req() req: Request) {
     const token = req.headers.authorization.split(' ')[1].trim();
     return await this.authService.deviceLogout([token]);
   }
 
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
   @Post('logout-all')
   async deviceLogoutAll(@Body('tokens') tokens: string[]) {
     return await this.authService.deviceLogout(tokens);

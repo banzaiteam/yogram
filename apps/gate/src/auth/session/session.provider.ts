@@ -54,9 +54,6 @@ export class SessionProvider {
     userId: string,
     devicesId: string[],
   ): Promise<{ deviceId: string; lastSeen: string }[]> {
-    const lastSeen = await this.redisClient.get(
-      `user:${userId}:device:${devicesId[0]}:lastseen`,
-    );
     const devicesLastSeen = await Promise.all(
       devicesId.map(async (deviceId) => {
         const lastSeen = await this.redisClient.get(
@@ -69,6 +66,7 @@ export class SessionProvider {
   }
 
   async findSessionbyToken(token: string): Promise<object> {
+    console.log('🚀 ~ SessionProvider ~ findSessionbyToken ~ token:', token);
     const deviceSessionInfo = await this.redisClient.hgetall(
       UsersRedisKey.UsersAuthToken + token,
     );
@@ -93,16 +91,18 @@ export class SessionProvider {
   }
 
   async deleteSession(token: string): Promise<void> {
-    const result = await this.redisClient.hdel(
-      UsersRedisKey.UsersAuthToken + token,
-      'deviceId',
-      'userId',
-      'active',
-      'expiresAt',
-      'ip',
-    );
-    if (result < 5)
+    try {
+      const result = await this.redisClient.hdel(
+        UsersRedisKey.UsersAuthToken + token,
+        'deviceId',
+        'userId',
+        'active',
+        'expiresAt',
+        'ip',
+      );
+    } catch (error) {
       throw new InternalServerErrorException('session was not deleted');
+    }
   }
 
   async setSessionNoActive(tokens: string[]) {
