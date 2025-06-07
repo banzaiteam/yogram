@@ -16,7 +16,6 @@ export class LoginGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    // console.log('🚀 ~ LoginGuard ~ canActivate ~ request:', request);
     const loginDto: LoginDto = request.body;
     const user = await this.usersGateService.usersHttpServiceGet(
       `users/login/${loginDto.email}`,

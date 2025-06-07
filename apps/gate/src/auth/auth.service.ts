@@ -46,6 +46,10 @@ export class AuthService {
     const refresh_token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
+    console.log(
+      '🚀 ~ AuthService ~ genRefreshToken ~ refresh_token:',
+      refresh_token,
+    );
     const token = await this.jwtService.verifyAsync(refresh_token);
     return [refresh_token, token.exp - token.iat];
   }
@@ -59,6 +63,7 @@ export class AuthService {
     const [refresh_token, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
+    console.log('proccessLogin');
 
     await this.createDeviceSession(
       refresh_token,
@@ -136,7 +141,7 @@ export class AuthService {
     return await this.sessionProvider.deviceLogout(currentDeviceToken, tokens);
   }
 
-  async refresh(id: string, refreshToken: string) {
+  async refresh(id: string) {
     const payloadAccess = { id };
     return await this.genAccessToken(payloadAccess);
   }
