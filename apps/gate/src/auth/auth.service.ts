@@ -40,8 +40,6 @@ export class AuthService {
   }
 
   async genRefreshToken(payload: object): Promise<[string, number]> {
-    const expiresAt =
-      Date.now() + Number(this.configService.get('REFRESH_TOKEN_EXPIRES'));
     const refresh_token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
@@ -54,6 +52,14 @@ export class AuthService {
     const [refresh_token, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
+    console.log(
+      '🚀 ~ AuthService ~ proccessLogin ~ refresh_token:',
+      refresh_token,
+    );
+    console.log(
+      '🚀 ~ AuthService ~ proccessLogin ~ access_token:',
+      access_token,
+    );
     const device = await this.createAndreturnDeviceSession(
       refresh_token,
       userId,
