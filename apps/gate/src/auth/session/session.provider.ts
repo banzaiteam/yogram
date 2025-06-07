@@ -16,12 +16,12 @@ export class SessionProvider {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createDeviceSession(token: string, device: Device) {
+  async createDeviceSession(token: string, device: Device, expiresAt: number) {
     try {
       await this.redisClient.hset(UsersRedisKey.UsersAuthToken + token, device);
       await this.redisClient.expire(
         UsersRedisKey.UsersAuthToken + token,
-        Number(device.expiresAt),
+        Number(expiresAt),
       );
     } catch (err) {
       console.log(err);
@@ -70,15 +70,19 @@ export class SessionProvider {
     const deviceSessionInfo = await this.redisClient.hgetall(
       UsersRedisKey.UsersAuthToken + token,
     );
+    console.log(
+      '🚀 ~ SessionProvider ~ findSessionbyToken ~ deviceSessionInfo:',
+      deviceSessionInfo,
+    );
     if (!deviceSessionInfo) {
       throw new InternalServerErrorException('device session was not found');
     }
     return deviceSessionInfo;
   }
 
-  async deviceLogout(tokens: string[]) {
+  async deviceLogout(tokens: string[], currentDeviceToken?: string) {
     try {
-      await this.setSessionNoActive(tokens);
+      await this.setSessionNoActive(tokens, currentDeviceToken);
     } catch (error) {
       throw new InternalServerErrorException(
         'Session provider: logout problem',
@@ -105,14 +109,23 @@ export class SessionProvider {
     }
   }
 
-  async setSessionNoActive(tokens: string[]) {
+  async setSessionNoActive(tokens: string[], currentDeviceToken?: string) {
+    console.log(
+      '🚀 ~ SessionProvider ~ setSessionNoActive ~ refreshToken:',
+      currentDeviceToken,
+    );
+    console.log('🚀 ~ SessionProvider ~ setSessionNoActive ~ tokens:', tokens);
     try {
       Promise.all(
-        tokens.map(async (token) => {
-          await this.redisClient.hset(UsersRedisKey.UsersAuthToken + token, {
-            active: false,
-          });
-        }),
+        tokens
+          .filter((token) => {
+            return token !== currentDeviceToken;
+          })
+          .map(async (token) => {
+            await this.redisClient.hset(UsersRedisKey.UsersAuthToken + token, {
+              active: false,
+            });
+          }),
       );
     } catch (err) {
       throw new InternalServerErrorException(

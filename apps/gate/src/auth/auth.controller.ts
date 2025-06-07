@@ -93,11 +93,13 @@ export class AuthController {
     return await this.authService.deviceLogout([token]);
   }
 
+  // pass refresh token which is the current session device
   @SkipAuthDecorator()
   @UseGuards(RefreshGuard)
   @Post('logout-all')
-  async deviceLogoutAll(@Body('tokens') tokens: string[]) {
-    return await this.authService.deviceLogout(tokens);
+  async deviceLogoutAll(@Body('tokens') tokens: string[], @Req() req: Request) {
+    const currentDeviceToken = req.headers.authorization.split(' ')[1].trim();
+    return await this.authService.deviceLogout(tokens, currentDeviceToken);
   }
 
   // send forgotPassword email to user email

@@ -83,10 +83,9 @@ export class AuthService {
       userId,
       active: true,
       deviceId,
-      expiresAt,
       ip,
     };
-    await this.sessionProvider.createDeviceSession(token, device);
+    await this.sessionProvider.createDeviceSession(token, device, expiresAt);
     return device;
   }
 
@@ -129,7 +128,11 @@ export class AuthService {
     return devicesWithCurrentDevice;
   }
 
-  async refresh(id: string) {
+  async deviceLogout(tokens: string[], currentDeviceToken?: string) {
+    return await this.sessionProvider.deviceLogout(tokens, currentDeviceToken);
+  }
+
+  async refresh(id: string, refreshToken: string) {
     //check if user not deleted
     // const user = await this.usersService.findUserByCriteria({ id });
     // if (!user) throw new UnauthorizedException();
