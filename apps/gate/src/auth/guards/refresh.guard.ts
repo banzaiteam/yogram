@@ -38,10 +38,14 @@ export class RefreshGuard implements CanActivate {
     });
     if (!user)
       throw new UnauthorizedException('RefreshGuard: user was not found');
-    //if !session or !active -> session does not exists or unactive, maybe fraud after user logged out and try to enter with stolen, still alive token
+    // if !session or !active -> session does not exists or unactive, maybe some fraud try to enter with stolen, still alive token after the user logged out
+    // we did not delete it after logout to check  if it active when someone try to auth with refresh
     const deviceSession =
       await this.sessionProvider.findSessionbyToken(refreshToken);
-    if (!Object.keys(deviceSession).length || !!deviceSession['active']) {
+    if (
+      !Object.keys(deviceSession).length ||
+      deviceSession['active'] === false
+    ) {
       throw new UnauthorizedException('session does not exists or unactive');
     }
     request.user = payload;
