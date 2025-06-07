@@ -33,6 +33,10 @@ import { RefreshSwagger } from './decorators/swagger/refresh-swagger.decorator';
 import { LoginSwagger } from './decorators/swagger/login-swagger.decorator';
 import { RefreshGuard } from './guards/refresh.guard';
 import { SkipAuthDecorator } from './decorators/skip-auth-guard.decorator';
+import { ResponseDeviceDto } from './dto/response-device.dto';
+import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
+import { LogoutAllDto } from './dto/logout-all.dto';
+import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -73,10 +77,14 @@ export class AuthController {
     return { accessToken };
   }
 
+  @DevicesSwagger()
   @SkipAuthDecorator()
   @UseGuards(RefreshGuard)
   @Get('devices')
-  async getAllUserDevices(@User('id') id: string, @Req() req: Request) {
+  async getAllUserDevices(
+    @User('id') id: string,
+    @Req() req: Request,
+  ): Promise<ResponseDeviceDto[]> {
     const allUsersDevices = await this.authService.getAllUserDevices(
       id,
       req.headers['user-agent'],
@@ -85,21 +93,17 @@ export class AuthController {
     return allUsersDevices;
   }
 
-  @SkipAuthDecorator()
-  @UseGuards(RefreshGuard)
-  @Get('logout')
-  async deviceLogout(@Req() req: Request) {
-    const token = req.headers.authorization.split(' ')[1].trim();
-    return await this.authService.deviceLogout([token]);
-  }
-
   // pass refresh token which is the current session device
+  @LogoutSwagger()
   @SkipAuthDecorator()
   @UseGuards(RefreshGuard)
-  @Post('logout-all')
-  async deviceLogoutAll(@Body('tokens') tokens: string[], @Req() req: Request) {
+  @Post('logout')
+  async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
     const currentDeviceToken = req.headers.authorization.split(' ')[1].trim();
-    return await this.authService.deviceLogout(tokens, currentDeviceToken);
+    return await this.authService.deviceLogout(
+      currentDeviceToken,
+      logoutAllDto.tokens,
+    );
   }
 
   // send forgotPassword email to user email

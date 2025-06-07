@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindUserByCriteriaQuery } from './find-users-by-criteria.query';
-import { UserQueryRepository } from 'apps/users/src/infrastructure/repository/query/user-query.repository';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { UserQueryRepository } from '../../../../../../apps/users/src/infrastructure/repository/query/user-query.repository';
+import { ResponseUserDto } from '../../../../../../apps/libs/Users/dto/user/response-user.dto';
 import { DataSource } from 'typeorm';
 
 @QueryHandler(FindUserByCriteriaQuery)

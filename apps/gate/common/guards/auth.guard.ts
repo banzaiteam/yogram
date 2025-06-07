@@ -7,8 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Is_Public } from '../decorators/public.decorator';
-import { SKIP_AUTH_GUARD } from 'apps/gate/src/auth/decorators/skip-auth-guard.decorator';
-import { AuthService } from 'apps/gate/src/auth/auth.service';
+import { SKIP_AUTH_GUARD } from '../../../../apps/gate/src/auth/decorators/skip-auth-guard.decorator';
+import { AuthService } from '../../../../apps/gate/src/auth/auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

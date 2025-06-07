@@ -19,6 +19,8 @@ import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { SessionProvider } from './session/session.provider';
 import { Device } from './session/types/device.type';
 import { Session } from './session/types/session.type';
+import { ResponseDeviceDto } from './dto/response-device.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -106,7 +108,7 @@ export class AuthService {
     userId: string,
     ip: string,
     userAgent: string,
-  ): Promise<Device[]> {
+  ): Promise<ResponseDeviceDto[]> {
     const devices = await this.sessionProvider.getAllUserDevices(userId);
     const devicesId = devices.map((device) => device.deviceId);
     const devicesLastSeen = await this.getUserDevicesLastSeen(
@@ -114,7 +116,7 @@ export class AuthService {
       devicesId,
     );
     const requestDeviceId = [userAgent, ip].join('-');
-    const devicesWithCurrentDevice = Promise.all(
+    const devicesWithCurrentDevice = await Promise.all(
       devices.map(async (device) => {
         if (requestDeviceId === device.deviceId) {
           device.current = true;
@@ -127,11 +129,11 @@ export class AuthService {
         return device;
       }),
     );
-    return devicesWithCurrentDevice;
+    return plainToInstance(ResponseDeviceDto, devicesWithCurrentDevice);
   }
 
-  async deviceLogout(tokens: string[], currentDeviceToken?: string) {
-    return await this.sessionProvider.deviceLogout(tokens, currentDeviceToken);
+  async deviceLogout(currentDeviceToken: string, tokens?: string[]) {
+    return await this.sessionProvider.deviceLogout(currentDeviceToken, tokens);
   }
 
   async refresh(id: string, refreshToken: string) {
