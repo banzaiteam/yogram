@@ -1,7 +1,7 @@
 export type Device = {
   deviceId: string;
   ip: string;
-  active: boolean;
+  // active: boolean;
   userId: string;
   current?: boolean;
   lastSeen?: string;

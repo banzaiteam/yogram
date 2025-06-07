@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -8,7 +9,6 @@ import {
   Query,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -131,7 +131,9 @@ export class AuthController {
           303,
           this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
         );
-        throw new UnauthorizedException();
+        throw new BadRequestException(
+          'Restore password link is expired, redirect to resend restore password page',
+        );
       }
     }
   }
@@ -162,9 +164,13 @@ export class AuthController {
   async googleAuthRedirect(
     @Query('code') code: string,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<LoggedUserDto> {
-    const [access_token, refresh_token, user] =
-      await this.authService.google(code);
+    const [access_token, refresh_token, user] = await this.authService.google(
+      code,
+      req.headers['user-agent'],
+      req.ip,
+    );
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',

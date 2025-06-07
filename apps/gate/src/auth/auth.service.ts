@@ -18,6 +18,7 @@ import { GoogleOauth } from './oauth/google.oauth';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { SessionProvider } from './session/session.provider';
 import { Device } from './session/types/device.type';
+import { Session } from './session/types/session.type';
 
 @Injectable()
 export class AuthService {
@@ -47,46 +48,47 @@ export class AuthService {
     return [refresh_token, token.exp - token.iat];
   }
 
-  async proccessLogin(userId: string, userAgent: string, ip: string) {
+  async proccessLogin(
+    userId: string,
+    userAgent: string,
+    ip: string,
+  ): Promise<[string, string]> {
     const access_token = await this.genAccessToken({ id: userId });
     const [refresh_token, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
-    console.log(
-      '🚀 ~ AuthService ~ proccessLogin ~ refresh_token:',
-      refresh_token,
-    );
-    console.log(
-      '🚀 ~ AuthService ~ proccessLogin ~ access_token:',
-      access_token,
-    );
-    const device = await this.createAndreturnDeviceSession(
+
+    await this.createDeviceSession(
       refresh_token,
       userId,
       userAgent,
       ip,
       expiresAt,
     );
-    await this.sessionProvider.addUserDevice(userId, device);
     return [access_token, refresh_token];
   }
 
-  async createAndreturnDeviceSession(
+  async createDeviceSession(
     token: string,
     userId: string,
     userAgent: string,
     ip: string,
     expiresAt: number,
-  ) {
+  ): Promise<Session> {
     const deviceId = [ip, userAgent].join('-');
-    const device: Device = {
+    const session: Session = {
       userId,
       active: true,
       deviceId,
       ip,
     };
-    await this.sessionProvider.createDeviceSession(token, device, expiresAt);
-    return device;
+    // hash hSet users:token:id {userId, active, deviceId, ip}
+    await this.sessionProvider.createDeviceSession(token, session, expiresAt);
+    delete session.active;
+    const device = session;
+    // set sAdd devices:user:id {userId, deviceId, ip}
+    await this.sessionProvider.addUserDevice(userId, device);
+    return session;
   }
 
   async updateDeviceLastSeen(userId: string, deviceId: string) {
@@ -133,12 +135,6 @@ export class AuthService {
   }
 
   async refresh(id: string, refreshToken: string) {
-    //check if user not deleted
-    // const user = await this.usersService.findUserByCriteria({ id });
-    // if (!user) throw new UnauthorizedException();
-    // const payloadAccess = { id: user.id };
-    // return await this.genAccessToken(payloadAccess);
-
     const payloadAccess = { id };
     return await this.genAccessToken(payloadAccess);
   }
@@ -186,18 +182,31 @@ export class AuthService {
     return this.usersService.update(criteria, updateUserDto);
   }
 
-  async google(code: string) {
+  async google(code: string, userAgent: string, ip: string) {
     const user = await this.googleOauth.performOAuth(code);
-    return await this.externalLogin(user);
+    return await this.externalLogin(user, userAgent, ip);
   }
 
-  async externalLogin(user: LoggedUserDto) {
+  async externalLogin(user: LoggedUserDto, userAgent: string, ip: string) {
+    console.log('🚀 ~ AuthService ~ externalLogin ~ ip:', ip);
+    console.log('🚀 ~ AuthService ~ externalLogin ~ userAgent:', userAgent);
     console.log('externalLogin');
     const payloadAccess = { id: user.id };
     const payloadRefresh = { id: user.id };
     const access_token = await this.genAccessToken(payloadAccess);
     const [refresh_token, expiresAt] =
       await this.genRefreshToken(payloadRefresh);
+
+    await this.createDeviceSession(
+      refresh_token,
+      user.id,
+      userAgent,
+      ip,
+      expiresAt,
+    );
+
+    await this.updateDeviceLastSeen(user.id, [ip, userAgent].join('-'));
+
     return [access_token, refresh_token, user];
   }
 
