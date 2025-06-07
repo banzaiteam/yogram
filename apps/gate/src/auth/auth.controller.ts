@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -13,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { LoginGuard } from './guards/login.guard';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
@@ -30,13 +31,15 @@ import { RestorePasswordSwagger } from './decorators/swagger/restore-password-sw
 import { ForgotPasswordSwagger } from './decorators/swagger/forgot-password-swagger.decorator';
 import { RefreshSwagger } from './decorators/swagger/refresh-swagger.decorator';
 import { LoginSwagger } from './decorators/swagger/login-swagger.decorator';
+import { RefreshGuard } from './guards/refresh.guard';
+import { SkipAuthDecorator } from './decorators/skip-auth-guard.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Public()
   @UseGuards(LoginGuard)
@@ -44,6 +47,7 @@ export class AuthController {
   @Post('login')
   async login(
     @User() user: LoggedUserDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const accessToken = await this.authService.genAccessToken({ id: user.id });
@@ -59,12 +63,28 @@ export class AuthController {
     return { accessToken };
   }
 
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
   @RefreshSwagger()
   @Get('refresh')
   async refresh(@User('id') id: string) {
     console.log('🚀 ~ AuthController ~ id:', id);
     const accessToken = await this.authService.refresh(id);
     return { accessToken };
+  }
+
+  @Get('devices')
+  async getAllUserDevices(@User('id') id: string, @Req() req: Request) {
+    const allUsersDevices = await this.authService.getAllUserDevices(
+      id,
+      req.headers['user-agent'],
+      req.ip,
+    );
+    console.log(
+      '🚀 ~ AuthController ~ getAllUserDevices ~ allUsersDevices:',
+      allUsersDevices,
+    );
+    return allUsersDevices;
   }
 
   // send forgotPassword email to user email

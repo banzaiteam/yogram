@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -21,6 +16,8 @@ import { HttpService } from '@nestjs/axios';
 import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
+import { SessionProvider } from './session/session.provider';
+import { Device } from './session/types/device.type';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +30,8 @@ export class AuthService {
     private readonly httpService: HttpService,
     private readonly signupService: SignupService,
     private readonly googleOauth: GoogleOauth,
-  ) { }
+    private readonly sessionProvider: SessionProvider,
+  ) {}
 
   async genAccessToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
@@ -41,17 +39,100 @@ export class AuthService {
     });
   }
 
-  async genRefreshToken(payload: object): Promise<string> {
-    return await this.jwtService.signAsync(payload, {
+  async genRefreshToken(payload: object): Promise<[string, number]> {
+    const expiresAt =
+      Date.now() + Number(this.configService.get('REFRESH_TOKEN_EXPIRES'));
+    const refresh_token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
+    const token = await this.jwtService.verifyAsync(refresh_token);
+    console.log('🚀 ~ AuthService ~ genRefreshToken ~ token:', token);
+    return [refresh_token, token.exp - token.iat];
+  }
+
+  async proccessLogin(userId: string, userAgent: string, ip: string) {
+    const access_token = await this.genAccessToken({ id: userId });
+    const [refresh_token, expiresAt] = await this.genRefreshToken({
+      id: userId,
+    });
+    console.log('🚀 ~ AuthService ~ proccessLogin ~ expiresAt:', expiresAt);
+    const device = await this.createAndreturnDeviceSession(
+      refresh_token,
+      userId,
+      userAgent,
+      ip,
+      expiresAt,
+    );
+    await this.sessionProvider.addUserDevice(userId, device);
+    return [access_token, refresh_token];
+  }
+
+  async createAndreturnDeviceSession(
+    token: string,
+    userId: string,
+    userAgent: string,
+    ip: string,
+    expiresAt: number,
+  ) {
+    const deviceId = [ip, userAgent].join('-');
+    const device: Device = {
+      userId,
+      active: true,
+      deviceId,
+      expiresAt,
+      ip,
+    };
+    await this.sessionProvider.createDeviceSession(token, device);
+    return device;
+  }
+
+  async updateDeviceLastSeen(userId: string, deviceId: string) {
+    return await this.sessionProvider.updateDeviceLastSeen(userId, deviceId);
+  }
+
+  async getUserDevicesLastSeen(
+    userId: string,
+    devicesId: string[],
+  ): Promise<{ deviceId: string; lastSeen: string }[]> {
+    return await this.sessionProvider.getUserDevicesLastSeen(userId, devicesId);
+  }
+
+  async getAllUserDevices(
+    userId: string,
+    ip: string,
+    userAgent: string,
+  ): Promise<Device[]> {
+    const devices = await this.sessionProvider.getAllUserDevices(userId);
+    const devicesId = devices.map((device) => device.deviceId);
+    const devicesLastSeen = await this.getUserDevicesLastSeen(
+      userId,
+      devicesId,
+    );
+    const requestDeviceId = [userAgent, ip].join('-');
+    const devicesWithCurrentDevice = Promise.all(
+      devices.map(async (device) => {
+        if (requestDeviceId === device.deviceId) {
+          device.current = true;
+        }
+        for await (const obj of devicesLastSeen) {
+          if (obj.deviceId === device.deviceId) {
+            device.lastSeen = obj.lastSeen;
+          }
+        }
+        return device;
+      }),
+    );
+    return devicesWithCurrentDevice;
   }
 
   async refresh(id: string) {
     //check if user not deleted
-    const user = await this.usersService.findUserByCriteria({ id });
-    if (!user) throw new UnauthorizedException();
-    const payloadAccess = { id: user.id };
+    // const user = await this.usersService.findUserByCriteria({ id });
+    // if (!user) throw new UnauthorizedException();
+    // const payloadAccess = { id: user.id };
+    // return await this.genAccessToken(payloadAccess);
+
+    const payloadAccess = { id };
     return await this.genAccessToken(payloadAccess);
   }
 
@@ -109,7 +190,8 @@ export class AuthService {
     const payloadAccess = { id: user.id };
     const payloadRefresh = { id: user.id };
     const access_token = await this.genAccessToken(payloadAccess);
-    const refresh_token = await this.genRefreshToken(payloadRefresh);
+    const [refresh_token, expiresAt] =
+      await this.genRefreshToken(payloadRefresh);
     return [access_token, refresh_token, user];
   }
 
