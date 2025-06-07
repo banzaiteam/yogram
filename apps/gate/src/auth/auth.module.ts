@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  forwardRef,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -10,12 +15,16 @@ import { UsersModule } from '../users/users.module';
 import { RabbitProducerModule } from '../../../../apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
+import { SessionProvider } from './session/session.provider';
+import { RedisModule } from 'apps/libs/common/redis/redis.module';
+import { RefreshGuard } from './guards/refresh.guard';
 
 @Module({
   imports: [
+    forwardRef(() => UsersModule),
     RabbitProducerModule.register(['mailer']),
     HttpModule,
-    UsersModule,
+    RedisModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
@@ -26,12 +35,16 @@ import { GoogleOauth } from './oauth/google.oauth';
   ],
   controllers: [AuthController],
   providers: [
+    SessionProvider,
     AuthService,
     { provide: 'GateService', useClass: GateService },
     GateService,
     SignupService,
     GoogleOauth,
+    SessionProvider,
+    RefreshGuard,
   ],
+  exports: [AuthService],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
