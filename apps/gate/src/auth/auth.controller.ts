@@ -55,9 +55,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const accessToken = await this.authService.genAccessToken({ id: user.id });
-    const refresh_token = await this.authService.genRefreshToken({
+    const [refresh_token, exp] = await this.authService.genRefreshToken({
       id: user.id,
     });
+    console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'strict',
