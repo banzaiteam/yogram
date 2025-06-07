@@ -45,7 +45,7 @@ export class ProfileCommandRepository
         }),
       )
       .getOne();
-    if (!profile) throw new NotFoundException();
+    if (!profile) throw new NotFoundException('Profile was not found');
     this.profileRepository(entityManager).merge(profile, {
       ...updateProfileDto,
     });

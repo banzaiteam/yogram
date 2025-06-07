@@ -8,6 +8,7 @@ import Redis from 'ioredis';
 import { REDIS_CLIENT } from 'apps/libs/common/redis/redis-client.factory';
 import { UsersRedisKey } from '../const/redis.constant';
 import { JwtService } from '@nestjs/jwt';
+import { Session } from './types/session.type';
 
 @Injectable()
 export class SessionProvider {
@@ -16,9 +17,16 @@ export class SessionProvider {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createDeviceSession(token: string, device: Device, expiresAt: number) {
+  async createDeviceSession(
+    token: string,
+    session: Session,
+    expiresAt: number,
+  ) {
     try {
-      await this.redisClient.hset(UsersRedisKey.UsersAuthToken + token, device);
+      await this.redisClient.hset(
+        UsersRedisKey.UsersAuthToken + token,
+        session,
+      );
       await this.redisClient.expire(
         UsersRedisKey.UsersAuthToken + token,
         Number(expiresAt),
@@ -59,24 +67,17 @@ export class SessionProvider {
         const lastSeen = await this.redisClient.get(
           `user:${userId}:device:${deviceId}:lastseen`,
         );
+        // need this stucture to add lastseen to user devices
         return { deviceId, lastSeen };
       }),
     );
     return devicesLastSeen;
   }
 
-  async findSessionbyToken(token: string): Promise<object> {
-    console.log('🚀 ~ SessionProvider ~ findSessionbyToken ~ token:', token);
-    const deviceSessionInfo = await this.redisClient.hgetall(
+  async findSessionByToken(token: string): Promise<object> {
+    let deviceSessionInfo = await this.redisClient.hgetall(
       UsersRedisKey.UsersAuthToken + token,
     );
-    console.log(
-      '🚀 ~ SessionProvider ~ findSessionbyToken ~ deviceSessionInfo:',
-      deviceSessionInfo,
-    );
-    if (!deviceSessionInfo) {
-      throw new InternalServerErrorException('device session was not found');
-    }
     return deviceSessionInfo;
   }
 
@@ -110,11 +111,6 @@ export class SessionProvider {
   }
 
   async setSessionNoActive(tokens: string[], currentDeviceToken?: string) {
-    console.log(
-      '🚀 ~ SessionProvider ~ setSessionNoActive ~ refreshToken:',
-      currentDeviceToken,
-    );
-    console.log('🚀 ~ SessionProvider ~ setSessionNoActive ~ tokens:', tokens);
     try {
       Promise.all(
         tokens
