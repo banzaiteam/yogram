@@ -46,7 +46,6 @@ export class AuthService {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
     const token = await this.jwtService.verifyAsync(refresh_token);
-    console.log('🚀 ~ AuthService ~ genRefreshToken ~ token:', token);
     return [refresh_token, token.exp - token.iat];
   }
 
@@ -55,7 +54,6 @@ export class AuthService {
     const [refresh_token, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
-    console.log('🚀 ~ AuthService ~ proccessLogin ~ expiresAt:', expiresAt);
     const device = await this.createAndreturnDeviceSession(
       refresh_token,
       userId,
@@ -185,7 +183,6 @@ export class AuthService {
   }
 
   async externalLogin(user: LoggedUserDto) {
-    console.log('🚀 ~ AuthService ~ externalLogin ~ user:', user);
     console.log('externalLogin');
     const payloadAccess = { id: user.id };
     const payloadRefresh = { id: user.id };

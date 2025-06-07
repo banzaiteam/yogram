@@ -28,7 +28,6 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
       context.getHandler(),
     ]);
-    console.log('🚀 ~ AuthGuard ~ canActivate ~ skipAuth:', skipAuth);
     if (isPublic || skipAuth) return true;
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
@@ -40,7 +39,7 @@ export class AuthGuard implements CanActivate {
       delete payload.exp;
       const userAgent = request.headers['user-agent'];
       const ip = request.ip;
-      const requestDeviceId = [userAgent, ip].join('-');
+      const requestDeviceId = [ip, userAgent].join('-');
       await this.authService.updateDeviceLastSeen(payload.id, requestDeviceId);
       request.user = payload;
       return true;

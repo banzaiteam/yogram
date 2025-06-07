@@ -80,11 +80,18 @@ export class AuthController {
       req.headers['user-agent'],
       req.ip,
     );
-    console.log(
-      '🚀 ~ AuthController ~ getAllUserDevices ~ allUsersDevices:',
-      allUsersDevices,
-    );
     return allUsersDevices;
+  }
+
+  @Get('logout')
+  async deviceLogout(@Req() req: Request) {
+    const token = req.headers.authorization.split(' ')[1].trim();
+    return await this.authService.deviceLogout([token]);
+  }
+
+  @Post('logout-all')
+  async deviceLogoutAll(@Body('tokens') tokens: string[]) {
+    return await this.authService.deviceLogout(tokens);
   }
 
   // send forgotPassword email to user email
@@ -150,7 +157,6 @@ export class AuthController {
   ): Promise<LoggedUserDto> {
     const [access_token, refresh_token, user] =
       await this.authService.google(code);
-    console.log('🚀 ~ AuthController ~ user:', user);
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',
