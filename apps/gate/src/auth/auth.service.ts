@@ -116,14 +116,22 @@ export class AuthService {
   ): Promise<ResponseDeviceDto[]> {
     const devices = await this.sessionProvider.getAllUserDevices(userId);
     const devicesId = devices.map((device) => device.deviceId);
+    console.log('🚀 ~ AuthService ~ devicesId:', devicesId);
     const devicesLastSeen = await this.getUserDevicesLastSeen(
       userId,
       devicesId,
     );
     const requestDeviceId = [userAgent, ip].join('-');
+    console.log('🚀 ~ AuthService ~ requestDeviceId:', requestDeviceId);
     const devicesWithCurrentDevice = await Promise.all(
       devices.map(async (device) => {
         if (requestDeviceId === device.deviceId) {
+          console.log(
+            ' if (requestDeviceId === device.deviceId)',
+            requestDeviceId,
+            device.deviceId,
+          );
+
           device.current = true;
         }
         for await (const obj of devicesLastSeen) {
