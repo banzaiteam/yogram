@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import { HttpUsersPath } from '../../../../../apps/libs/Users/constants/path.enum';
 import { IOauth } from './interfaces/oauth.interface';
 import { LoggedUserDto } from '../../../../../apps/libs/Users/dto/user/logged-user.dto';
+import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
 
 @Injectable()
 export class GoogleOauth implements IOauth {
@@ -88,7 +89,8 @@ export class GoogleOauth implements IOauth {
           user: { id: user.id, email: user.email, username: user.username },
         };
       }
-      const userResponse = await this.gateService.usersHttpServicePost(
+      const userResponse = await this.gateService.requestHttpServicePost(
+        HttpServices.Users,
         HttpUsersPath.CreateWithGoogle,
         googleSignupDto,
         {},

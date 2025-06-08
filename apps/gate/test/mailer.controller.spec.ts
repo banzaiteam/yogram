@@ -14,7 +14,7 @@ describe('MailerController', () => {
     mailerController = app.get<MailerController>(MailerController);
   });
 
-  describe('root', () => {
+  describe.skip('root', () => {
     it.skip('should return "Hello World!"', () => {
       expect(mailerController.sendUserVerifyEmail).toBe('Hello World!');
     });

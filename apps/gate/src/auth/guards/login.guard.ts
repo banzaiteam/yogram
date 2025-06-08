@@ -8,6 +8,7 @@ import { GateService } from '../../../../../apps/libs/gateService';
 import { LoginDto } from '../../../../../apps/libs/Users/dto/user/login.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth.service';
+import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
 
 export class LoginGuard implements CanActivate {
   constructor(
@@ -17,7 +18,8 @@ export class LoginGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const loginDto: LoginDto = request.body;
-    const user = await this.usersGateService.usersHttpServiceGet(
+    const user = await this.usersGateService.requestHttpServiceGet(
+      HttpServices.Users,
       `users/login/${loginDto.email}`,
       {},
     );

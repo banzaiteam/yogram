@@ -54,10 +54,12 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    const accessToken = await this.authService.genAccessToken({ id: user.id });
-    const [refresh_token, exp] = await this.authService.genRefreshToken({
-      id: user.id,
-    });
+    const userAgent = req.headers['user-agent'];
+    const [accessToken, refresh_token] = await this.authService.proccessLogin(
+      user.id,
+      userAgent,
+      req.ip,
+    );
     console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
@@ -73,7 +75,6 @@ export class AuthController {
   @RefreshSwagger()
   @Get('refresh')
   async refresh(@User('id') id: string) {
-    console.log('🚀 ~ AuthController ~ id:', id);
     const accessToken = await this.authService.refresh(id);
     return { accessToken };
   }
