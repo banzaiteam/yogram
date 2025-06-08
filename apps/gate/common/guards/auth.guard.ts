@@ -7,19 +7,28 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Is_Public } from '../decorators/public.decorator';
+import { SKIP_AUTH_GUARD } from '../../../../apps/gate/src/auth/decorators/skip-auth-guard.decorator';
+import { AuthService } from '../../../../apps/gate/src/auth/auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
+    private readonly authService: AuthService,
   ) {}
   async canActivate(context: ExecutionContext) {
+    console.log('AuthGuard');
+
     const isPublic = this.reflector.getAllAndOverride(Is_Public, [
       context.getClass(),
       context.getHandler(),
     ]);
-    if (isPublic) return true;
+    const skipAuth = this.reflector.getAllAndOverride(SKIP_AUTH_GUARD, [
+      context.getClass(),
+      context.getHandler(),
+    ]);
+    if (isPublic || skipAuth) return true;
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
     if (!token) throw new UnauthorizedException('No Bearer token');
@@ -28,6 +37,10 @@ export class AuthGuard implements CanActivate {
       let payload = await this.jwtService.verifyAsync(accessToken.trim());
       delete payload.iat;
       delete payload.exp;
+      const userAgent = request.headers['user-agent'];
+      const ip = request.ip;
+      const requestDeviceId = [ip, userAgent].join('-');
+      await this.authService.updateDeviceLastSeen(payload.id, requestDeviceId);
       request.user = payload;
       return true;
     } catch (err) {

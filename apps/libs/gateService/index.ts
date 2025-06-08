@@ -25,10 +25,16 @@ export class GateService {
     // example for normal switch service throw config in micro
     Object.assign(this.services, {
       POSTS: this.configService.get('POSTS_SERVICE_URL'),
+      USERS: this.configService.get('USERS_SERVICE_URL'),
     });
   }
 
   async requestHttpServicePost(service, path, payload, headers) {
+    console.log('🚀 ~ GateService ~ requestHttpServicePost ~ path:', path);
+    console.log(
+      '🚀 ~ GateService ~ requestHttpServicePost ~ service:',
+      service,
+    );
     try {
       console.log([this.services[service], path].join('/'), 'pathPOST');
       const { data } = await lastValueFrom(
@@ -47,6 +53,39 @@ export class GateService {
     }
   }
 
+  async requestHttpServiceGet(service, path, headers) {
+    try {
+      console.log([this.services[service], path].join('/'), 'pathGET');
+      const { data } = await lastValueFrom(
+        this.httpService.get([this.services[service], path].join('/'), {
+          headers,
+        }),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.message, error.response.status);
+    }
+  }
+
+  async requestHttpServicePatch(service, path, payload, headers) {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.patch(
+          [this.services[service], path].join('/'),
+          payload,
+          {
+            headers,
+          },
+        ),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.response.data, error.response.status);
+    }
+  }
+
   async usersHttpServicePost(path, payload, headers) {
     try {
       const { data } = await lastValueFrom(
@@ -61,7 +100,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -79,7 +118,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -92,7 +131,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error getAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -106,7 +145,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
@@ -119,7 +158,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error getAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 }

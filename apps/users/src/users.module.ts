@@ -25,7 +25,7 @@ import { UsersQueryRepositoryProvider } from './providers/query/users-query-repo
 import { UsersController } from './users.controller';
 import { SendVerifyEmailEvent } from './features/create/event/send-verify-email.event';
 import { SendVerifyEmailHandler } from './features/create/event/send-verify-email.handler';
-import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
+import { RabbitProducerModule } from '../../../apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { EmailVerifyCommand } from './features/email-verify/email-verify.command';
 import { EmailVerifyHandler } from './features/email-verify/email-verify.handler';
 import { FindUserByCriteriaHandler } from './features/find-by-criteria/query/find-users-by-criteria.handler';

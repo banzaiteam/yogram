@@ -13,6 +13,7 @@ import { UsersService } from '../users/users.service';
 import { ProducerService } from '../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
 import { UsersRoutingKeys } from '../../../../apps/users/src/message-brokers/rabbit/users-routing-keys.constant';
 import { UserVerifyEmailDto } from '../../../../apps/libs/Users/dto/user/user-verify-email.dto';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 
 @Injectable()
 export class SignupService {
@@ -24,7 +25,8 @@ export class SignupService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<void> {
-    await this.gateService.usersHttpServicePost(
+    await this.gateService.requestHttpServicePost(
+      HttpServices.Users,
       HttpUsersPath.Create,
       createUserDto,
       {},
@@ -36,7 +38,8 @@ export class SignupService {
     email = await this.jwtService.verifyAsync(token);
     delete email['iat'];
     delete email['exp'];
-    await this.gateService.usersHttpServicePost(
+    await this.gateService.requestHttpServicePost(
+      HttpServices.Users,
       HttpUsersPath.EmailVerify,
       email['email'],
       {},

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateUserByCriteriaCommand } from './update-user-by-criteria.command';
-import { UsersCommandService } from 'apps/users/src/users-command.service';
+import { UsersCommandService } from '../../../../../../apps/users/src/users-command.service';
 import { InternalServerErrorException } from '@nestjs/common';
 
 @CommandHandler(UpdateUserByCriteriaCommand)
