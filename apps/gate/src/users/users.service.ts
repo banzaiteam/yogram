@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { GateService } from '../../../../apps/libs/gateService';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import { FindUserByCriteriaDto } from 'apps/libs/Users/dto/user/find-user-criteria.dto';
-import { UpdateUserDto } from 'apps/libs/Users/dto/user/update-user.dto';
-import { UpdateUserCriteria } from 'apps/libs/Users/dto/user/update-user-criteria.dto';
-import { ResponseProviderDto } from 'apps/libs/Users/dto/provider/response-provider.dto';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
+import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
+import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.dto';
+import { UpdateUserCriteria } from '../../../../apps/libs/Users/dto/user/update-user-criteria.dto';
+import { ResponseProviderDto } from '../../../../apps/libs/Users/dto/provider/response-provider.dto';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 
 @Injectable()
 export class UsersService {
