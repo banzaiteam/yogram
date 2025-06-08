@@ -37,6 +37,7 @@ import { ResponseDeviceDto } from './dto/response-device.dto';
 import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
 import { LogoutAllDto } from './dto/logout-all.dto';
 import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
+import { RecaptchaGuard } from '../../../../apps/gate/common/guards/recapcha.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -111,7 +112,7 @@ export class AuthController {
   // send forgotPassword email to user email
   @Public()
   @ForgotPasswordSwagger()
-  // @UseGuards(RecaptchaGuard)
+  @UseGuards(RecaptchaGuard)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
     await this.authService.forgotPassword(email);
