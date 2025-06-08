@@ -8,7 +8,7 @@ import { GateService } from '../../../../../apps/libs/gateService';
 import { LoginDto } from '../../../../../apps/libs/Users/dto/user/login.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth.service';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { HttpServices } from '../../../../../apps/gate/common/constants/http-services.enum';
 
 export class LoginGuard implements CanActivate {
   constructor(
