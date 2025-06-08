@@ -1,8 +1,12 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 export function ForgotPasswordSwagger() {
   return applyDecorators(
+    ApiHeader({
+      name: 'x-recaptcha-token',
+      description: 'Recaptcha token',
+    }),
     ApiResponse({
       status: 200,
       description: 'email was sent succesfully',
