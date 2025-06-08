@@ -5,8 +5,8 @@ import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dt
 import { Profile } from '../../entity/Profile.entity';
 import { Brackets, EntityManager, Repository } from 'typeorm';
 import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/profile-command.interface';
-import { ResponseProfileDto } from 'apps/libs/Users/dto/user/response-profile.dto';
-import { UpdateProfileDto } from 'apps/libs/Users/dto/profile/update-profile.dto';
+import { ResponseProfileDto } from '../../../../../../apps/libs/Users/dto/user/response-profile.dto';
+import { UpdateProfileDto } from '../../../../../../apps/libs/Users/dto/profile/update-profile.dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -45,7 +45,7 @@ export class ProfileCommandRepository
         }),
       )
       .getOne();
-    if (!profile) throw new NotFoundException();
+    if (!profile) throw new NotFoundException('Profile was not found');
     this.profileRepository(entityManager).merge(profile, {
       ...updateProfileDto,
     });

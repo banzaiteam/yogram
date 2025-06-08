@@ -8,13 +8,19 @@ export function LoginSwagger() {
     HttpCode(HttpStatus.OK),
     ApiBody({ type: LoginDto }),
     ApiOkResponse({
+      description: ' return set-cookie refresh token and accessToken in body',
       headers: {
         'Set-Cookie': {
-          description: 'access_token without httpOnly/refresh_token httpOnly',
+          description: 'refresh_token httpOnly, secure, samesite',
           schema: { type: 'string' },
         },
       },
-      type: LoggedUserDto,
+      content: {
+        ApiResponse: {
+          example:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI2NTAwNGQ2LTc5MzQtNGRkNS04MDAxLWJhYWFkN2I0MmIzYiIsImlhdCI6MTc0OTQxMzA1NCwiZXhwIjoxNzQ5NDEzMjk0fQ.I50Lao0A1Tic4Npfaf8620SzNJvFfNjgO-_AvMkvNa0',
+        },
+      },
     }),
     ApiResponse({
       status: 401,

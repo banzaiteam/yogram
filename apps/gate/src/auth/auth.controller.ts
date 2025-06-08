@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,14 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
-  UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User } from './decorators/user.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { LoginGuard } from './guards/login.guard';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
@@ -30,13 +31,19 @@ import { RestorePasswordSwagger } from './decorators/swagger/restore-password-sw
 import { ForgotPasswordSwagger } from './decorators/swagger/forgot-password-swagger.decorator';
 import { RefreshSwagger } from './decorators/swagger/refresh-swagger.decorator';
 import { LoginSwagger } from './decorators/swagger/login-swagger.decorator';
+import { RefreshGuard } from './guards/refresh.guard';
+import { SkipAuthDecorator } from './decorators/skip-auth-guard.decorator';
+import { ResponseDeviceDto } from './dto/response-device.dto';
+import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
+import { LogoutAllDto } from './dto/logout-all.dto';
+import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Public()
   @UseGuards(LoginGuard)
@@ -44,12 +51,16 @@ export class AuthController {
   @Post('login')
   async login(
     @User() user: LoggedUserDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    const accessToken = await this.authService.genAccessToken({ id: user.id });
-    const refresh_token = await this.authService.genRefreshToken({
-      id: user.id,
-    });
+    const userAgent = req.headers['user-agent'];
+    const [accessToken, refresh_token] = await this.authService.proccessLogin(
+      user.id,
+      userAgent,
+      req.ip,
+    );
+    console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'strict',
@@ -59,12 +70,42 @@ export class AuthController {
     return { accessToken };
   }
 
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
   @RefreshSwagger()
   @Get('refresh')
   async refresh(@User('id') id: string) {
-    console.log('🚀 ~ AuthController ~ id:', id);
     const accessToken = await this.authService.refresh(id);
     return { accessToken };
+  }
+
+  @DevicesSwagger()
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
+  @Get('devices')
+  async getAllUserDevices(
+    @User('id') id: string,
+    @Req() req: Request,
+  ): Promise<ResponseDeviceDto[]> {
+    const allUsersDevices = await this.authService.getAllUserDevices(
+      id,
+      req.headers['user-agent'],
+      req.ip,
+    );
+    return allUsersDevices;
+  }
+
+  // pass refresh token which is the current session device
+  @LogoutSwagger()
+  @SkipAuthDecorator()
+  @UseGuards(RefreshGuard)
+  @Post('logout')
+  async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
+    const currentDeviceToken = req.headers.authorization.split(' ')[1].trim();
+    return await this.authService.deviceLogout(
+      currentDeviceToken,
+      logoutAllDto.tokens,
+    );
   }
 
   // send forgotPassword email to user email
@@ -96,7 +137,9 @@ export class AuthController {
           303,
           this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
         );
-        throw new UnauthorizedException();
+        throw new BadRequestException(
+          'Restore password link is expired, redirect to resend restore password page',
+        );
       }
     }
   }
@@ -127,10 +170,13 @@ export class AuthController {
   async googleAuthRedirect(
     @Query('code') code: string,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<LoggedUserDto> {
-    const [access_token, refresh_token, user] =
-      await this.authService.google(code);
-    console.log('🚀 ~ AuthController ~ user:', user);
+    const [access_token, refresh_token, user] = await this.authService.google(
+      code,
+      req.headers['user-agent'],
+      req.ip,
+    );
     res.cookie('access_token', access_token, {
       httpOnly: false,
       sameSite: 'strict',
