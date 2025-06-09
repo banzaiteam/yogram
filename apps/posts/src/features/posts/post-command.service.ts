@@ -30,6 +30,7 @@ export class PostCommandService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
       const post = await this.postCommandRepository.create(
         createPostDto,
         queryRunner.manager,
@@ -41,6 +42,7 @@ export class PostCommandService {
           metatype: file.mimetype,
           post,
         };
+        // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
         await this.fileCommandService.create(
           createFileDto,
           queryRunner.manager,

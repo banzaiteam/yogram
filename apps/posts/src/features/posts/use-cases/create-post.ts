@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-
 import { Post } from '../infrastracture/entity/post.entity';
 import { PostCommandService } from '../post-command.service';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';

@@ -55,10 +55,11 @@ export class PostsController {
   async createPost(
     @Body() createPostDto: CreatePostDto & Express.Multer.File[],
   ) {
-    const body = { ...createPostDto };
-    console.log('🚀 ~ PostsController ~ body:', body['createPostDto']);
     const result = await this.commandBus.execute(
-      new CreatePostCommand(body['createPostDto'], body['files']),
+      new CreatePostCommand(
+        createPostDto['createPostDto'],
+        createPostDto['files'],
+      ),
     );
     return result;
   }
