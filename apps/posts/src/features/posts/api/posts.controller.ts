@@ -2,8 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Post,
+  ForbiddenException,
   Req,
   UploadedFiles,
   UseGuards,
@@ -23,7 +23,7 @@ import { CreatePostDto } from '../../../../../libs/Posts/dto/input/create-post.d
 
 @Controller()
 export class PostsController {
-  constructor(private commandBus: CommandBus) { }
+  constructor(private commandBus: CommandBus) {}
 
   @Post('posts/create')
   @ApiOperation({
@@ -52,12 +52,13 @@ export class PostsController {
     status: 401,
     description: 'Unauthorized - authentication required',
   })
-  async createPost(@Body() post: CreatePostDto) {
-    console.log(JSON.stringify(post));
-    // throw new ForbiddenException();
-    if (!post.userId || !post.description) throw new BadRequestException();
+  async createPost(
+    @Body() createPostDto: CreatePostDto & Express.Multer.File[],
+  ) {
+    const body = { ...createPostDto };
+    console.log('🚀 ~ PostsController ~ body:', body['createPostDto']);
     const result = await this.commandBus.execute(
-      new CreatePostCommand(post.description, post.userId),
+      new CreatePostCommand(body['createPostDto'], body['files']),
     );
     return result;
   }

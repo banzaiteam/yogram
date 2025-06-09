@@ -5,5 +5,5 @@ export class CreatePostDto {
   @IsString()
   description: string;
   @IsOptional()
-  userId: string;
+  userId?: string;
 }

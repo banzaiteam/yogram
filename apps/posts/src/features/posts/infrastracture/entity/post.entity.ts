@@ -13,11 +13,11 @@ export class Post extends BaseEntity {
   @Column({ type: 'varchar', length: '500' })
   description;
 
-  // @OneToMany(() => File, (file) => file.post, {
-  //   eager: true,
-  //   cascade: true,
-  // })
-  // files: File[];
+  @OneToMany(() => File, (file) => file.post, {
+    eager: true,
+    cascade: true,
+  })
+  files: File[];
 
   constructor(entity: Partial<Post>) {
     super();

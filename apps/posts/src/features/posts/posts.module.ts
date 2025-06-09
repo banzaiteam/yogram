@@ -20,7 +20,13 @@ import {
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
 import { PostsController } from './api/posts.controller';
 import { CreatePostUseCase } from './use-cases/create-post';
-import { PostRepository } from './infrastracture/repository/post.repository';
+
+import { PostCommandService } from './post-command.service';
+import { IPostCommandRepository } from './interfaces/Post.interface';
+import { PostCommandRepository } from './infrastracture/repository/post-command.repository';
+import { IFileCommandRepository } from './interfaces/File.interface';
+import { FileCommandRepository } from './infrastracture/repository/file-command.repository';
+import { FileCommandService } from './file-command.service';
 
 @Module({
   imports: [
@@ -40,6 +46,12 @@ import { PostRepository } from './infrastracture/repository/post.repository';
     // }),
   ],
   controllers: [PostsController],
-  providers: [PostRepository, CreatePostUseCase],
+  providers: [
+    CreatePostUseCase,
+    PostCommandService,
+    FileCommandService,
+    { provide: IPostCommandRepository, useClass: PostCommandRepository },
+    { provide: IFileCommandRepository, useClass: FileCommandRepository },
+  ],
 })
-export class PostsModule { }
+export class PostsModule {}

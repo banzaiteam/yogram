@@ -13,12 +13,9 @@ export class File extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   metatype: string;
 
-  @Column({ nullable: true })
-  postId: string;
-
-  // @ManyToOne(() => Post, (post) => post.files, { onDelete: 'CASCADE' })
-  // @JoinColumn()
-  // post: Post;
+  @ManyToOne(() => Post, (post) => post.files, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  post: Post;
 
   constructor(entity: Partial<File>) {
     super();
