@@ -37,7 +37,7 @@ import { ResponseDeviceDto } from './dto/response-device.dto';
 import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
 import { LogoutAllDto } from './dto/logout-all.dto';
 import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
-import { RecaptchaGuard } from 'apps/gate/common/guards/recapcha.guard';
+import { RecaptchaGuard } from '../../../../apps/gate/common/guards/recapcha.guard';
 
 @Controller('auth')
 export class AuthController {
