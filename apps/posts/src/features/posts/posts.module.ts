@@ -20,16 +20,17 @@ import {
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
 import { PostsController } from './api/posts.controller';
 import { CreatePostUseCase } from './use-cases/create-post';
-
 import { PostCommandService } from './post-command.service';
 import { IPostCommandRepository } from './interfaces/Post.interface';
 import { PostCommandRepository } from './infrastracture/repository/post-command.repository';
 import { IFileCommandRepository } from './interfaces/File.interface';
 import { FileCommandRepository } from './infrastracture/repository/file-command.repository';
 import { FileCommandService } from './file-command.service';
+import { ChunksFileUploaderModule } from 'apps/libs/common/upload/chunks-file-uploader.module';
 
 @Module({
   imports: [
+    ChunksFileUploaderModule,
     CqrsModule,
     // RabbitProducerModule.register(['posts']),
     DatabaseModule.register(),

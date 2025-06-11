@@ -42,6 +42,8 @@ export class PostCommandService {
           metatype: file.mimetype,
           post,
         };
+        console.log('file =', file.path);
+
         // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
         await this.fileCommandService.create(
           createFileDto,
@@ -61,4 +63,6 @@ export class PostCommandService {
       await queryRunner.release();
     }
   }
+
+  async proccessFiles() {}
 }

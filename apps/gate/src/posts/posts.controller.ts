@@ -22,7 +22,7 @@ export class PostsController {
 
   @ApiResponse({ status: 201, description: 'post was created' })
   @Post()
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(FilesInterceptor('files', 10))
   @HttpCode(201)
   async create(
     @User('id') id: string,
@@ -31,6 +31,7 @@ export class PostsController {
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<void> {
+    // console.log('🚀 ~ PostsController ~ files:', files);
     return await this.postsService.create(createPostDto, files, id);
   }
 }

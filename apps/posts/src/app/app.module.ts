@@ -14,6 +14,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { PostsModule } from '../features/posts/posts.module';
 import { AppController } from './app.controller';
 
+import { GateService } from 'apps/libs/gateService';
+
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
     'apps/posts/src/.env.development',
@@ -49,4 +51,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   controllers: [AppController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

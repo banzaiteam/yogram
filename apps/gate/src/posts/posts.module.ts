@@ -8,8 +8,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { AuthModule } from '../auth/auth.module';
 
+import { MulterModule } from '@nestjs/platform-express';
+import path from 'path';
+import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
+
 @Module({
   imports: [
+    MulterModule.register({
+      // dest: path.resolve('.', 'apps/gate/src/posts/uploads'),
+    }),
     AuthModule,
     HttpModule,
     JwtModule.registerAsync({
@@ -22,6 +29,7 @@ import { AuthModule } from '../auth/auth.module';
   ],
   controllers: [PostsController],
   providers: [
+    ChunksFileUploader,
     PostsService,
     GateService,
     { provide: 'APP_GUARD', useClass: AuthGuard },

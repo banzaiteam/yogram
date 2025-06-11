@@ -20,10 +20,15 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 import { CreatePostCommand } from '../use-cases/create-post';
 import { CreatePostDto } from '../../../../../libs/Posts/dto/input/create-post.dto';
+import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
+import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
 
 @Controller()
 export class PostsController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private readonly chunksFileUploader: ChunksFileUploader,
+  ) {}
 
   @Post('posts/create')
   @ApiOperation({
@@ -52,15 +57,14 @@ export class PostsController {
     status: 401,
     description: 'Unauthorized - authentication required',
   })
-  async createPost(
-    @Body() createPostDto: CreatePostDto & Express.Multer.File[],
-  ) {
-    const result = await this.commandBus.execute(
-      new CreatePostCommand(
-        createPostDto['createPostDto'],
-        createPostDto['files'],
-      ),
-    );
-    return result;
+  async createPost(@Body() chunkedFileDto: ChunkedFileDto) {
+    await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
+    // const result = await this.commandBus.execute(
+    //   new CreatePostCommand(
+    //     createPostDto['createPostDto'],
+    //     createPostDto['files'],
+    //   ),
+    // );
+    // return result;
   }
 }
