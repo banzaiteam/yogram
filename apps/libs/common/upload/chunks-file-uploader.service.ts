@@ -1,11 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ChunkedFileDto } from './dto/chunked-file.dto';
-import fs, { FileHandle } from 'node:fs/promises';
+import fs from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { GateService } from 'apps/libs/gateService';
 import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
 import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
-import { Readable } from 'node:stream';
 
 @Injectable()
 export class ChunksFileUploader {
@@ -23,7 +22,14 @@ export class ChunksFileUploader {
       let startByte = 0;
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
-        let chunk = file.buffer.subarray(startByte, endByte);
+        const openFile = await fs.open(file.path, 'r');
+        const readable = openFile.createReadStream();
+        const chunks = [];
+        for await (const chunk of readable) {
+          chunks.push(chunk);
+        }
+        const buffer = Buffer.concat(chunks);
+        let chunk = buffer.subarray(startByte, endByte);
         await this.uploadChunk(
           endpoint,
           JSON.stringify(chunk),
@@ -51,10 +57,12 @@ export class ChunksFileUploader {
       fieldname: file.fieldname,
       mimetype: file.mimetype,
       originalname: file.originalname,
+      pathToFile: file.path,
       size: file.size,
       userId,
       metadata: { currentChunk, totalChunks },
     };
+
     const response = await this.gateService.requestHttpServicePost(
       HttpServices.Posts,
       endpoint,
@@ -66,9 +74,9 @@ export class ChunksFileUploader {
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
     const CHUNKS_DIR = 'apps/posts/src/features/posts/chunks';
     const UPLOAD_DIR = 'apps/posts/src/features/posts/uploads';
-    const chunkPath = `${CHUNKS_DIR}/${chunkedFileDto.userId}`;
+    const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.userId}`;
     const uploadsPath = `${UPLOAD_DIR}/${chunkedFileDto.userId}`;
-    await this.createFolderIfNotExists(chunkPath);
+    await this.createFolderIfNotExists(chunksPath);
 
     try {
       // convert chunk back to buffer
@@ -78,7 +86,7 @@ export class ChunksFileUploader {
       const stream = blob.stream();
       const writableChunk = await fs.open(
         [
-          chunkPath,
+          chunksPath,
           [
             chunkedFileDto.originalname,
             chunkedFileDto.metadata.currentChunk,
@@ -97,21 +105,23 @@ export class ChunksFileUploader {
         await this.assembleChunks(
           chunkedFileDto.originalname,
           +chunkedFileDto.metadata.totalChunks,
-          CHUNKS_DIR,
+          chunksPath,
           uploadsPath,
           chunkedFileDto.userId,
         );
       }
     } catch (err) {
       console.error('Error moving chunk file:', err);
-      throw new InternalServerErrorException('Error uploading chunk');
+      throw new InternalServerErrorException(
+        'FileUploader: proccessComposeFile error during uploading files',
+      );
     }
   }
 
   private async assembleChunks(
     filename: string,
     totalChunks: number,
-    chunksDir: string,
+    chunksDirPath: string,
     uploadsPath: string,
     userId: string,
   ): Promise<void> {
@@ -120,44 +130,28 @@ export class ChunksFileUploader {
       await this.createFolderIfNotExists(uploadsPath);
       const file = await fs.open(`${uploadsPath}/${filename}`, 'w');
       const writer = file.createWriteStream();
-      writer.on('finish', () => {
-        console.log(`unpipe writer close`);
+      writer.on('unpipe', () => {
+        console.log(`finish write`);
         writer.close();
         file.close();
       });
       // write all chunks to file
       for (let i = 1; i <= totalChunks; i++) {
-        const chunkPath = `${chunksDir}/${userId}/${filename}.${i}`;
+        const chunkPath = `${chunksDirPath}/${filename}.${i}`;
         const readableFile = await fs.open(chunkPath, 'r');
         const reader = readableFile.createReadStream();
-        await pipeline(reader, writer, { end: false }).then(() => {
-          // console.log('🚀 unpipe:');
-          // reader.unpipe(writer);
-        });
-        // end/close does not trigger
-        // reader.on('close', () => {
-        //   console.log(`reader ${i} ends`);
-        //   reader.close();
-        //   readableFile.close();
-        // });
-        // writer.on('unpipe', () => {
-        //   console.log(`unpipe close reader`);
-        //   reader.close();
-        //   readableFile.close();
-        // });
-
-        // writer.on('finish', () => {
-        //   console.log(`writer finish`);
-        //   writer.close();
-        //   file.close();
-        // });
-
+        await pipeline(reader, writer, { end: false });
+        reader.close();
+        readableFile.close();
         await fs.unlink(chunkPath);
       }
+      writer.end();
     } catch (error) {
+      await fs.rm(chunksDirPath, { recursive: true });
+      await fs.rm(uploadsPath, { recursive: true });
       console.log('🚀 ~ ChunksFileUploader ~ error:', error);
       throw new InternalServerErrorException(
-        'FileUploader: error  during deleting chunk file',
+        'FileUploader: assembleChunks error  during uploading files',
       );
     }
   }

@@ -18,4 +18,6 @@ export class ChunkedFileDto {
   metadata: ChunkMetadataDto;
   @IsUUID()
   userId: string;
+  @IsString()
+  pathToFile: string;
 }

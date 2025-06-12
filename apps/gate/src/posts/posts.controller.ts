@@ -14,8 +14,9 @@ import { PostsService } from './posts.service';
 import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
-import { getUploadPath } from './helper';
+import { genFileName, getUploadPath } from './helper';
 import multer, { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -24,7 +25,18 @@ export class PostsController {
 
   @ApiResponse({ status: 201, description: 'post was created' })
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: diskStorage({
+        destination: async (req, file, cb) => {
+          cb(null, await getUploadPath(req['user'].id));
+        },
+        filename: (req, file, cb) => {
+          cb(null, genFileName(file.originalname));
+        },
+      }),
+    }),
+  )
   @HttpCode(201)
   async create(
     @User('id') id: string,
@@ -33,7 +45,6 @@ export class PostsController {
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<void> {
-    // console.log('🚀 ~ PostsController ~ files:', files);
     return await this.postsService.create(createPostDto, files, id);
   }
 }
