@@ -14,6 +14,8 @@ import { PostsService } from './posts.service';
 import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
+import { getUploadPath } from './helper';
+import multer, { diskStorage } from 'multer';
 
 @ApiTags('Posts')
 @Controller('posts')

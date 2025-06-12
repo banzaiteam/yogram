@@ -16,15 +16,11 @@ export class PostsService {
     files: Express.Multer.File[],
     id: string,
   ): Promise<void> {
-    console.log('🚀 ~ PostsService ~ files:', files);
-
     createPostDto.userId = id;
-    await this.chunksFileUploader.proccessChunksUpload(files, id);
-    // return await this.gateService.requestHttpServicePost(
-    //   HttpServices.Posts,
-    //   HttpPostsPath.Create,
-    //   { createPostDto, files },
-    //   {},
-    // );
+    await this.chunksFileUploader.proccessChunksUpload(
+      files,
+      id,
+      HttpPostsPath.Create,
+    );
   }
 }

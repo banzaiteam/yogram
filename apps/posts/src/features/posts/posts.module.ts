@@ -27,11 +27,15 @@ import { IFileCommandRepository } from './interfaces/File.interface';
 import { FileCommandRepository } from './infrastracture/repository/file-command.repository';
 import { FileCommandService } from './file-command.service';
 import { ChunksFileUploaderModule } from 'apps/libs/common/upload/chunks-file-uploader.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
     ChunksFileUploaderModule,
     CqrsModule,
+    // MulterModule.register({
+    //   dest: 'apps/posts/src/features/posts/uploads/820d7ffd-5a68-4ee3-9d70-282399362b23',
+    // }),
     // RabbitProducerModule.register(['posts']),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Post, File]),

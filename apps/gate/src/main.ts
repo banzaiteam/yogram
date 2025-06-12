@@ -3,11 +3,13 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { applyAppSettings } from './settings/main.settings';
 import { useContainer } from 'class-validator';
+import bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
+  app.use(bodyParser.json());
 
   app.enableCors({
     origin: [
