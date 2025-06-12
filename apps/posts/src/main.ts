@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { applyAppSettings } from './settings/main.settings';
-
 import { useContainer } from 'class-validator';
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';

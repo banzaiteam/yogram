@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
 // import { GraphQLModule } from '@nestjs/graphql';
 // import {
 //   ApolloFederationDriver,
@@ -11,7 +10,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 import { Post } from './infrastracture/entity/post.entity';
 import { File } from './infrastracture/entity/file.entity';
-
 import {
   EnvironmentMode,
   EnvironmentsTypes,
