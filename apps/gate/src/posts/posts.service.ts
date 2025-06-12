@@ -1,18 +1,18 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HttpPostsPath } from '../../../libs/Posts/constants/path.enum';
 import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
-import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
+import { ChunksFileUploader } from '../../../../apps/libs/common/upload/chunks-file-uploader.service';
 import fs from 'node:fs/promises';
 
 @Injectable()
 export class PostsService {
   constructor(private readonly chunksFileUploader: ChunksFileUploader) {}
+
   async create(
     createPostDto: CreatePostDto,
     files: Express.Multer.File[],
     id: string,
   ): Promise<void> {
-    console.log('🚀 ~ PostsService ~ files:', files);
     createPostDto.userId = id;
     try {
       await this.chunksFileUploader.proccessChunksUpload(

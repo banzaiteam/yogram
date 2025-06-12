@@ -33,9 +33,6 @@ import { MulterModule } from '@nestjs/platform-express';
   imports: [
     ChunksFileUploaderModule,
     CqrsModule,
-    // MulterModule.register({
-    //   dest: 'apps/posts/src/features/posts/uploads/820d7ffd-5a68-4ee3-9d70-282399362b23',
-    // }),
     // RabbitProducerModule.register(['posts']),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Post, File]),

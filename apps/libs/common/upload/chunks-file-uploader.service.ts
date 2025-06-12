@@ -2,9 +2,9 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ChunkedFileDto } from './dto/chunked-file.dto';
 import fs from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
-import { GateService } from 'apps/libs/gateService';
-import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { GateService } from '../../../../apps/libs/gateService';
+import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 
 @Injectable()
 export class ChunksFileUploader {
@@ -14,21 +14,24 @@ export class ChunksFileUploader {
     files: Express.Multer.File[],
     userId: string,
     endpoint: HttpPostsPath,
-  ) {
+  ): Promise<void> {
     // todo devide files on chunks
     for await (const file of files) {
       const chunkSize = 1024 * 1024;
       const totalChunks = Math.ceil(file.size / chunkSize);
       let startByte = 0;
+      const openFile = await fs.open(file.path, 'r');
+      const readable = openFile.createReadStream();
+      const chunks = [];
+      for await (const chunk of readable) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+      readable.removeAllListeners();
+      await openFile.close();
+      readable.close();
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
-        const openFile = await fs.open(file.path, 'r');
-        const readable = openFile.createReadStream();
-        const chunks = [];
-        for await (const chunk of readable) {
-          chunks.push(chunk);
-        }
-        const buffer = Buffer.concat(chunks);
         let chunk = buffer.subarray(startByte, endByte);
         await this.uploadChunk(
           endpoint,
@@ -50,7 +53,7 @@ export class ChunksFileUploader {
     currentChunk: number,
     file: Express.Multer.File,
     userId: string,
-  ) {
+  ): Promise<void> {
     // todo upload chunk to posts microservice
     const chunkedFileDto: ChunkedFileDto = {
       chunk,
@@ -63,7 +66,7 @@ export class ChunksFileUploader {
       metadata: { currentChunk, totalChunks },
     };
 
-    const response = await this.gateService.requestHttpServicePost(
+    await this.gateService.requestHttpServicePost(
       HttpServices.Posts,
       endpoint,
       chunkedFileDto,
@@ -97,6 +100,12 @@ export class ChunksFileUploader {
       // todo write chunk to file
       const writable = writableChunk.createWriteStream();
       await pipeline(stream, writable);
+      writable.on('finish', async () => {
+        console.log('proccessComposeFile finish!!!');
+        await writableChunk.close();
+        writable.end();
+      });
+
       if (
         +chunkedFileDto.metadata.currentChunk ===
         +chunkedFileDto.metadata.totalChunks
@@ -107,7 +116,6 @@ export class ChunksFileUploader {
           +chunkedFileDto.metadata.totalChunks,
           chunksPath,
           uploadsPath,
-          chunkedFileDto.userId,
         );
       }
     } catch (err) {
@@ -123,17 +131,17 @@ export class ChunksFileUploader {
     totalChunks: number,
     chunksDirPath: string,
     uploadsPath: string,
-    userId: string,
   ): Promise<void> {
     try {
       // todo write chunk files to file
       await this.createFolderIfNotExists(uploadsPath);
       const file = await fs.open(`${uploadsPath}/${filename}`, 'w');
       const writer = file.createWriteStream();
-      writer.on('unpipe', () => {
+      writer.on('finish', async () => {
         console.log(`finish write`);
+        writer.removeAllListeners();
         writer.close();
-        file.close();
+        await file.close();
       });
       // write all chunks to file
       for (let i = 1; i <= totalChunks; i++) {
@@ -141,8 +149,10 @@ export class ChunksFileUploader {
         const readableFile = await fs.open(chunkPath, 'r');
         const reader = readableFile.createReadStream();
         await pipeline(reader, writer, { end: false });
+        reader.removeAllListeners();
         reader.close();
-        readableFile.close();
+        await readableFile.close();
+        // writer.removeAllListeners();
         await fs.unlink(chunkPath);
       }
       writer.end();

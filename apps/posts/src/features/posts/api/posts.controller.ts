@@ -1,29 +1,8 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Post,
-  ForbiddenException,
-  Req,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-  Get,
-} from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreatePostCommand } from '../use-cases/create-post';
-import { CreatePostDto } from '../../../../../libs/Posts/dto/input/create-post.dto';
 import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
 import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
-import { Request } from 'express';
 
 @Controller()
 export class PostsController {
@@ -55,23 +34,11 @@ export class PostsController {
   //   description: 'Post created successfully',
   //   type: PostViewModel,
   // })
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      dest: 'apps/posts/src/features/posts/uploads/820d7ffd-5a68-4ee3-9d70-282399362b23',
-    }),
-  )
   @ApiResponse({
     status: 401,
     description: 'Unauthorized - authentication required',
   })
-  async createPost(
-    @Body() chunkedFileDto: ChunkedFileDto,
-    @UploadedFiles()
-    files: Express.Multer.File[],
-    @Req() req: Request,
-  ) {
-    console.log('req', files);
-
+  async createPost(@Body() chunkedFileDto: ChunkedFileDto) {
     await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
     // const result = await this.commandBus.execute(
     //   new CreatePostCommand(
