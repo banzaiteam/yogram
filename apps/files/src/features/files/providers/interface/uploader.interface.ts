@@ -8,4 +8,6 @@ export interface UploadFilesResponse {
 
 export abstract class IUploader {
   abstract uploadFiles(path: string, files: any): Promise<UploadFilesResponse>;
+  abstract createBucket(name: string): Promise<string>;
+  abstract isBucketExists(name: string, accountId: string): Promise<boolean>;
 }
