@@ -29,7 +29,7 @@ let command = '';
 
 switch (type) {
   case 'create':
-    command = `yarn typeorm -- migration:create ${migrationDir}/${name}`;
+    command = `yarn typeorm -- migration:create ${basePath}/${name}`;
     break;
 
   case 'generate':

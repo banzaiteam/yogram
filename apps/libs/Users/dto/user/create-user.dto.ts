@@ -13,7 +13,9 @@ export class CreateUserDto {
     description: 'username should be 6-30 characters length and unique',
   })
   @IsString()
-  @MinLength(6)
+  @MinLength(6, {
+    message: 'username must be longer than or equal to 6 characters',
+  })
   @MaxLength(30)
   username: string;
   @ApiProperty({

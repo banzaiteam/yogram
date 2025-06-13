@@ -30,13 +30,7 @@ export class GateService {
   }
 
   async requestHttpServicePost(service, path, payload, headers) {
-    console.log('🚀 ~ GateService ~ requestHttpServicePost ~ path:', path);
-    console.log(
-      '🚀 ~ GateService ~ requestHttpServicePost ~ service:',
-      service,
-    );
     try {
-      console.log([this.services[service], path].join('/'), 'pathPOST');
       const { data } = await lastValueFrom(
         this.httpService.post(
           [this.services[service], path].join('/'),
@@ -49,13 +43,12 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 
   async requestHttpServiceGet(service, path, headers) {
     try {
-      console.log([this.services[service], path].join('/'), 'pathGET');
       const { data } = await lastValueFrom(
         this.httpService.get([this.services[service], path].join('/'), {
           headers,
@@ -64,7 +57,7 @@ export class GateService {
       return data;
     } catch (error) {
       console.warn('error postAdapter', error);
-      throw new HttpException(error.message, error.response.status);
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 

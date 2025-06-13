@@ -60,7 +60,7 @@ const setAppPipes = (app: INestApplication) => {
 };
 
 const setAppExceptionsFilters = (app: INestApplication) => {
-  app.useGlobalFilters(new HttpExceptionFilter());
+  // app.useGlobalFilters(new HttpExceptionFilter());
 };
 
 class IntervalRunner {

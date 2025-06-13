@@ -1,29 +1,28 @@
 import {
-  BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Post,
   Req,
   UploadedFiles,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
+import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
+import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
+import { Request } from 'express';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
+import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { CreatePostCommand } from '../use-cases/create-post';
-import { CreatePostDto } from '../../../../../libs/Posts/dto/input/create-post.dto';
 
 @Controller()
 export class PostsController {
-  constructor(private commandBus: CommandBus) { }
+  constructor(
+    private commandBus: CommandBus,
+    private readonly chunksFileUploader: ChunksFileUploader,
+  ) {}
 
   @Post('posts/create')
   @ApiOperation({
@@ -52,13 +51,32 @@ export class PostsController {
     status: 401,
     description: 'Unauthorized - authentication required',
   })
-  async createPost(@Body() post: CreatePostDto) {
-    console.log(JSON.stringify(post));
-    // throw new ForbiddenException();
-    if (!post.userId || !post.description) throw new BadRequestException();
-    const result = await this.commandBus.execute(
-      new CreatePostCommand(post.description, post.userId),
-    );
-    return result;
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: diskStorage({
+        destination: async (req, file, cb) => {
+          cb(null, await getUploadPath(req.body.userId));
+        },
+        filename: (req, file, cb) => {
+          cb(null, genFileName(file.originalname));
+        },
+      }),
+    }),
+  )
+  async createPost(
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFiles()
+    files: Express.Multer.File[],
+  ) {
+    console.log('files =  ', files);
+    await this.commandBus.execute(new CreatePostCommand(createPostDto, files));
+    // await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
+    // const result = await this.commandBus.execute(
+    //   new CreatePostCommand(
+    //     createPostDto['createPostDto'],
+    //     createPostDto['files'],
+    //   ),
+    // );
+    // return result;
   }
 }
