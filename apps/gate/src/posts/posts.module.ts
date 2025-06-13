@@ -7,12 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { AuthModule } from '../auth/auth.module';
-import { MulterModule } from '@nestjs/platform-express';
 import { ChunksFileUploader } from '../../../../apps/libs/common/upload/chunks-file-uploader.service';
 
 @Module({
   imports: [
-    MulterModule.register({}),
     AuthModule,
     HttpModule,
     JwtModule.registerAsync({

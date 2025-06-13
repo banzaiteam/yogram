@@ -38,7 +38,7 @@ export class PostCommandService {
       for (const file of files) {
         const createFileDto: CreateFileDto = {
           fileName: file.fieldname,
-          url: `http//:www.url.com`,
+          url: null,
           metatype: file.mimetype,
           post,
         };

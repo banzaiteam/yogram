@@ -9,9 +9,10 @@ async function createFolderIfNotExists(folder: string): Promise<void> {
 }
 
 export async function getUploadPath(userId: string): Promise<string> {
-  const UPLOAD_DIR = 'apps/gate/src/posts/uploads';
+  const UPLOAD_DIR = 'apps/posts/src/features/posts/uploads';
   const uploadsPath = `${UPLOAD_DIR}/${userId}`;
   await createFolderIfNotExists(uploadsPath);
+  console.log('🚀 ~ getUploadPath ~ uploadsPath:', uploadsPath);
   return uploadsPath;
 }
 

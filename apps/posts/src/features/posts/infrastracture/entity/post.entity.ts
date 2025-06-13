@@ -1,5 +1,5 @@
 import { BaseEntity } from '../../../../../../libs/common/entity/base.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { File } from './file.entity';
 
 @Entity('posts')
@@ -11,7 +11,7 @@ export class Post extends BaseEntity {
   isPublished: boolean;
 
   @Column({ type: 'varchar', length: '500' })
-  description;
+  description: string;
 
   @OneToMany(() => File, (file) => file.post, {
     eager: true,
