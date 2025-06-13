@@ -46,9 +46,15 @@ export class SignupController {
     console.log('🚀 ~ SignupController ~ emailVerify ~ emailVerify:');
     try {
       await this.signupService.emailVerify(token);
+      console.log('all is ok, redirect to login page............');
       res.redirect(303, this.configService.get('LOGIN_PAGE'));
     } catch (err) {
+      console.log('error, should redirect............');
+
       if (err instanceof TokenExpiredError) {
+        console.log(
+          'err instanceof TokenExpiredError, should redirect............',
+        );
         // redirect to 'send-verify-email' where unauthorized user should enter email to resend verification email
         res.redirect(303, 'https://yogram.ru/signup/email-verify');
       }
