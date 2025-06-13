@@ -11,6 +11,8 @@ export class FilesController {
 
   @Post('files/upload')
   async uploadFile() {
-    await this.uploadService.uploadFiles('path', 'ddd');
+    const res = await this.uploadService.uploadFiles('yogram1-files1', 'files');
+    console.log('🚀 ~ FilesController ~ uploadFile ~ res:', res);
+    return res;
   }
 }
