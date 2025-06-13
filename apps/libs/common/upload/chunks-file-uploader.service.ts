@@ -33,6 +33,7 @@ export class ChunksFileUploader {
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
         let chunk = buffer.subarray(startByte, endByte);
+        //test
         await this.uploadChunk(
           endpoint,
           JSON.stringify(chunk),
