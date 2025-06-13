@@ -49,7 +49,7 @@ export class SignupController {
     } catch (err) {
       if (err instanceof TokenExpiredError) {
         // redirect to 'send-verify-email' where unauthorized user should enter email to resend verification email
-        res.redirect(303, 'https://yogram.ru/signup/email-verify');
+        res.redirect(303, 'RESEND_EMAIL_VERIFY_PAGE');
       }
     }
   }
