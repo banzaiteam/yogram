@@ -16,8 +16,8 @@ export class ChunkedFileDto {
   @ValidateNested()
   @Type(() => ChunkMetadataDto)
   metadata: ChunkMetadataDto;
-  @IsUUID()
-  userId: string;
+  @IsString()
+  folderPath: string;
   @IsString()
   pathToFile: string;
 }
