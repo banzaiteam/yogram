@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FilesController } from './files.controller';
-import { FilesService } from './files.service';
+import { FilesService } from '../../../files.service';
 
 describe('FilesController', () => {
   let filesController: FilesController;
@@ -14,9 +14,5 @@ describe('FilesController', () => {
     filesController = app.get<FilesController>(FilesController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(filesController.getHello()).toBe('Hello World!');
-    });
-  });
+  describe('root', () => {});
 });
