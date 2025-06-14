@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -156,10 +160,9 @@ export class AuthService {
 
   async forgotPassword(email: EmailDto) {
     const user = await this.usersService.findUserByCriteria(email);
-    // if (!user) {
-    //   throw new UnauthorizedException('User with this email doesnt exist');
-    // }
-    // if (!user.verified) throw new BadRequestException('user is not verified');
+    if (!user) {
+      throw new NotFoundException('user with this email was not found');
+    }
     const payload = { email: user.email };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('FORGOT_PASSWORD_TOKEN_EXPIRES'),
