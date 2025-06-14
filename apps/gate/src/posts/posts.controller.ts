@@ -18,11 +18,12 @@ import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
-import { genFileName, getUploadPath } from './helper';
+import { getUploadPath } from './helper';
 import { diskStorage } from 'multer';
 import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
+import { v4 } from 'uuid';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -43,16 +44,21 @@ export class PostsController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    console.log('🚀 ~ PostsController ~ id:', id);
     // todo create uploadFilesCommand, call postsService.create from handler then return files paths and upload to aws in handler
     try {
       const microserviceResponse = await axios.post(
         'http://localhost:3004/api/v1/posts/create',
         req,
-        { headers: req.headers, responseType: 'stream' },
+        {
+          // generate uuid for posts because of multer call destination method on each uploaded file
+          headers: { ...req.headers, postid: v4(), userid: id },
+          responseType: 'stream',
+        },
       );
+      res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
     } catch (error) {
-      console.log('error', error);
       throw new HttpException(error.response.data, error.response.status);
     }
 

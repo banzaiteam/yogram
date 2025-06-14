@@ -7,6 +7,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const { port, env, host } = applyAppSettings(app);
+  app.useBodyParser('json', { limit: '150mb' });
+  app.useBodyParser('urlencoded', { limit: '150mb', extended: true });
   console.log('🚀 ~ bootstrap ~ port:', port);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
