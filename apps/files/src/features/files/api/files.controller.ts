@@ -11,7 +11,7 @@ export class FilesController {
 
   @Post('files/upload')
   async uploadFile() {
-    const res = await this.uploadService.uploadFiles('yogram1-files1', 'files');
+    const res = await this.uploadService.createBucket('yogram1-files1');
     console.log('🚀 ~ FilesController ~ uploadFile ~ res:', res);
     return res;
   }
