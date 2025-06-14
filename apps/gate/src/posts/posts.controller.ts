@@ -20,9 +20,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
 import { genFileName, getUploadPath } from './helper';
 import { diskStorage } from 'multer';
-import { GateService } from 'apps/libs/gateService';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
-import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
+import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
 
