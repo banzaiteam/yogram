@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Patch,
   Post,
   Req,
   UploadedFiles,
@@ -15,6 +16,9 @@ import { diskStorage } from 'multer';
 import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { CreatePostCommand } from '../use-cases/commands/create-post.handler';
+import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
+import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { UpdatePostCommand } from '../use-cases/commands/update-post.handler';
 
 @Controller()
 export class PostsController {
@@ -72,6 +76,18 @@ export class PostsController {
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, files),
+    );
+  }
+
+  @Patch('posts/update')
+  async update(
+    @Body()
+    payload: UpdatePostCriteria & UpdatePostDto,
+  ): Promise<void> {
+    const criteria = payload['criteria'];
+    const updatePostDto = payload['updatePostDto'];
+    return await this.commandBus.execute(
+      new UpdatePostCommand(criteria, updatePostDto),
     );
   }
 }

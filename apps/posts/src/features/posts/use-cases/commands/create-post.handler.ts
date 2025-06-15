@@ -10,7 +10,9 @@ export class CreatePostCommand {
   ) {}
 }
 @CommandHandler(CreatePostCommand)
-export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
+export class CreatePostCommandHandler
+  implements ICommandHandler<CreatePostCommand>
+{
   constructor(private readonly postCommandService: PostCommandService) {}
 
   async execute({ createPostDto, files }: CreatePostCommand): Promise<Post> {

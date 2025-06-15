@@ -16,6 +16,8 @@ import { DeletePostFilesDto } from 'apps/libs/Files/dto/delete-post-files.dto';
 import { firstValueFrom } from 'rxjs';
 import { v4 } from 'uuid';
 import { FileStatus } from './constants/file.constant';
+import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
+import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 
 export interface UploadFile
   extends Omit<
@@ -30,7 +32,7 @@ export class PostCommandService {
   constructor(
     private readonly postCommandRepository: IPostCommandRepository<
       CreatePostDto,
-      null,
+      UpdatePostDto,
       Post
     >,
     private readonly fileCommandService: FileCommandService,
@@ -142,6 +144,13 @@ export class PostCommandService {
         );
         await fs.rm(files[0].destination, { recursive: true });
       });
+  }
+
+  async update(
+    criteria: UpdatePostCriteria,
+    updatePostDto: UpdatePostDto,
+  ): Promise<Post> {
+    return await this.postCommandRepository.update(criteria, updatePostDto);
   }
 
   async deletePostWithFiles(

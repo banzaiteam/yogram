@@ -11,24 +11,6 @@ export class FilesController {
     private readonly commandBus: CommandBus,
   ) {}
 
-  // @UseInterceptors(
-  //   FilesInterceptor('files', 10, {
-  //     storage: diskStorage({
-  //       destination: async (req, file, cb) => {
-  //         cb(
-  //           null,
-  //           await getUploadPath(
-  //             req.body.userId,
-  //             'apps/files/src/features/files/uploads',
-  //           ),
-  //         );
-  //       },
-  //       // filename: (req, file, cb) => {
-  //       //   cb(null, genFileName(file.originalname));
-  //       // },
-  //     }),
-  //   }),
-  // )
   @Post('files/upload')
   async uploadFile(@Body() chunkedFileDto: ChunkedFileDto) {
     await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
