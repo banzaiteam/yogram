@@ -25,8 +25,12 @@ import { FileCommandRepository } from './infrastracture/repository/file-command.
 import { FileCommandService } from './file-command.service';
 import { ChunksFileUploaderModule } from 'apps/libs/common/chunks-upload/chunks-file-uploader.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { CreatePostUseCase } from './use-cases/commands/create-post.handler';
+import { CreatePostCommandHandler } from './use-cases/commands/create-post.handler';
 import { HttpModule } from '@nestjs/axios';
+import {
+  UpdatePostCommand,
+  UpdatePostCommandHandler,
+} from './use-cases/commands/update-post.handler';
 
 @Module({
   imports: [
@@ -50,9 +54,11 @@ import { HttpModule } from '@nestjs/axios';
   ],
   controllers: [PostsController],
   providers: [
-    CreatePostUseCase,
+    CreatePostCommandHandler,
     PostCommandService,
     FileCommandService,
+    UpdatePostCommand,
+    UpdatePostCommandHandler,
     { provide: IPostCommandRepository, useClass: PostCommandRepository },
     { provide: IFileCommandRepository, useClass: FileCommandRepository },
   ],

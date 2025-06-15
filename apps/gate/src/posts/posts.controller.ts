@@ -1,25 +1,15 @@
 import {
-  Body,
   Controller,
   HttpCode,
   HttpException,
-  InternalServerErrorException,
   Post,
-  RawBody,
-  RawBodyRequest,
   Req,
   Res,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
-import { getUploadPath } from './helper';
-import { diskStorage } from 'multer';
 import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
@@ -40,7 +30,6 @@ export class PostsController {
   @HttpCode(201)
   async create(
     @User('id') id: string,
-    // @Body() createPostDto: Omit<CreatePostDto, 'userId'>,
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
