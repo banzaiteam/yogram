@@ -5,4 +5,9 @@ export abstract class IPostCommandRepository<C, U, R> {
     createPostDto: DeepPartial<C>,
     entityManager?: EntityManager,
   ): Promise<R>;
+
+  abstract delete(
+    postId: string,
+    entityManager?: EntityManager,
+  ): Promise<number>;
 }

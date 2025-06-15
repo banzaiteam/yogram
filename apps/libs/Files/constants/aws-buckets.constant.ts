@@ -1,3 +1,3 @@
 export enum AwsBuckets {
-  Files = 'files',
+  Files = 'yogram-files',
 }

@@ -3,6 +3,8 @@ import {
   IUploader,
   UploadFilesResponse,
 } from '../interface/uploader.interface';
+import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
+import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 
 @Injectable()
 export class GoogleService implements IUploader {
@@ -14,7 +16,10 @@ export class GoogleService implements IUploader {
     throw new Error('Method not implemented.');
   }
 
-  async uploadFiles(): Promise<UploadFilesResponse> {
+  async uploadFiles(
+    files: ChunkedFileDto,
+    bucket: AwsBuckets,
+  ): Promise<UploadFilesResponse> {
     console.log('GoogleService');
     return;
   }

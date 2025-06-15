@@ -3,7 +3,7 @@ import { Post } from '../entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { CreatePostDto } from '../../../../../../libs/Posts/dto/input/create-post.dto';
-import { IPostCommandRepository } from '../../interfaces/Post.interface';
+import { IPostCommandRepository } from '../../interfaces/post-command-repository.interface';
 
 @Injectable()
 export class PostCommandRepository
@@ -34,5 +34,12 @@ export class PostCommandRepository
     }
     const post = new Post(postDto);
     return this.postRepo.save(post);
+  }
+
+  async delete(postId: string, entityManager?: EntityManager): Promise<number> {
+    if (entityManager) {
+      return (await entityManager.delete(Post, postId)).affected;
+    }
+    return (await this.postRepo.delete(postId)).affected;
   }
 }

@@ -44,8 +44,6 @@ export class PostsController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    console.log('🚀 ~ PostsController ~ id:', id);
-    // todo create uploadFilesCommand, call postsService.create from handler then return files paths and upload to aws in handler
     try {
       const microserviceResponse = await axios.post(
         'http://localhost:3004/api/v1/posts/create',
@@ -61,7 +59,5 @@ export class PostsController {
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }
-
-    // return await this.postsService.create(createPostDto, files, id);
   }
 }
