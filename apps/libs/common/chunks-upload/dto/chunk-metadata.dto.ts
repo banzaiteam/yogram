@@ -5,4 +5,8 @@ export class ChunkMetadataDto {
   totalChunks: number;
   @IsNumber()
   currentChunk: number;
+  @IsNumber()
+  filesCount: number;
+  @IsNumber()
+  currentFile: number;
 }

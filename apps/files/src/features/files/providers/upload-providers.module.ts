@@ -14,8 +14,8 @@ import { ConfigModule } from '@nestjs/config';
     {
       provide: IUploader,
       inject: [UploadProvidersFactory],
-      useFactory: (uploadProvidersFactory: UploadProvidersFactory) => {
-        return uploadProvidersFactory.getUploadService();
+      useFactory: async (uploadProvidersFactory: UploadProvidersFactory) => {
+        return await uploadProvidersFactory.getUploadService();
       },
     },
   ],

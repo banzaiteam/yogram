@@ -4,6 +4,8 @@ import { Type } from 'class-transformer';
 
 export class ChunkedFileDto {
   @IsString()
+  filesUploadBaseDir: string;
+  @IsString()
   fieldname: string;
   @IsString()
   originalname: string;
@@ -20,4 +22,6 @@ export class ChunkedFileDto {
   folderPath: string;
   @IsString()
   pathToFile: string;
+  @IsUUID()
+  fileId: string;
 }

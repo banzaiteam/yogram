@@ -17,18 +17,20 @@ import {
 } from '../../settings/configuration';
 import { DatabaseModule } from 'apps/libs/common/database/database.module';
 import { PostsController } from './api/posts.controller';
-import { CreatePostUseCase } from './use-cases/create-post';
 import { PostCommandService } from './post-command.service';
-import { IPostCommandRepository } from './interfaces/Post.interface';
+import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { PostCommandRepository } from './infrastracture/repository/post-command.repository';
-import { IFileCommandRepository } from './interfaces/File.interface';
+import { IFileCommandRepository } from './interfaces/file-command-repository.interface';
 import { FileCommandRepository } from './infrastracture/repository/file-command.repository';
 import { FileCommandService } from './file-command.service';
-import { ChunksFileUploaderModule } from 'apps/libs/common/upload/chunks-file-uploader.module';
+import { ChunksFileUploaderModule } from 'apps/libs/common/chunks-upload/chunks-file-uploader.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { CreatePostUseCase } from './use-cases/commands/create-post.handler';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     ChunksFileUploaderModule,
     CqrsModule,
     MulterModule.register({}),

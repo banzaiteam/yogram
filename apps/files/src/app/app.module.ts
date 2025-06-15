@@ -3,9 +3,10 @@ import {
   EnvironmentMode,
   EnvironmentsTypes,
 } from 'apps/gate/src/settings/configuration';
-import { FilesModule } from '../files.module';
+
 import { ConfigModule } from '@nestjs/config';
 import { getConfiguration } from '../settings/configuration';
+import { FilesModule } from '../features/files/files.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [

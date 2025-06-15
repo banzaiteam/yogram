@@ -1,26 +1,14 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UploadedFiles,
-  UseInterceptors,
-} from '@nestjs/common';
-import { FilesService } from '../../../files.service';
-import { IUploader } from '../providers/interface/uploader.interface';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { getUploadPath } from 'apps/gate/src/posts/helper';
-import { Request } from 'express';
-import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
-import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { UploadFilesCommand } from '../use-case/commands/upload-files.handler';
 
 @Controller()
 export class FilesController {
   constructor(
-    private readonly filesService: FilesService,
-    private readonly uploadService: IUploader,
     private readonly chunksFileUploader: ChunksFileUploader,
+    private readonly commandBus: CommandBus,
   ) {}
 
   // @UseInterceptors(
@@ -43,11 +31,15 @@ export class FilesController {
   // )
   @Post('files/upload')
   async uploadFile(@Body() chunkedFileDto: ChunkedFileDto) {
-    console.log(
-      '🚀 ~ FilesController ~ uploadFile ~ chunkedFileDto:',
-      chunkedFileDto,
-    );
-
     await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
+    if (
+      chunkedFileDto.metadata.currentChunk ===
+      chunkedFileDto.metadata.totalChunks
+    ) {
+      return new Promise((res, rej) => {
+        res(this.commandBus.execute(new UploadFilesCommand(chunkedFileDto)));
+        rej(new Error('Files Controller: files was not uploaded'));
+      });
+    }
   }
 }

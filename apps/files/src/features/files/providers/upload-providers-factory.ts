@@ -17,11 +17,12 @@ export class UploadProvidersFactory {
     private readonly googleService: GoogleService,
   ) {}
   async getUploadService() {
-    let provider: UploadProvider = this.request.query
-      .provider as UploadProvider;
-    if (!provider) {
-      provider = UploadProvider.Aws;
-    }
+    // let provider: UploadProvider = this.request.query
+    //   .provider as UploadProvider;
+    // if (!provider) {
+    //   provider = UploadProvider.Aws;
+    // }
+    const provider: UploadProvider = UploadProvider.Aws as UploadProvider;
     switch (provider) {
       case UploadProvider.Aws:
         return this.awsService;

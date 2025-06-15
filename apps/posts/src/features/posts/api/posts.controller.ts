@@ -3,28 +3,22 @@ import {
   Controller,
   Post,
   Req,
-  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
-import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
-import { Request, Response } from 'express';
+import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
-import { CreatePostCommand } from '../use-cases/create-post';
-import axios from 'axios';
+import { CreatePostCommand } from '../use-cases/commands/create-post.handler';
 
 @Controller()
 export class PostsController {
-  constructor(
-    private commandBus: CommandBus,
-    private readonly chunksFileUploader: ChunksFileUploader,
-  ) {}
+  constructor(private commandBus: CommandBus) {}
 
   @Post('posts/create')
   @ApiOperation({
