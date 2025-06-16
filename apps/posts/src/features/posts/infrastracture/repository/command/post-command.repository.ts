@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Post } from '../entity/post.entity';
+import { Post } from '../../entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { CreatePostDto } from '../../../../../../libs/Posts/dto/input/create-post.dto';
-import { IPostCommandRepository } from '../../interfaces/post-command-repository.interface';
+import { CreatePostDto } from '../../../../../../../libs/Posts/dto/input/create-post.dto';
+import { IPostCommandRepository } from '../../../interfaces/post-command-repository.interface';
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
 
@@ -37,7 +37,7 @@ export class PostCommandRepository
     const post = new Post(postDto);
     return this.postRepo.save(post);
   }
-
+  // todo! make different update for post and file
   async update(
     criteria: UpdatePostCriteria,
     updateDto: UpdatePostDto,
@@ -50,21 +50,18 @@ export class PostCommandRepository
       .orWhere('files.id = :fileid', { fileid: criteria?.fileid })
       .getOne();
     if (!post) throw new NotFoundException('post not found');
-
     let files = [];
     if (
       Object.keys(updateDto).includes('url') ||
       Object.keys(updateDto).includes('status')
     ) {
-      files = await Promise.all(
-        post.files.map((file) => {
-          if (file.id === criteria.fileid) {
-            file.url = updateDto?.url;
-            file.status = updateDto?.status;
-          }
-          return file;
-        }),
-      );
+      files = post.files.map((file) => {
+        if (file.id === criteria.fileid) {
+          file.url = updateDto?.url;
+          file.status = updateDto?.status;
+        }
+        return file;
+      });
     }
 
     this.postRepo.merge(post, {

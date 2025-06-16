@@ -29,13 +29,10 @@ export class UploadFilesCommandHandler
       chunkedFileDto.filesUploadBaseDir,
       response.folderPath,
     ].join('/');
-    await this.filesCommandService.deleteLocalFileFromPath(delPath);
-    // todo? maybe firstly wait on acknowlegment and then delete local files
     await this.producerService.emit({
       routingKey: FilesRoutingKeys.FilesUploaded,
       payload: response,
     });
-    // todo!!! need to remove uploaded files from /apps/files/src/features/files/uploads
-    // send uploadFilesResponse via rmq to update post files
+    await this.filesCommandService.deleteLocalFileFromPath(delPath);
   }
 }

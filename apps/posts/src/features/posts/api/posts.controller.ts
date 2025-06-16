@@ -97,6 +97,7 @@ export class PostsController {
 
   @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploaded })
   async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
+    // todo! if error there need to delete local photos from files and posts
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
     const criteria = {
