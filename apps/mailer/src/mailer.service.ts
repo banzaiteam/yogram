@@ -17,7 +17,7 @@ export class MailService implements IMailer {
   async sendUserVerifyEmail(userVerifyEmailDto: UserVerifyEmailDto) {
     const payload = { email: userVerifyEmailDto.to };
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get('VERIFY_TOKEN_EXPIRES'),
+      expiresIn: parseInt(this.configService.get('VERIFY_TOKEN_EXPIRES')),
     });
     let path: string;
     if (process.env.NODE_ENV !== undefined) {

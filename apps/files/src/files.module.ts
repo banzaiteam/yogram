@@ -10,9 +10,15 @@ import {
   UploadFilesCommand,
   UploadFilesCommandHandler,
 } from './features/files/use-case/commands/upload-files.handler';
+import { RabbitProducerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-producer.module';
 
 @Module({
-  imports: [HttpModule, UploadProvidersModule, CqrsModule],
+  imports: [
+    HttpModule,
+    UploadProvidersModule,
+    CqrsModule,
+    RabbitProducerModule.register(['files']),
+  ],
   controllers: [FilesController],
   providers: [
     FilesCommandService,

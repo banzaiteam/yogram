@@ -31,6 +31,8 @@ import {
   UpdatePostCommand,
   UpdatePostCommandHandler,
 } from './use-cases/commands/update-post.handler';
+import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
+import { FilesBindingKeysEnum } from 'apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
 
 @Module({
   imports: [
@@ -38,7 +40,9 @@ import {
     ChunksFileUploaderModule,
     CqrsModule,
     MulterModule.register({}),
-    // RabbitProducerModule.register(['posts']),
+    RabbitConsumerModule.register([
+      { files: [FilesBindingKeysEnum.Files_Uploaded_Many] },
+    ]),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Post, File]),
     // GraphQLModule.forRoot<ApolloFederationDriverConfig>({
