@@ -3,7 +3,6 @@ import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-u
 import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { UploadFilesCommand } from '../use-case/commands/upload-files.handler';
-
 @Controller()
 export class FilesController {
   constructor(
