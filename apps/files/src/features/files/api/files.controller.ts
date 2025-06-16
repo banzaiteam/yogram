@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
-import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
+import { ChunksFileUploader } from '../../../../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { ChunkedFileDto } from '../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { UploadFilesCommand } from '../use-case/commands/upload-files.handler';
 @Controller()
