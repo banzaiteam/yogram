@@ -16,7 +16,6 @@ export class ChunksFileUploader {
     path: string, // todo rename
     host: string,
   ): Promise<void> {
-    console.log('🚀 ~ ChunksFileUploader ~ files:', files);
     // todo devide files on chunks
     const filesCount = files.length;
     let currentFile = 0;

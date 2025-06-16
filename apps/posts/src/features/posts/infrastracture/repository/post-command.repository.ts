@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post } from '../entity/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository, UpdateResult } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { CreatePostDto } from '../../../../../../libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from '../../interfaces/post-command-repository.interface';
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
@@ -50,13 +50,28 @@ export class PostCommandRepository
       .orWhere('files.id = :fileid', { fileid: criteria?.fileid })
       .getOne();
     if (!post) throw new NotFoundException('post not found');
-    const files = post.files.map((file) => {
-      if (file.id === criteria.fileid || post.id === criteria.id) {
-        file.url = updateDto.url;
-      }
-      return file;
+
+    let files = [];
+    if (
+      Object.keys(updateDto).includes('url') ||
+      Object.keys(updateDto).includes('status')
+    ) {
+      files = await Promise.all(
+        post.files.map((file) => {
+          if (file.id === criteria.fileid) {
+            file.url = updateDto?.url;
+            file.status = updateDto?.status;
+          }
+          return file;
+        }),
+      );
+    }
+
+    this.postRepo.merge(post, {
+      ...updateDto,
+      ...files,
     });
-    this.postRepo.merge(post, { ...updateDto, files });
+    // if transaction then save with entityManager
     if (entityManager) {
       return await entityManager.save(post);
     }

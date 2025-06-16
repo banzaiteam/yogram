@@ -19,6 +19,10 @@ import { CreatePostCommand } from '../use-cases/commands/create-post.handler';
 import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 import { UpdatePostCommand } from '../use-cases/commands/update-post.handler';
+import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
+import { FileStatus } from '../constants/file.constant';
 
 @Controller()
 export class PostsController {
@@ -86,6 +90,20 @@ export class PostsController {
   ): Promise<void> {
     const criteria = payload['criteria'];
     const updatePostDto = payload['updatePostDto'];
+    return await this.commandBus.execute(
+      new UpdatePostCommand(criteria, updatePostDto),
+    );
+  }
+
+  @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploaded })
+  async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
+    let folderPath: string = <string>payload['folderPath'];
+    folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
+    const criteria = {
+      id: folderPath,
+      fileid: payload['fileId'],
+    };
+    const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto),
     );
