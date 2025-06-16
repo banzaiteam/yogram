@@ -1,10 +1,8 @@
-import { th } from '@faker-js/faker/.';
-import { InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { FilesCommandService } from 'apps/files/src/files-command.service';
-import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
-import { ProducerService } from 'apps/libs/common/message-brokers/rabbit/providers/producer.service';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
+import { FilesCommandService } from '../../../../../../../apps/files/src/files-command.service';
+import { ChunkedFileDto } from '../../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
+import { ProducerService } from '../../../../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
+import { AwsBuckets } from '../../../../../../../apps/libs/Files/constants/aws-buckets.constant';
 import { FilesRoutingKeys } from '../../message-brokers/rabbit/files-routing-keys.constant';
 
 export class UploadFilesCommand {
