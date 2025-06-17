@@ -13,8 +13,6 @@ export const verifyRecaptcha = async (
 ) => {
   const secretKey = configService.get('RECAPTCHA_SECRET_KEY');
   const verifyUrl = configService.get('RECAPTCHA_URL');
-  const minimumScore = 0.5;
-  const expectedHostname = configService.get('RECAPTCHA_HOSTNAME');
 
   try {
     const response = await lastValueFrom(
@@ -25,26 +23,8 @@ export const verifyRecaptcha = async (
         },
       }),
     );
-
-    const { success, score, hostname } = response.data;
-    console.log(`🚀 ~ { success, score, hostname }:`, {
-      success,
-      score,
-      hostname,
-    });
-
-    if (!success) {
-      throw new BadRequestException('Invalid captcha');
-    }
-
-    if (score < minimumScore) {
-      throw new BadRequestException('Low captcha score');
-    }
-
-    if (expectedHostname && hostname !== expectedHostname) {
-      throw new InternalServerErrorException('Invalid hostname');
-    }
-
+    const { success } = response.data;
+    if (!success) throw new BadRequestException('Invalid captcha');
     return true;
   } catch (error) {
     console.error('Error verifying reCAPTCHA:', error);
