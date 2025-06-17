@@ -16,6 +16,13 @@ export class DatabaseModule {
           useFactory: (configService: ConfigService) => ({
             type: configService.get('type'),
             url: configService.get('url'),
+            extra: {
+              max: 100,
+              poolSize: 100,
+            },
+            connectionTimeoutMillis: 2000,
+            idleTimeoutMillis: 30000,
+            maxQueryExecutionTime: 5000,
             migrationsTableName: configService.get('migrationsTableName'),
             entities: [`${__dirname}/../**/*.entity{.ts,.js}`],
             migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
