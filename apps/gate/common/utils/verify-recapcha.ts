@@ -1,8 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
@@ -28,6 +25,6 @@ export const verifyRecaptcha = async (
     return true;
   } catch (error) {
     console.error('Error verifying reCAPTCHA:', error);
-    return false;
+    throw new BadRequestException('Invalid captcha');
   }
 };
