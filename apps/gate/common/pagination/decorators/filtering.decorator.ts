@@ -4,9 +4,10 @@ import {
   ExecutionContext,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { Equal } from 'typeorm';
 
-export interface Filtering {
-  property: string;
+export interface IFiltering {
+  filterProperty: string;
   rule: string;
   value: string;
 }
@@ -27,32 +28,47 @@ export enum FilterRule {
   IS_NOT_NULL = 'isnotnull',
 }
 
-export const filteringFactory = createParamDecorator(
-  (data, ctx: ExecutionContext): Filtering => {
-    const req: Request = ctx.switchToHttp().getRequest();
-    const filter = req.query.filter as string;
-    if (!filter) return null;
+const rulesMapping = (rule: string, value: string) => {
+  switch (rule) {
+    case 'eq':
+      return Equal(value);
+    default:
+      return null;
+  }
+};
 
-    if (!Array.isArray(data))
-      throw new BadRequestException('Invalid filter parameter');
+export const filteringFactory = (data, ctx: ExecutionContext): IFiltering => {
+  const req: Request = ctx.switchToHttp().getRequest();
+  const filter = req.query.filter as string;
+  if (!filter) return null;
 
-    if (
-      !filter.match(
-        /^[a-zA-Z0-9_]+:(eq|neq|gt|gte|lt|lte|like|nlike|in|nin):[a-zA-Z0-9_,]+$/,
-      )
-    ) {
-      throw new BadRequestException('Invalid filter parameter');
-    }
+  if (!Array.isArray(data))
+    throw new BadRequestException('Invalid filter parameter');
 
-    // extract the parameters and validate if the rule and the property are valid
-    const [property, rule, value] = filter.split(':');
-    if (!data.includes(property))
-      throw new BadRequestException(`Invalid filter property: ${property}`);
-    if (!Object.values(FilterRule).includes(rule as FilterRule))
-      throw new BadRequestException(`Invalid filter rule: ${rule}`);
+  if (
+    !filter.match(
+      /^[a-zA-Z0-9_]+:(eq|neq|gt|gte|lt|lte|like|nlike|in|nin):[a-zA-Z0-9-_,]+$/,
+    )
+  ) {
+    throw new BadRequestException('Invalid filter parameter');
+  }
 
-    return { property, rule, value };
-  },
-);
+  // extract the parameters and validate if the rule and the filterProperty are valid
+  const [filterProperty, rule, value] = filter.split(':');
+
+  if (!data.includes(filterProperty))
+    throw new BadRequestException(
+      `Invalid filter filterProperty: ${filterProperty}`,
+    );
+  if (!Object.values(FilterRule).includes(rule as FilterRule))
+    throw new BadRequestException(`Invalid filter rule: ${rule}`);
+
+  return { filterProperty, rule, value };
+};
 
 export const FilteringParams = createParamDecorator(filteringFactory);
+
+export const getFilteringObject = (filtering: IFiltering) => {
+  const filter = rulesMapping(filtering.rule, filtering.value);
+  return filtering ? { [filtering.filterProperty]: filter } : {};
+};

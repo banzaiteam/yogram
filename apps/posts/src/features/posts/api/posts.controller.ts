@@ -1,14 +1,17 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -23,10 +26,26 @@ import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorato
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
 import { FileStatus } from '../constants/file.constant';
+import {
+  IPagination,
+  PaginationParams,
+} from 'apps/gate/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from 'apps/gate/common/pagination/decorators/sorting.decorator';
+import {
+  FilteringParams,
+  IFiltering,
+} from 'apps/gate/common/pagination/decorators/filtering.decorator';
+import { GetPostsQuery } from '../use-cases/queries/get-posts.query';
 
 @Controller()
 export class PostsController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('posts/create')
   @ApiOperation({
@@ -80,6 +99,18 @@ export class PostsController {
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, files),
+    );
+  }
+
+  @Get('posts/get/:id')
+  async get(
+    @Param('id') id: string,
+    @PaginationParams() pagination: IPagination,
+    @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
+    @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
+  ) {
+    return await this.queryBus.execute(
+      new GetPostsQuery(pagination, sorting, filtering),
     );
   }
 

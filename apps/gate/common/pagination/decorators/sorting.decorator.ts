@@ -7,7 +7,7 @@ import { Request } from 'express';
 
 type Direction = 'asc' | 'desc';
 
-export interface Sorting {
+export interface ISorting {
   property: string;
   direction: Direction;
 }
@@ -27,6 +27,6 @@ export const sortFactory = (validParams: string[], ctx: ExecutionContext) => {
 
 export const SortingParams = createParamDecorator(sortFactory);
 
-export const getSortingOrder = (sorting: Sorting) => {
+export const getSortingOrder = (sorting: ISorting) => {
   return sorting ? { [sorting.property.toString()]: sorting.direction } : {};
 };

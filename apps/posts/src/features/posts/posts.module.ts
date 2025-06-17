@@ -33,6 +33,12 @@ import {
 } from './use-cases/commands/update-post.handler';
 import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
 import { FilesBindingKeysEnum } from 'apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
+import { PostsQueryService } from './posts-query.service';
+import { PostsQueryRepository } from './infrastracture/repository/query/posts-query.repository';
+import {
+  GetPostsQuery,
+  GetPostsQueryHandler,
+} from './use-cases/queries/get-posts.query';
 
 @Module({
   imports: [
@@ -63,6 +69,10 @@ import { FilesBindingKeysEnum } from 'apps/files/src/features/files/message-brok
     FileCommandService,
     UpdatePostCommand,
     UpdatePostCommandHandler,
+    PostsQueryService,
+    PostsQueryRepository,
+    GetPostsQuery,
+    GetPostsQueryHandler,
     { provide: IPostCommandRepository, useClass: PostCommandRepository },
     { provide: IFileCommandRepository, useClass: FileCommandRepository },
   ],

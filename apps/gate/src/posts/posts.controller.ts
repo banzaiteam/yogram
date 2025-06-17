@@ -3,12 +3,13 @@ import {
   Get,
   HttpCode,
   HttpException,
+  Param,
   Post,
   Query,
   Req,
   Res,
 } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
 import { User } from '../auth/decorators/user.decorator';
@@ -16,19 +17,17 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
 import { v4 } from 'uuid';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
-import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
 import {
   IPagination,
   PaginationParams,
 } from 'apps/gate/common/pagination/decorators/pagination.decorator';
 import {
-  Sorting,
+  ISorting,
   SortingParams,
 } from 'apps/gate/common/pagination/decorators/sorting.decorator';
 import {
-  Filtering,
   FilteringParams,
+  IFiltering,
 } from 'apps/gate/common/pagination/decorators/filtering.decorator';
 
 @ApiTags('Posts')
@@ -78,10 +77,10 @@ export class PostsController {
 
   @Get(':id')
   get(
-    @Query('id') id: string,
+    @Param('id') id: string,
     @PaginationParams() pagination: IPagination,
-    @SortingParams(['createdAt', 'isPublished']) sorting?: Sorting,
-    @FilteringParams(['isPublished', 'userId']) filtering?: Filtering,
+    @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
+    @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
   ) {
     return this.postsService.get(id, pagination, sorting, filtering);
   }
