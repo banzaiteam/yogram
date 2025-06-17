@@ -1,8 +1,10 @@
 import {
   Controller,
+  Get,
   HttpCode,
   HttpException,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -14,6 +16,20 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
 import { v4 } from 'uuid';
+import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
+import {
+  IPagination,
+  PaginationParams,
+} from 'apps/gate/common/pagination/decorators/pagination.decorator';
+import {
+  Sorting,
+  SortingParams,
+} from 'apps/gate/common/pagination/decorators/sorting.decorator';
+import {
+  Filtering,
+  FilteringParams,
+} from 'apps/gate/common/pagination/decorators/filtering.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -24,7 +40,6 @@ export class PostsController {
     private readonly httpService: HttpService,
   ) {}
 
-  @ApiExcludeEndpoint()
   @ApiResponse({ status: 201, description: 'post was created' })
   @Post()
   @HttpCode(201)
@@ -34,6 +49,17 @@ export class PostsController {
     @Res() res: Response,
   ): Promise<void> {
     try {
+      // todo! error 413, bodyparser limit 150 mb does not help
+      // const microserviceResponse =
+      //   await this.gateService.requestHttpServicePost(
+      //     HttpServices.Posts,
+      //     HttpPostsPath.Create,
+      //     req,
+      //     {
+      //       headers: { ...req.headers, postid: v4(), userid: id },
+      //       // responseType: 'stream',
+      //     },
+      //   );
       const microserviceResponse = await axios.post(
         'http://localhost:3004/api/v1/posts/create',
         req,
@@ -48,5 +74,15 @@ export class PostsController {
     } catch (error) {
       throw new HttpException(error.response.data, error.response.status);
     }
+  }
+
+  @Get(':id')
+  get(
+    @Query('id') id: string,
+    @PaginationParams() pagination: IPagination,
+    @SortingParams(['createdAt', 'isPublished']) sorting?: Sorting,
+    @FilteringParams(['isPublished', 'userId']) filtering?: Filtering,
+  ) {
+    return this.postsService.get(id, pagination, sorting, filtering);
   }
 }

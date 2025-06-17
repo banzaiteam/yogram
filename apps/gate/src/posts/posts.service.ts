@@ -1,35 +1,29 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpPostsPath } from '../../../libs/Posts/constants/path.enum';
-import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
-import { ChunksFileUploader } from '../../../libs/common/chunks-upload/chunks-file-uploader.service';
-import fs from 'node:fs/promises';
 import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { Filtering } from 'apps/gate/common/pagination/decorators/filtering.decorator';
+import { IPagination } from 'apps/gate/common/pagination/decorators/pagination.decorator';
+import { Sorting } from 'apps/gate/common/pagination/decorators/sorting.decorator';
+import { GateService } from 'apps/libs/gateService';
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly chunksFileUploader: ChunksFileUploader) {}
+  constructor(private readonly gateService: GateService) {}
 
-  async create(
-    createPostDto: CreatePostDto,
-    files: Express.Multer.File[],
+  async get(
     id: string,
-  ): Promise<void> {
-    createPostDto.userId = id;
-    try {
-      // await this.chunksFileUploader.proccessChunksUpload(
-      //   files,
-      //   id,
-      //   HttpPostsPath.Create,
-      //   HttpServices.Files
-      // );
-      for await (const file of files) {
-        await fs.unlink(file.path);
-      }
-    } catch (error) {
-      await fs.rm(files[0].destination, { recursive: true });
-      throw new InternalServerErrorException(
-        'FileUploader: error  during uploading files',
-      );
-    }
+    pagination: IPagination,
+    sorting: Sorting,
+    filtering: Filtering,
+  ) {
+    const path = [
+      HttpPostsPath.Get,
+      `${id}?page=${pagination.page}&limit=${pagination.limit}&sort=${sorting.property}:${sorting.direction}&filter=${filtering.property}:${filtering.rule}:${filtering.value}`,
+    ].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Posts,
+      path,
+      {},
+    );
   }
 }

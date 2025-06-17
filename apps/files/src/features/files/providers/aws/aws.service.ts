@@ -53,6 +53,7 @@ export class AwsService implements IUploader {
         Body: buffer,
         ContentLength: file.size,
         Bucket: bucket,
+        ContentType: file.mimetype,
         Key: `${file.pathToFile}`,
       },
     });
