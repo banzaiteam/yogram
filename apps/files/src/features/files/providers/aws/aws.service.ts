@@ -66,6 +66,10 @@ export class AwsService implements IUploader {
       folderPath: file.folderPath,
     };
   }
+  // todo! if files array passed delete only this files , else all folder
+  async deleteFiles(path: string, files?: string[]): Promise<void> {
+    // check if files exists in folder or check delete behavior if files does not exist
+  }
 
   async createBucket(name: string): Promise<string> {
     const input = {

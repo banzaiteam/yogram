@@ -31,6 +31,6 @@ export class UploadFilesCommandHandler
       routingKey: FilesRoutingKeys.FilesUploaded,
       payload: response,
     });
-    await this.filesCommandService.deleteLocalFileFromPath(delPath);
+    await this.filesCommandService.deleteLocalFolderWithFiles(delPath);
   }
 }

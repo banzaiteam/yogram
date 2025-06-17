@@ -9,7 +9,7 @@ export class DeletePostFilesDto {
   folderPath: string;
   @ApiProperty({
     description:
-      'leave empty if need delete folder with all files or pass aaray of files names',
+      'leave empty if need delete folder with all files or pass array of files names',
   })
   @IsOptional()
   @IsString({ each: true })

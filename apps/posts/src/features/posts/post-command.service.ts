@@ -118,6 +118,7 @@ export class PostCommandService {
     path: string,
     host: string,
   ) {
+    console.log('🚀 ~ PostCommandService ~ path:', path);
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
@@ -139,6 +140,7 @@ export class PostCommandService {
       .catch(async (err) => {
         console.log('error in post-command-service.........', err);
         // todo delete post event
+        // it delete db post and related files in aws
         await this.eventBus.publish(
           new DeletePostEvent(postId, folderPath, path, host),
         );

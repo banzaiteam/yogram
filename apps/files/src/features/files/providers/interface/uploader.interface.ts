@@ -15,4 +15,5 @@ export abstract class IUploader {
   ): Promise<UploadFilesResponse>;
   abstract createBucket(name: string): Promise<string>;
   abstract isBucketExists(name: string, accountId: string): Promise<boolean>;
+  abstract deleteFiles(path: string): Promise<void>;
 }

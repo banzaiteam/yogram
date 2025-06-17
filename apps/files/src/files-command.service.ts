@@ -5,6 +5,7 @@ import {
 } from './features/files/providers/interface/uploader.interface';
 import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 import fs from 'node:fs/promises';
+import { DeletePostFilesDto } from 'apps/libs/Files/dto/delete-post-files.dto';
 
 @Injectable()
 export class FilesCommandService {
@@ -26,8 +27,14 @@ export class FilesCommandService {
       );
     }
   }
+  // todo! if files array passed delete only this files , else all folder
+  async deleteUploadedFolderOrFiles(deleteFilesDto: DeletePostFilesDto) {
+    const path = [deleteFilesDto.folderPath, deleteFilesDto.postId].join('/');
+    console.log('🚀 ~ FilesCommandService ~ deleteUploadedFiles ~ path:', path);
+    return await this.uploaderService.deleteFiles(path);
+  }
 
-  async deleteLocalFileFromPath(path: string) {
+  async deleteLocalFolderWithFiles(path: string) {
     try {
       await fs.rm(path, { recursive: true });
     } catch (err) {
