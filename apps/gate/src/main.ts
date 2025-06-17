@@ -15,6 +15,8 @@ async function bootstrap() {
     allowedHeaders: [
       'Access-Control-Allow-Origin',
       'Access-Control-Allow-Headers',
+      'Content-Type',
+      'Accept',
     ],
     origin: [
       'https://yogram.ru',
