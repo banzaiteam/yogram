@@ -12,12 +12,17 @@ async function bootstrap() {
   app.use(bodyParser.json());
 
   app.enableCors({
+    allowedHeaders: [
+      'Access-Control-Allow-Origin',
+      'Access-Control-Allow-Headers',
+    ],
     origin: [
       'https://yogram.ru',
       'http://localhost:5173',
       'http://localhost:56938',
       'https://localhost:3000',
       'http://localhost:3000',
+      'http://localhost',
     ],
     credentials: true,
   });
