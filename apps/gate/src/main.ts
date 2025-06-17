@@ -18,7 +18,13 @@ async function bootstrap() {
       'Access-Control-Allow-Origin',
       'Access-Control-Allow-Headers',
       'Content-Type',
+      'Authorization',
+      'Content-Length',
+      'Host',
       'Accept',
+      'Accept-Encoding',
+      'Connection',
+      'User-Agent',
     ],
     origin: [
       'https://yogram.ru',
