@@ -5,7 +5,6 @@ import {
   HttpException,
   Param,
   Post,
-  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -20,15 +19,15 @@ import { v4 } from 'uuid';
 import {
   IPagination,
   PaginationParams,
-} from 'apps/gate/common/pagination/decorators/pagination.decorator';
+} from '../../../../apps/gate/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from 'apps/gate/common/pagination/decorators/sorting.decorator';
+} from '../../../../apps/gate/common/pagination/decorators/sorting.decorator';
 import {
   FilteringParams,
   IFiltering,
-} from 'apps/gate/common/pagination/decorators/filtering.decorator';
+} from '../../../../apps/gate/common/pagination/decorators/filtering.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
