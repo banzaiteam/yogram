@@ -9,6 +9,9 @@ import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 @Injectable()
 export class GoogleService implements IUploader {
   constructor() {}
+  deleteFiles(path: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   isBucketExists(name: string, accountId: string): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
