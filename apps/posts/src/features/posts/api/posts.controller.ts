@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Patch,
   Post,
   Req,
   UploadedFiles,
@@ -8,21 +9,24 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
-import { ChunksFileUploader } from 'apps/libs/common/upload/chunks-file-uploader.service';
-import { ChunkedFileDto } from 'apps/libs/common/upload/dto/chunked-file.dto';
+import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
-import { CreatePostCommand } from '../use-cases/create-post';
+import { CreatePostCommand } from '../use-cases/commands/create-post.handler';
+import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
+import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { UpdatePostCommand } from '../use-cases/commands/update-post.handler';
+import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
+import { FileStatus } from '../constants/file.constant';
 
 @Controller()
 export class PostsController {
-  constructor(
-    private commandBus: CommandBus,
-    private readonly chunksFileUploader: ChunksFileUploader,
-  ) {}
+  constructor(private commandBus: CommandBus) {}
 
   @Post('posts/create')
   @ApiOperation({
@@ -55,7 +59,10 @@ export class PostsController {
     FilesInterceptor('files', 10, {
       storage: diskStorage({
         destination: async (req, file, cb) => {
-          cb(null, await getUploadPath(req.body.userId));
+          cb(
+            null,
+            await getUploadPath('apps/posts/src/features/posts/uploads', req),
+          );
         },
         filename: (req, file, cb) => {
           cb(null, genFileName(file.originalname));
@@ -67,16 +74,39 @@ export class PostsController {
     @Body() createPostDto: CreatePostDto,
     @UploadedFiles()
     files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
-    console.log('files =  ', files);
-    await this.commandBus.execute(new CreatePostCommand(createPostDto, files));
-    // await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
-    // const result = await this.commandBus.execute(
-    //   new CreatePostCommand(
-    //     createPostDto['createPostDto'],
-    //     createPostDto['files'],
-    //   ),
-    // );
-    // return result;
+    createPostDto.userId = <string>req.headers.userid;
+    createPostDto.postId = req.body.postId;
+    return await this.commandBus.execute(
+      new CreatePostCommand(createPostDto, files),
+    );
+  }
+
+  @Patch('posts/update')
+  async update(
+    @Body()
+    payload: UpdatePostCriteria & UpdatePostDto,
+  ): Promise<void> {
+    const criteria = payload['criteria'];
+    const updatePostDto = payload['updatePostDto'];
+    return await this.commandBus.execute(
+      new UpdatePostCommand(criteria, updatePostDto),
+    );
+  }
+
+  @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploaded })
+  async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
+    // todo! if error there need to delete local photos from files and posts
+    let folderPath: string = <string>payload['folderPath'];
+    folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
+    const criteria = {
+      id: folderPath,
+      fileid: payload['fileId'],
+    };
+    const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
+    return await this.commandBus.execute(
+      new UpdatePostCommand(criteria, updatePostDto),
+    );
   }
 }

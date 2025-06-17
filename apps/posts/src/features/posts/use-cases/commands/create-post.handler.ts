@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Post } from '../infrastracture/entity/post.entity';
-import { PostCommandService } from '../post-command.service';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
+import { PostCommandService } from '../../post-command.service';
+import { Post } from '../../infrastracture/entity/post.entity';
 
 export class CreatePostCommand {
   constructor(
@@ -10,7 +10,9 @@ export class CreatePostCommand {
   ) {}
 }
 @CommandHandler(CreatePostCommand)
-export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
+export class CreatePostCommandHandler
+  implements ICommandHandler<CreatePostCommand>
+{
   constructor(private readonly postCommandService: PostCommandService) {}
 
   async execute({ createPostDto, files }: CreatePostCommand): Promise<Post> {

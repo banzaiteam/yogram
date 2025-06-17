@@ -4,6 +4,8 @@ import { Type } from 'class-transformer';
 
 export class ChunkedFileDto {
   @IsString()
+  filesUploadBaseDir: string;
+  @IsString()
   fieldname: string;
   @IsString()
   originalname: string;
@@ -16,8 +18,10 @@ export class ChunkedFileDto {
   @ValidateNested()
   @Type(() => ChunkMetadataDto)
   metadata: ChunkMetadataDto;
-  @IsUUID()
-  userId: string;
+  @IsString()
+  folderPath: string;
   @IsString()
   pathToFile: string;
+  @IsUUID()
+  fileId: string;
 }

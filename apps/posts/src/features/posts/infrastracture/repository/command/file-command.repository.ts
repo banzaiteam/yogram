@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { File } from '../entity/file.entity';
-import { IFileCommandRepository } from '../../interfaces/File.interface';
+import { File } from '../../entity/file.entity';
+import { IFileCommandRepository } from '../../../interfaces/file-command-repository.interface';
 import { CreateFileDto } from 'apps/posts/src/dto/create-file.dto';
 
 @Injectable()

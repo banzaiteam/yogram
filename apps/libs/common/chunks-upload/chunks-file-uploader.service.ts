@@ -2,21 +2,25 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ChunkedFileDto } from './dto/chunked-file.dto';
 import fs from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
-import { GateService } from '../../../../apps/libs/gateService';
-import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
-import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { UploadFile } from 'apps/posts/src/features/posts/post-command.service';
 
 @Injectable()
 export class ChunksFileUploader {
-  constructor(private readonly gateService: GateService) {}
+  constructor(private readonly httpService: HttpService) {}
 
   async proccessChunksUpload(
-    files: Express.Multer.File[],
-    userId: string,
-    endpoint: HttpPostsPath,
+    files: UploadFile[],
+    folderPath: string,
+    path: string, // todo rename
+    host: string,
   ): Promise<void> {
     // todo devide files on chunks
+    const filesCount = files.length;
+    let currentFile = 0;
     for await (const file of files) {
+      ++currentFile;
       const chunkSize = 1024 * 1024;
       const totalChunks = Math.ceil(file.size / chunkSize);
       let startByte = 0;
@@ -35,12 +39,15 @@ export class ChunksFileUploader {
         let chunk = buffer.subarray(startByte, endByte);
         //test
         await this.uploadChunk(
-          endpoint,
+          path,
           JSON.stringify(chunk),
           totalChunks,
           i,
+          filesCount,
+          currentFile,
           file,
-          userId,
+          folderPath,
+          host,
         );
         startByte = endByte;
       }
@@ -48,38 +55,41 @@ export class ChunksFileUploader {
   }
 
   private async uploadChunk(
-    endpoint: HttpPostsPath,
+    path: string,
     chunk: string,
     totalChunks: number,
     currentChunk: number,
-    file: Express.Multer.File,
-    userId: string,
+    filesCount: number,
+    currentFile: number,
+    file: UploadFile,
+    folderPath: string,
+    host: string,
   ): Promise<void> {
     // todo upload chunk to posts microservice
+    const pathToFile = [folderPath, file.originalname].join('/');
     const chunkedFileDto: ChunkedFileDto = {
+      filesUploadBaseDir: file.filesUploadBaseDir,
       chunk,
       fieldname: file.fieldname,
       mimetype: file.mimetype,
       originalname: file.originalname,
-      pathToFile: file.path,
+      pathToFile,
       size: file.size,
-      userId,
-      metadata: { currentChunk, totalChunks },
+      fileId: file.fileId,
+      folderPath,
+      metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
 
-    await this.gateService.requestHttpServicePost(
-      HttpServices.Posts,
-      endpoint,
-      chunkedFileDto,
-      {},
+    await firstValueFrom(
+      this.httpService.post([host, path].join('/'), chunkedFileDto),
     );
   }
 
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
-    const CHUNKS_DIR = 'apps/posts/src/features/posts/chunks';
-    const UPLOAD_DIR = 'apps/posts/src/features/posts/uploads';
-    const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.userId}`;
-    const uploadsPath = `${UPLOAD_DIR}/${chunkedFileDto.userId}`;
+    const CHUNKS_DIR = 'apps/files/src/features/files/chunks';
+    const UPLOAD_DIR = 'apps/files/src/features/files/uploads';
+    const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.folderPath}`;
+    const uploadsPath = `${UPLOAD_DIR}/${chunkedFileDto.folderPath}`;
     await this.createFolderIfNotExists(chunksPath);
 
     try {
@@ -102,7 +112,6 @@ export class ChunksFileUploader {
       const writable = writableChunk.createWriteStream();
       await pipeline(stream, writable);
       writable.on('finish', async () => {
-        console.log('proccessComposeFile finish!!!');
         await writableChunk.close();
         writable.end();
       });
@@ -112,6 +121,7 @@ export class ChunksFileUploader {
         +chunkedFileDto.metadata.totalChunks
       ) {
         // All chunks have been uploaded, assemble them into a single file
+
         await this.assembleChunks(
           chunkedFileDto.originalname,
           +chunkedFileDto.metadata.totalChunks,
@@ -138,8 +148,8 @@ export class ChunksFileUploader {
       await this.createFolderIfNotExists(uploadsPath);
       const file = await fs.open(`${uploadsPath}/${filename}`, 'w');
       const writer = file.createWriteStream();
+
       writer.on('finish', async () => {
-        console.log(`finish write`);
         writer.removeAllListeners();
         writer.close();
         await file.close();
@@ -153,10 +163,12 @@ export class ChunksFileUploader {
         reader.removeAllListeners();
         reader.close();
         await readableFile.close();
-        // writer.removeAllListeners();
         await fs.unlink(chunkPath);
       }
       writer.end();
+      // todo check error
+      // throw new Error();
+      await fs.rm(chunksDirPath, { recursive: true });
     } catch (error) {
       await fs.rm(chunksDirPath, { recursive: true });
       await fs.rm(uploadsPath, { recursive: true });
