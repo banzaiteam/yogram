@@ -22,7 +22,6 @@ export class UserCommandRepository
   ): Promise<User> {
     const user = new User(createUserDto);
     if (entityManager) {
-      console.log('🚀 ~ entityManager:', entityManager);
       return await entityManager.save(user);
     }
     return await this.userRepository.save(user);
