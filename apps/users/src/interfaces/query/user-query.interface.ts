@@ -1,24 +1,11 @@
-import { EntityManager } from 'typeorm';
 import { UserCriteria } from '../../features/find-by-criteria/query/find-users-by-criteria.query';
 
 export abstract class IUsersQueryRepository<U, R> {
-  abstract userLoginQuery(
-    email: string,
-    entityManager?: EntityManager,
-  ): Promise<U>;
+  abstract userLoginQuery(email: string): Promise<U>;
 
-  abstract findUserByCriteria(
-    criteria: UserCriteria,
-    entityManager?: EntityManager,
-  ): Promise<R>;
+  abstract findUserByCriteria(criteria: UserCriteria): Promise<R>;
 
-  abstract findUserByUsername(
-    username: string,
-    entityManager?: EntityManager,
-  ): Promise<R>;
+  abstract findUserByUsername(username: string): Promise<R>;
 
-  abstract findUserByProviderId(
-    providerId: string,
-    entityManager?: EntityManager,
-  ): Promise<R>;
+  abstract findUserByProviderId(providerId: string): Promise<R>;
 }
