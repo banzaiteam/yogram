@@ -12,6 +12,9 @@ export const RedisClientFactory: FactoryProvider<Redis> = {
       password: configService.get('REDIS_PASSWORD'),
       host: configService.get('REDIS_HOST'),
       port: configService.get('REDIS_PORT'),
+      reconnectOnError(err) {
+        return true;
+      },
     });
 
     redisInstance.on('error', (e) => {

@@ -1,28 +1,33 @@
 import {
-  Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
-  InternalServerErrorException,
+  Param,
   Post,
-  RawBody,
-  RawBodyRequest,
   Req,
   Res,
-  UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
-import { genFileName, getUploadPath } from './helper';
-import { diskStorage } from 'multer';
 import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
+import { v4 } from 'uuid';
+import {
+  IPagination,
+  PaginationParams,
+} from '../../../../apps/gate/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from '../../../../apps/gate/common/pagination/decorators/sorting.decorator';
+import {
+  FilteringParams,
+  IFiltering,
+} from '../../../../apps/gate/common/pagination/decorators/filtering.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -33,29 +38,49 @@ export class PostsController {
     private readonly httpService: HttpService,
   ) {}
 
-  @ApiExcludeEndpoint()
   @ApiResponse({ status: 201, description: 'post was created' })
   @Post()
   @HttpCode(201)
   async create(
     @User('id') id: string,
-    // @Body() createPostDto: Omit<CreatePostDto, 'userId'>,
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    // todo create uploadFilesCommand, call postsService.create from handler then return files paths and upload to aws in handler
     try {
+      // todo! error 413, bodyparser limit 150 mb does not help
+      // const microserviceResponse =
+      //   await this.gateService.requestHttpServicePost(
+      //     HttpServices.Posts,
+      //     HttpPostsPath.Create,
+      //     req,
+      //     {
+      //       headers: { ...req.headers, postid: v4(), userid: id },
+      //       // responseType: 'stream',
+      //     },
+      //   );
       const microserviceResponse = await axios.post(
         'http://localhost:3004/api/v1/posts/create',
         req,
-        { headers: req.headers, responseType: 'stream' },
+        {
+          // generate uuid for posts because of multer call destination method on each uploaded file
+          headers: { ...req.headers, postid: v4(), userid: id },
+          responseType: 'stream',
+        },
       );
+      res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
     } catch (error) {
-      console.log('error', error);
       throw new HttpException(error.response.data, error.response.status);
     }
+  }
 
-    // return await this.postsService.create(createPostDto, files, id);
+  @Get(':id')
+  get(
+    @Param('id') id: string,
+    @PaginationParams() pagination: IPagination,
+    @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
+    @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
+  ) {
+    return this.postsService.get(id, pagination, sorting, filtering);
   }
 }

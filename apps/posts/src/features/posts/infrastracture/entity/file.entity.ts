@@ -5,7 +5,7 @@ import { FileStatus } from '../../constants/file.constant';
 
 @Entity('files')
 export class File extends BaseEntity {
-  @Column({ type: 'varchar', length: '50' })
+  @Column({ type: 'varchar', length: '100' })
   fileName: string;
 
   @Column({ type: 'varchar', length: '200', default: null })

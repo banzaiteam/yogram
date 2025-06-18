@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BaseRepository } from '../../../../../libs/common/abstract/base-repository.abstract';
 import { CreateUserDto } from '../../../../../libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dto';
 import { Profile } from '../../entity/Profile.entity';
@@ -8,13 +7,17 @@ import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/pro
 import { ResponseProfileDto } from '../../../../../../apps/libs/Users/dto/user/response-profile.dto';
 import { UpdateProfileDto } from '../../../../../../apps/libs/Users/dto/profile/update-profile.dto';
 import { plainToInstance } from 'class-transformer';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ProfileCommandRepository
-  extends BaseRepository
   implements
     IProfileCommandRepository<CreateUserDto, UpdateUserDto, ResponseProfileDto>
 {
+  constructor(
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
+  ) {}
   // We pass the entity manager into getRepository to ensure that we
   // we run the query in the same context as the transaction.
   async create(
@@ -22,7 +25,10 @@ export class ProfileCommandRepository
     entityManager?: EntityManager,
   ): Promise<Profile> {
     const profile = new Profile(createProfileDto);
-    return this.profileRepository(entityManager).save(profile);
+    if (entityManager) {
+      return await entityManager.save(profile);
+    }
+    return await this.profileRepository.save(profile);
   }
 
   async update(
@@ -30,7 +36,7 @@ export class ProfileCommandRepository
     updateProfileDto: UpdateProfileDto,
     entityManager?: EntityManager,
   ): Promise<ResponseProfileDto> {
-    const profile = await this.profileRepository(entityManager)
+    const profile = await this.profileRepository
       .createQueryBuilder('profiles')
       .innerJoin('profiles.user', 'user')
       .where('profiles.id = :id', { id: criteria?.id })
@@ -46,20 +52,18 @@ export class ProfileCommandRepository
       )
       .getOne();
     if (!profile) throw new NotFoundException('Profile was not found');
-    this.profileRepository(entityManager).merge(profile, {
+    this.profileRepository.merge(profile, {
       ...updateProfileDto,
     });
-    await this.profileRepository(entityManager).save(profile);
+    if (entityManager) {
+      await entityManager.save(profile);
+      return plainToInstance(ResponseProfileDto, profile);
+    }
+    await this.profileRepository.save(profile);
     return plainToInstance(ResponseProfileDto, profile);
   }
   delete(userId: string): Promise<void> {
     throw new Error('Method not implemented.');
-  }
-
-  private profileRepository(
-    entityManager?: EntityManager,
-  ): Repository<Profile> {
-    return this.getRepository(Profile, entityManager);
   }
 }
 

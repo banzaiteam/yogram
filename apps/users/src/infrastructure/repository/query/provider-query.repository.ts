@@ -1,32 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { BaseRepository } from '../../../../../libs/common/abstract/base-repository.abstract';
-import { EntityManager, Repository } from 'typeorm';
-import { Provider } from '../../entity/Provider.entity';
+import { Repository } from 'typeorm';
 import { IProviderQueryRepository } from '../../../../../../apps/users/src/interfaces/query/provider-query.interface';
 import { ResponseProviderDto } from '../../../../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { plainToInstance } from 'class-transformer';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Provider } from '../../entity/Provider.entity';
 
 @Injectable()
 export class ProviderQueryRepository
-  extends BaseRepository
   implements IProviderQueryRepository<ResponseProviderDto>
 {
+  constructor(
+    @InjectRepository(Provider)
+    private readonly providerRepository: Repository<Provider>,
+  ) {}
   // We pass the entity manager into getRepository to ensure that we
   // we run the query in the same context as the transaction.
   async findProviderByProviderId(
     providerId: string,
-    entityManager?: EntityManager,
   ): Promise<ResponseProviderDto | null> {
-    const provider = await this.providerRepository(entityManager).findOneBy({
+    const provider = await this.providerRepository.findOneBy({
       providerId,
     });
     if (!provider) return null;
     return plainToInstance(ResponseProviderDto, provider);
-  }
-
-  private providerRepository(
-    entityManager?: EntityManager,
-  ): Repository<Provider> {
-    return this.getRepository(Provider, entityManager);
   }
 }

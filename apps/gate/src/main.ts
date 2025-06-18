@@ -4,20 +4,35 @@ import cookieParser from 'cookie-parser';
 import { applyAppSettings } from './settings/main.settings';
 import { useContainer } from 'class-validator';
 import bodyParser from 'body-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use(cookieParser());
-  app.use(bodyParser.json());
+  app.useBodyParser('json', { limit: '150mb' });
+  app.useBodyParser('urlencoded', { limit: '150mb', extended: true });
 
   app.enableCors({
+    allowedHeaders: [
+      'Access-Control-Allow-Origin',
+      'Access-Control-Allow-Headers',
+      'Content-Type',
+      'Authorization',
+      'Content-Length',
+      'Host',
+      'Accept',
+      'Accept-Encoding',
+      'Connection',
+      'User-Agent',
+    ],
     origin: [
       'https://yogram.ru',
       'http://localhost:5173',
       'http://localhost:56938',
       'https://localhost:3000',
       'http://localhost:3000',
+      'http://localhost',
     ],
     credentials: true,
   });

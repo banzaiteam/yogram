@@ -12,7 +12,7 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
-  const SERVICES_NAMES = ['USERS', 'POSTS'];
+  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES'];
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {
       Object.assign(acc, {
@@ -36,6 +36,7 @@ export const getConfiguration = () => {
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
     POSTS_PORT: process.env.POSTS_PORT,
+    FILES_PORT: process.env.FILES_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,

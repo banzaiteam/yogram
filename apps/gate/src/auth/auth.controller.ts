@@ -61,7 +61,6 @@ export class AuthController {
       userAgent,
       req.ip,
     );
-    console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'strict',

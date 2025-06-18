@@ -12,7 +12,7 @@ export function ForgotPasswordSwagger() {
       description: 'email was sent succesfully',
     }),
     ApiResponse({
-      status: 401,
+      status: 404,
       description: 'user with this email was not found',
     }),
     ApiResponse({

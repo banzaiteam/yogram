@@ -17,10 +17,11 @@ export class RecaptchaGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['x-recaptcha-token'];
+    console.log('🚀 ~ RecaptchaGuard ~ canActivate ~ token:', token);
     if (!token) {
       throw new BadRequestException('Recaptcha token is required');
     }
 
-    return await verifyRecaptcha(token, this.httpService, this.configService);
+    return await verifyRecaptcha('', this.httpService, this.configService);
   }
 }
