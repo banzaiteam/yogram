@@ -90,6 +90,7 @@ export class PostsController {
           cb(null, genFileName(file.originalname));
         },
       }),
+      // todo! not return error message because of stream response in gate/posts.controller
       fileFilter: (req, file, cb) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
           return cb(
@@ -101,7 +102,6 @@ export class PostsController {
       },
     }),
   )
-  // @UsePipes(SharpPipe)
   async createPost(
     @Body() createPostDto: CreatePostDto,
     @UploadedFiles(
@@ -111,9 +111,6 @@ export class PostsController {
             maxSize: 20000000,
             message: ' file is biiger than 20mb',
           }),
-          // new FileTypeValidator({
-          //   fileType: 'image/jpeg | image/png | application/pdf',
-          // }),
         ],
       }),
       SharpPipe,

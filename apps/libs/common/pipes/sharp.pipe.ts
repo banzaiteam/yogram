@@ -38,4 +38,3 @@ export class SharpPipe implements PipeTransform {
     return files;
   }
 }
-//[file.destination, newFileName].join('/')
