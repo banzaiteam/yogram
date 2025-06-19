@@ -5,7 +5,6 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import fs from 'fs/promises';
-import { extname } from 'path';
 import sharp from 'sharp';
 import { pipeline } from 'node:stream/promises';
 
