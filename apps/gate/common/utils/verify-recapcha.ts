@@ -1,28 +1,19 @@
-import { HttpService } from '@nestjs/axios';
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { lastValueFrom } from 'rxjs';
+import { RecaptchaV2 } from 'recaptcha-node';
 
 export const verifyRecaptcha = async (
   token: string,
-  httpService: HttpService,
   configService: ConfigService,
 ) => {
   const secretKey = configService.get('RECAPTCHA_SECRET_KEY');
-  const verifyUrl = configService.get('RECAPTCHA_URL');
-
   try {
-    const response = await lastValueFrom(
-      httpService.post(verifyUrl, null, {
-        params: {
-          secret: secretKey,
-          response: token,
-        },
-      }),
-    );
-    const { success } = response.data;
+    const recaptcha = new RecaptchaV2(secretKey);
+    const response = await recaptcha.verify(token);
+
+    const { success } = response;
+    if (success) return true;
     if (!success) throw new BadRequestException('Invalid captcha');
-    return true;
   } catch (error) {
     console.error('Error verifying reCAPTCHA:', error);
     throw new BadRequestException('Invalid captcha');

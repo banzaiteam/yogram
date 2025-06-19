@@ -8188,6 +8188,13 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
+recaptcha-node@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/recaptcha-node/-/recaptcha-node-0.2.0.tgz#4378468768ba03ee8939e533eccd76e357c6eb08"
+  integrity sha512-2vIS9arjiUwXlUCOFYaKw5neEajtb9Ql7eNai1K+lYDMlAe5zV4zi5Kg23BoJqbm36yXWksstyNEnP/Q65zz2w==
+  dependencies:
+    tslib "^2.1.0"
+
 redis-errors@^1.0.0, redis-errors@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/redis-errors/-/redis-errors-1.2.0.tgz#eb62d2adb15e4eaf4610c04afe1529384250abad"
