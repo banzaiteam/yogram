@@ -24,5 +24,5 @@ export async function getUploadPath(
 export function genFileName(originalname: string) {
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
   const fileExtension = extname(originalname);
-  return `${originalname}-${uniqueSuffix}${fileExtension}`;
+  return `${originalname.substring(0, originalname.indexOf('.'))}-${uniqueSuffix}${fileExtension}`;
 }

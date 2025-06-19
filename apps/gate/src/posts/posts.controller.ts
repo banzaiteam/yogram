@@ -47,6 +47,8 @@ export class PostsController {
     @Res() res: Response,
   ): Promise<void> {
     try {
+      console.log('post');
+
       // todo! error 413, bodyparser limit 150 mb does not help
       // const microserviceResponse =
       //   await this.gateService.requestHttpServicePost(
@@ -70,7 +72,7 @@ export class PostsController {
       res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
     } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
+      throw new HttpException(error, error.response.status);
     }
   }
 

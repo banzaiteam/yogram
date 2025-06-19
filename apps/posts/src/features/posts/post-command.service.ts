@@ -78,7 +78,7 @@ export class PostCommandService {
           size: file.size,
           path: file.path,
           fileId: id,
-          originalname: file.originalname,
+          originalname: file.filename,
           destination: file.destination,
         };
         uploadFiles.push(uploadFile);

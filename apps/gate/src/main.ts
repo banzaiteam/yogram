@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { applyAppSettings } from './settings/main.settings';
 import { useContainer } from 'class-validator';
-import bodyParser from 'body-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
@@ -25,6 +24,7 @@ async function bootstrap() {
       'Accept-Encoding',
       'Connection',
       'User-Agent',
+      'x-recaptcha-token',
     ],
     origin: [
       'https://yogram.ru',

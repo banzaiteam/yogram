@@ -1,18 +1,20 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  FileTypeValidator,
   Get,
-  Param,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Patch,
   Post,
-  Query,
   Req,
   UploadedFiles,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { Request } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -39,6 +41,7 @@ import {
   IFiltering,
 } from 'apps/gate/common/pagination/decorators/filtering.decorator';
 import { GetPostsQuery } from '../use-cases/queries/get-posts.query';
+import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
 
 @Controller()
 export class PostsController {
@@ -87,11 +90,34 @@ export class PostsController {
           cb(null, genFileName(file.originalname));
         },
       }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
     }),
   )
+  // @UsePipes(SharpPipe)
   async createPost(
     @Body() createPostDto: CreatePostDto,
-    @UploadedFiles()
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 20000000,
+            message: ' file is biiger than 20mb',
+          }),
+          // new FileTypeValidator({
+          //   fileType: 'image/jpeg | image/png | application/pdf',
+          // }),
+        ],
+      }),
+      SharpPipe,
+    )
     files: Express.Multer.File[],
     @Req() req: Request,
   ) {
@@ -102,9 +128,8 @@ export class PostsController {
     );
   }
 
-  @Get('posts/get/:id')
+  @Get('posts/get')
   async get(
-    @Param('id') id: string,
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
     @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
