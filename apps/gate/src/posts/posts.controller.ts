@@ -28,9 +28,9 @@ import {
   FilteringParams,
   IFiltering,
 } from '../../../libs/common/pagination/decorators/filtering.decorator';
-import { ResponsePostDto } from 'apps/libs/Posts/dto/output/response-post.dto';
+import { ResponsePostDto } from '../../../../apps/libs/Posts/dto/output/response-post.dto';
 import { plainToInstance } from 'class-transformer';
-import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 @ApiTags('Posts')
 @Controller('posts')

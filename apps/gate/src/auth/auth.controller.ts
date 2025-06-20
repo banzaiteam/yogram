@@ -38,6 +38,7 @@ import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
 import { LogoutAllDto } from './dto/logout-all.dto';
 import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
 import { RecaptchaGuard } from '../../../../apps/gate/common/guards/recapcha.guard';
+import open from 'open';
 
 @Controller('auth')
 export class AuthController {
@@ -161,7 +162,7 @@ export class AuthController {
   @GoogleSwagger()
   @Get('google')
   async googleOauth(@Res() res: Response) {
-    res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
+    await open(this.configService.get('GOOGLE_OAUTH_URI'));
   }
 
   @Public()
