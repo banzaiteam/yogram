@@ -11,8 +11,8 @@ export class PostsQueryService {
 
   async get(
     pagination: IPagination,
-    sorting: ISorting,
-    filtering: IFiltering,
+    sorting?: ISorting,
+    filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
     return await this.postQueryRepository.get(pagination, sorting, filtering);
   }

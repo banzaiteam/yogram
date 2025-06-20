@@ -31,6 +31,7 @@ import {
 import { ResponsePostDto } from '../../../../apps/libs/Posts/dto/output/response-post.dto';
 import { plainToInstance } from 'class-transformer';
 import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -87,11 +88,7 @@ export class PostsController {
     }
   }
 
-  @ApiResponse({
-    status: 200,
-    type: PostPaginatedResponseDto,
-    isArray: true,
-  })
+  @GetSwagger()
   @Get()
   async get(
     @PaginationParams() pagination: IPagination,
@@ -99,7 +96,6 @@ export class PostsController {
     @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
     const posts = await this.postsService.get(pagination, sorting, filtering);
-    console.log('🚀 ~ PostsController ~ posts:', posts);
     return plainToInstance(PostPaginatedResponseDto, posts);
   }
 }

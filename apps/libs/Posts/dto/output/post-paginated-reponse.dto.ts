@@ -1,4 +1,8 @@
-import { IPaginatedResponse } from '../../../../../apps/libs/common/pagination/interface/Pagination-response.interface';
 import { ResponsePostDto } from './response-post.dto';
 
-export class PostPaginatedResponseDto extends IPaginatedResponse<ResponsePostDto> {}
+export class PostPaginatedResponseDto {
+  items: ResponsePostDto[];
+  totalItems: number;
+  page: number;
+  limit: number;
+}

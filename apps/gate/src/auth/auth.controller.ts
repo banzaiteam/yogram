@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -163,13 +164,12 @@ export class AuthController {
   @Get('google')
   async googleOauth(@Res() res: Response) {
     try {
-      const result = await open(
-        'https://accounts.google.com/o/oauth2/v2/auth?client_id=704585299775-o91opnriljtokoelmpm0ahr4087cn9jr.apps.googleusercontent.com&redirect_uri=http://localhost:3000/api/v1/auth/google/callback&scope=openid%20profile%20email&response_type=code',
-      );
-      console.log('google after', result);
+      await open(this.configService.get('GOOGLE_OAUTH_URI'));
       res.status(200).json('success');
     } catch (error) {
-      console.log('🚀 ~ AuthController ~ googleOauth ~ error:', error);
+      throw new InternalServerErrorException(
+        'AuthController: cant open oauth link',
+      );
     }
   }
 

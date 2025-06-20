@@ -14,7 +14,7 @@ export const paginationFactory = (
   let page = parseInt(request.query?.page as string);
   let limit = parseInt(request.query?.limit as string);
   isNaN(page) || page < 1 ? (page = 1) : page;
-  isNaN(limit) || limit < 1 ? (limit = 1) : limit;
+  isNaN(limit) || limit < 1 ? (limit = 9) : limit;
   const offset = page * limit - limit;
   return { page, limit, offset };
 };

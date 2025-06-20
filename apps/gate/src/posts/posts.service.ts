@@ -13,12 +13,12 @@ export class PostsService {
 
   async get(
     pagination: IPagination,
-    sorting: ISorting,
-    filtering: IFiltering,
+    sorting?: ISorting,
+    filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
     const path = [
       HttpPostsPath.Get,
-      `?page=${pagination.page}&limit=${pagination.limit}&sort=${sorting.property}:${sorting.direction}&filter=${filtering.filterProperty}:${filtering.rule}:${filtering.value}`,
+      `?page=${pagination.page}&limit=${pagination.limit}${sorting ? `&sort=${sorting.property}:${sorting.direction}` : ''}${filtering ? `&filter=${filtering?.filterProperty}:${filtering?.rule}:${filtering?.value}` : ''}`,
     ].join('/');
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Posts,

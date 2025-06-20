@@ -5,7 +5,7 @@ import { ISorting } from 'apps/libs/common/pagination/decorators/sorting.decorat
 export abstract class IPostQueryRepository<R> {
   abstract get(
     pagination: IPagination,
-    sorting: ISorting,
-    filtering: IFiltering,
+    sorting?: ISorting,
+    filtering?: IFiltering,
   ): Promise<R>;
 }

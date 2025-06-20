@@ -39,9 +39,8 @@ const rulesMapping = (rule: string, value: string) => {
 
 export const filteringFactory = (data, ctx: ExecutionContext): IFiltering => {
   const req: Request = ctx.switchToHttp().getRequest();
-  const filter = req.query.filter as string;
+  const filter = req.query?.filter as string;
   if (!filter) return null;
-
   if (!Array.isArray(data))
     throw new BadRequestException('Invalid filter parameter');
 

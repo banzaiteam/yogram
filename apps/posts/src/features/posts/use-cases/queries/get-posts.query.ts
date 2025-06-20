@@ -8,8 +8,8 @@ import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-pagina
 export class GetPostsQuery {
   constructor(
     public readonly pagination: IPagination,
-    public readonly sorting: ISorting,
-    public readonly filtering: IFiltering,
+    public readonly sorting?: ISorting,
+    public readonly filtering?: IFiltering,
   ) {}
 }
 

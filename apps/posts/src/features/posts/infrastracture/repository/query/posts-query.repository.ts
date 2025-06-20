@@ -23,11 +23,19 @@ export class PostsQueryRepository
 
   async get(
     pagination: IPagination,
-    sorting: ISorting,
-    filtering: IFiltering,
+    sorting?: ISorting,
+    filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
-    const sort = getSortingOrder(sorting);
-    const filter = getFilteringObject(filtering);
+    let sort = {},
+      filter = {};
+
+    if (sorting) {
+      sort = getSortingOrder(sorting);
+    }
+    if (filtering) {
+      filter = getFilteringObject(filtering);
+    }
+
     const data = await this.postRepository.findAndCount({
       skip: pagination.offset,
       take: pagination.limit,
