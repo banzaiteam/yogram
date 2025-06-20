@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IUsersQueryRepository } from './interfaces/query/user-query.interface';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { User } from './infrastructure/entity/User.entity';
@@ -19,7 +19,9 @@ export class UsersQueryService {
   }
 
   async findUserByCriteria(criteria: UserCriteria): Promise<ResponseUserDto> {
-    return await this.userQueryRepository.findUserByCriteria(criteria);
+    const user = await this.userQueryRepository.findUserByCriteria(criteria);
+    if (!user) throw new NotFoundException('user was not found');
+    return user;
   }
 
   async findUserByProviderId(providerId: string): Promise<ResponseUserDto> {

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Param,
   Patch,
   Post,
   Query,
@@ -18,6 +19,20 @@ import { plainToInstance } from 'class-transformer';
 import { FindUserByCriteriaSwagger } from './decorators/swagger/find-one-by-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
 import { UpdateUserWithCriteriaDto } from '../../../../apps/libs/Users/dto/user/update-user-with-criteria.dto';
+import {
+  IPagination,
+  PaginationParams,
+} from 'apps/libs/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from 'apps/libs/common/pagination/decorators/sorting.decorator';
+import {
+  FilteringParams,
+  IFiltering,
+} from 'apps/libs/common/pagination/decorators/filtering.decorator';
+import { Public } from 'apps/gate/common/decorators/public.decorator';
+import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -56,5 +71,23 @@ export class UsersController {
     );
     if (!user) throw new NotFoundException('user was not found');
     return plainToInstance(ResponseUserDto, user);
+  }
+
+  @Public()
+  @Get('profile/:id/posts')
+  async profilePage(
+    @Param('id') id: string,
+    @PaginationParams() pagination: IPagination,
+    @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
+    @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
+  ): Promise<ResponseProfilePageDto> {
+    const p = await this.usersService.profilePage(
+      id,
+      pagination,
+      sorting,
+      filtering,
+    );
+    console.log('🚀 ~ UsersController ~ p:', p);
+    return p;
   }
 }

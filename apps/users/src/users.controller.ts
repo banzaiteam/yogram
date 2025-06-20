@@ -25,7 +25,6 @@ import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/f
 import { ResponseProviderDto } from '../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { ProviderQueryService } from './provider-query.service';
 import { GoogleResponse } from './users-command.service';
-
 @Controller()
 export class UsersController {
   constructor(

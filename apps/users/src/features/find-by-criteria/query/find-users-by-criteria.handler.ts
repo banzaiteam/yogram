@@ -1,16 +1,17 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { FindUserByCriteriaQuery } from './find-users-by-criteria.query';
-import { UserQueryRepository } from '../../../../../../apps/users/src/infrastructure/repository/query/user-query.repository';
 import { ResponseUserDto } from '../../../../../../apps/libs/Users/dto/user/response-user.dto';
+import { UsersQueryService } from 'apps/users/src/users-query.service';
 
 @QueryHandler(FindUserByCriteriaQuery)
 export class FindUserByCriteriaHandler
   implements IQueryHandler<FindUserByCriteriaQuery>
 {
-  constructor(private readonly userQueryRepository: UserQueryRepository) {}
+  constructor(private readonly userQueryService: UsersQueryService) {}
+
   async execute({
     criteria,
   }: FindUserByCriteriaQuery): Promise<ResponseUserDto | null> {
-    return await this.userQueryRepository.findUserByCriteria(criteria);
+    return await this.userQueryService.findUserByCriteria(criteria);
   }
 }
