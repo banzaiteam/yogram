@@ -7,3 +7,6 @@ export class ResponsePostDto {
   description?: string;
   files: ResponseFileDto[];
 }
+
+// todo! apps/libs/Posts/dto/output/post-paginated-reponse.dto does not visible in swagger
+// make it just with dto without generic interface
