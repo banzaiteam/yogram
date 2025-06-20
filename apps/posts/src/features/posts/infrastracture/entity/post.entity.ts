@@ -10,8 +10,8 @@ export class Post extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isPublished: boolean;
 
-  @Column({ type: 'varchar', length: '500' })
-  description: string;
+  @Column({ type: 'varchar', length: '500', nullable: true })
+  description?: string;
 
   @OneToMany(() => File, (file) => file.post, {
     eager: true,

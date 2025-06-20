@@ -1,33 +1,29 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpPostsPath } from '../../../libs/Posts/constants/path.enum';
-import { CreatePostDto } from '../../../libs/Posts/dto/input/create-post.dto';
-import { ChunksFileUploader } from '../../../../apps/libs/common/upload/chunks-file-uploader.service';
-import fs from 'node:fs/promises';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { IPagination } from '../../../libs/common/pagination/decorators/pagination.decorator';
+import { GateService } from '../../../../apps/libs/gateService';
+import { ISorting } from '../../../libs/common/pagination/decorators/sorting.decorator';
+import { IFiltering } from '../../../libs/common/pagination/decorators/filtering.decorator';
+import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly chunksFileUploader: ChunksFileUploader) {}
+  constructor(private readonly gateService: GateService) {}
 
-  async create(
-    createPostDto: CreatePostDto,
-    files: Express.Multer.File[],
-    id: string,
-  ): Promise<void> {
-    createPostDto.userId = id;
-    try {
-      await this.chunksFileUploader.proccessChunksUpload(
-        files,
-        id,
-        HttpPostsPath.Create,
-      );
-      for await (const file of files) {
-        await fs.unlink(file.path);
-      }
-    } catch (error) {
-      await fs.rm(files[0].destination, { recursive: true });
-      throw new InternalServerErrorException(
-        'FileUploader: error  during uploading files',
-      );
-    }
+  async get(
+    pagination: IPagination,
+    sorting?: ISorting,
+    filtering?: IFiltering,
+  ): Promise<PostPaginatedResponseDto> {
+    const path = [
+      HttpPostsPath.Get,
+      `?page=${pagination.page}&limit=${pagination.limit}${sorting ? `&sort=${sorting.property}:${sorting.direction}` : ''}${filtering ? `&filter=${filtering?.filterProperty}:${filtering?.rule}:${filtering?.value}` : ''}`,
+    ].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Posts,
+      path,
+      {},
+    );
   }
 }

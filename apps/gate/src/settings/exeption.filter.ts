@@ -16,6 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
     const error = exception.getResponse()['error'];
+    console.log('🚀 ~ HttpExceptionFilter ~ error:', error);
 
     if (host.getType<string>() === 'graphql') {
       const status = exception.getStatus();

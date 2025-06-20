@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { AuthModule } from '../auth/auth.module';
-import { ChunksFileUploader } from '../../../../apps/libs/common/upload/chunks-file-uploader.service';
+import { ChunksFileUploader } from '../../../libs/common/chunks-upload/chunks-file-uploader.service';
 
 @Module({
   imports: [

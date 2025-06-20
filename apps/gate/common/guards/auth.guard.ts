@@ -18,8 +18,6 @@ export class AuthGuard implements CanActivate {
     private readonly authService: AuthService,
   ) {}
   async canActivate(context: ExecutionContext) {
-    console.log('AuthGuard');
-
     const isPublic = this.reflector.getAllAndOverride(Is_Public, [
       context.getClass(),
       context.getHandler(),

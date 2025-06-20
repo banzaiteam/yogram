@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -38,6 +39,7 @@ import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
 import { LogoutAllDto } from './dto/logout-all.dto';
 import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
 import { RecaptchaGuard } from '../../../../apps/gate/common/guards/recapcha.guard';
+import open from 'open';
 
 @Controller('auth')
 export class AuthController {
@@ -61,7 +63,6 @@ export class AuthController {
       userAgent,
       req.ip,
     );
-    console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       sameSite: 'strict',
@@ -162,7 +163,14 @@ export class AuthController {
   @GoogleSwagger()
   @Get('google')
   async googleOauth(@Res() res: Response) {
-    res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
+    try {
+      await open(this.configService.get('GOOGLE_OAUTH_URI'));
+      res.status(200).json('success');
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'AuthController: cant open oauth link',
+      );
+    }
   }
 
   @Public()
@@ -172,25 +180,19 @@ export class AuthController {
     @Query('code') code: string,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<LoggedUserDto> {
-    const [access_token, refresh_token, user] = await this.authService.google(
+  ): Promise<{ accessToken: string; user: LoggedUserDto }> {
+    const { accessToken, refreshToken, user } = await this.authService.google(
       code,
       req.headers['user-agent'],
       req.ip,
     );
-    res.cookie('access_token', access_token, {
-      httpOnly: false,
-      sameSite: 'strict',
-      secure: true,
-      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
-    });
-    res.cookie('refresh_token', refresh_token, {
+    res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
-    return plainToInstance(LoggedUserDto, user);
+    return { accessToken, user: plainToInstance(LoggedUserDto, user) };
   }
 
   @AuthMeSwagger()

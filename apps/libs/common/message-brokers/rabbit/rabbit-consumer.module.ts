@@ -120,7 +120,6 @@ export class RabbitConsumerModule implements OnModuleInit {
 
             if (message) {
               const JsondMessage = JSON.parse(message.content.toString());
-              console.log(JsondMessage, 'Parsed Message');
 
               const rtk = message.fields.routingKey;
               if (message.fields.routingKey in this.actionMapper) {

@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { DataSource, QueryFailedError } from 'typeorm';
@@ -19,7 +18,6 @@ import { OauthProviders } from '../../../apps/libs/Users/constants/oauth-provide
 import { GoogleSignupDto } from '../../../apps/libs/Users/dto/user/google-signup.dto';
 import { CreateUserByProviderDto } from '../../../apps/libs/Users/dto/user/create-user-by-provider.dto';
 import { genUserName } from './utils/gen-username.util';
-import { Response } from 'express';
 import { UsersQueryService } from './users-query.service';
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
@@ -41,12 +39,12 @@ export class UsersCommandService {
 
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
     const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.startTransaction();
     try {
       const user = await this.userCommandRepository.create(
         createUserDto,
         queryRunner.manager,
       );
+      await queryRunner.startTransaction();
       const createProfileDto: CreateProfileDto = {
         user,
         username: createUserDto.username,
@@ -93,7 +91,7 @@ export class UsersCommandService {
     // form user does not exists so create provider entity and merge to the form user
     if (!googleSignupDto.user) {
       const queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.startTransaction();
+
       try {
         let username = googleSignupDto.username;
         const userWithTheSameUserName =
@@ -112,10 +110,10 @@ export class UsersCommandService {
               );
           username = await genUserName(
             usernameFromUsernameOrEmail,
-            queryRunner,
             this.usersQueryService,
           );
         }
+        await queryRunner.startTransaction();
         // create user
         const createUserDto: CreateUserByProviderDto = {
           email: googleSignupDto.email,

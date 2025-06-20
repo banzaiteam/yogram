@@ -7,8 +7,14 @@ export function GoogleSwagger() {
     ApiOkResponse({
       headers: {
         'Set-Cookie': {
-          description: 'access_token without httpOnly/refresh_token httpOnly',
+          description: 'sameSite, secure, httpOnly refresh_token',
           schema: { type: 'string' },
+        },
+      },
+      content: {
+        ApiResponse: {
+          example:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI2NTAwNGQ2LTc5MzQtNGRkNS04MDAxLWJhYWFkN2I0MmIzYiIsImlhdCI6MTc0OTQxMzA1NCwiZXhwIjoxNzQ5NDEzMjk0fQ.I50Lao0A1Tic4Npfaf8620SzNJvFfNjgO-_AvMkvNa0',
         },
       },
     }),
@@ -19,7 +25,7 @@ export function GoogleSwagger() {
     ApiOperation({
       summary: 'Signup/login with google',
       description:
-        'if user didnt register with form, usual user account will be created and logged in. If user have form registered account, he will be logged in',
+        'if user didnt register with form, usual user account will be created and logged in then create password for form account link will be sent to the user mail. If user have form registered account, he will be logged in',
     }),
   );
 }

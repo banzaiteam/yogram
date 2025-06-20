@@ -24,7 +24,8 @@ export function LoginSwagger() {
     }),
     ApiResponse({
       status: 401,
-      description: 'invalid login/password or not verified',
+      description:
+        'invalid login/password or not verified / you created account using oAuth2, please create new password using forgotPassword',
     }),
     ApiResponse({
       status: 404,

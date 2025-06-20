@@ -3,6 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
+import open from 'open';
+
+jest.mock('open', () => jest.fn());
 
 const createUserDto: CreateUserDto = {
   username: 'username1',
