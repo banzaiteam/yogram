@@ -164,8 +164,8 @@ export class AuthController {
   async googleOauth(@Res() res: Response) {
     try {
       console.log('google');
-      await open(this.configService.get('GOOGLE_OAUTH_URI'));
-      console.log('google after');
+      const result = await open(this.configService.get('GOOGLE_OAUTH_URI'), {});
+      console.log('google after', result);
       res.status(200).json('success');
     } catch (error) {
       console.log('🚀 ~ AuthController ~ googleOauth ~ error:', error);
