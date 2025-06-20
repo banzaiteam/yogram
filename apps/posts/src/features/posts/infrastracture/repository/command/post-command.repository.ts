@@ -24,7 +24,7 @@ export class PostCommandRepository
     const post = new Post({
       id: postDto.postId,
       userId: postDto.userId,
-      description: postDto.description,
+      description: null,
       isPublished: false,
       files: null,
       createdAt: new Date(),

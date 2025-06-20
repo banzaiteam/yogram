@@ -52,18 +52,12 @@ export class GoogleOauth implements IOauth {
 
   async performOAuth(code: string): Promise<LoggedUserDto> {
     const userCredentials = await this.getUserCredentials(code);
-    console.log(
-      '🚀 ~ GoogleOauth ~ performOAuth ~ userCredentials:',
-      userCredentials,
-    );
     const provider = await this.usersService.findProviderByProviderId(
       userCredentials.providerId,
     );
-    console.log('🚀 ~ GoogleOauth ~ performOAuth ~ provider:', provider);
     const user = await this.usersService.findUserByCriteria({
       email: userCredentials.email,
     });
-    console.log('🚀 ~ GoogleOauth ~ performOAuth ~ user:', user);
 
     if (!provider) {
       console.log('auth: no provider');

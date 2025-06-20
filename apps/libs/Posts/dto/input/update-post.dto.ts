@@ -15,4 +15,7 @@ export class UpdatePostDto extends PartialType(
   @IsOptional()
   @IsEnum({ enum: FileStatus })
   status?: FileStatus;
+  @IsOptional()
+  @IsString()
+  description?: string;
 }

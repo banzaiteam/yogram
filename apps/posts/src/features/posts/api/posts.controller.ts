@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  FileTypeValidator,
   Get,
   MaxFileSizeValidator,
   ParseFilePipe,
@@ -11,7 +10,6 @@ import {
   Req,
   UploadedFiles,
   UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -31,17 +29,19 @@ import { FileStatus } from '../constants/file.constant';
 import {
   IPagination,
   PaginationParams,
-} from 'apps/gate/common/pagination/decorators/pagination.decorator';
+} from 'apps/libs/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from 'apps/gate/common/pagination/decorators/sorting.decorator';
+} from 'apps/libs/common/pagination/decorators/sorting.decorator';
 import {
   FilteringParams,
   IFiltering,
-} from 'apps/gate/common/pagination/decorators/filtering.decorator';
+} from 'apps/libs/common/pagination/decorators/filtering.decorator';
 import { GetPostsQuery } from '../use-cases/queries/get-posts.query';
 import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
+import { Post as PostResponse } from '../infrastracture/entity/post.entity';
+import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 @Controller()
 export class PostsController {
@@ -117,7 +117,9 @@ export class PostsController {
     )
     files: Express.Multer.File[],
     @Req() req: Request,
-  ) {
+  ): Promise<PostResponse> {
+    // todo! when uploading files and exception throw in post-command-repository/create
+    // files in posts/upload not deleting
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
@@ -130,7 +132,7 @@ export class PostsController {
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
     @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
-  ) {
+  ): Promise<PostPaginatedResponseDto> {
     return await this.queryBus.execute(
       new GetPostsQuery(pagination, sorting, filtering),
     );

@@ -200,17 +200,14 @@ export class AuthService {
   }
 
   async externalLogin(user: LoggedUserDto, userAgent: string, ip: string) {
-    console.log('🚀 ~ AuthService ~ externalLogin ~ ip:', ip);
-    console.log('🚀 ~ AuthService ~ externalLogin ~ userAgent:', userAgent);
-    console.log('externalLogin');
     const payloadAccess = { id: user.id };
     const payloadRefresh = { id: user.id };
-    const access_token = await this.genAccessToken(payloadAccess);
-    const [refresh_token, expiresAt] =
+    const accessToken = await this.genAccessToken(payloadAccess);
+    const [refreshToken, expiresAt] =
       await this.genRefreshToken(payloadRefresh);
 
     await this.createDeviceSession(
-      refresh_token,
+      refreshToken,
       user.id,
       userAgent,
       ip,
@@ -219,7 +216,7 @@ export class AuthService {
 
     await this.updateDeviceLastSeen(user.id, [ip, userAgent].join('-'));
 
-    return [access_token, refresh_token, user];
+    return { accessToken, refreshToken, user };
   }
 
   async authMe(id: string): Promise<ResponseUserDto> {

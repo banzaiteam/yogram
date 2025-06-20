@@ -8,7 +8,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
 import { User } from '../auth/decorators/user.decorator';
@@ -19,15 +19,18 @@ import { v4 } from 'uuid';
 import {
   IPagination,
   PaginationParams,
-} from '../../../../apps/gate/common/pagination/decorators/pagination.decorator';
+} from '../../../libs/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from '../../../../apps/gate/common/pagination/decorators/sorting.decorator';
+} from '../../../libs/common/pagination/decorators/sorting.decorator';
 import {
   FilteringParams,
   IFiltering,
-} from '../../../../apps/gate/common/pagination/decorators/filtering.decorator';
+} from '../../../libs/common/pagination/decorators/filtering.decorator';
+import { ResponsePostDto } from 'apps/libs/Posts/dto/output/response-post.dto';
+import { plainToInstance } from 'class-transformer';
+import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -38,17 +41,25 @@ export class PostsController {
     private readonly httpService: HttpService,
   ) {}
 
-  @ApiResponse({ status: 201, description: 'post was created' })
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: ' Authorization with bearer token',
+    },
+  ])
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({
+    status: 201,
+    description: 'post was created',
+    type: ResponsePostDto,
+  })
   @Post()
-  @HttpCode(201)
   async create(
     @User('id') id: string,
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<void> {
+  ) {
     try {
-      console.log('post');
-
       // todo! error 413, bodyparser limit 150 mb does not help
       // const microserviceResponse =
       //   await this.gateService.requestHttpServicePost(
@@ -76,13 +87,19 @@ export class PostsController {
     }
   }
 
-  @Get(':id')
-  get(
-    @Param('id') id: string,
+  @ApiResponse({
+    status: 200,
+    type: PostPaginatedResponseDto,
+    isArray: true,
+  })
+  @Get()
+  async get(
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
     @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
-  ) {
-    return this.postsService.get(id, pagination, sorting, filtering);
+  ): Promise<PostPaginatedResponseDto> {
+    const posts = await this.postsService.get(pagination, sorting, filtering);
+    console.log('🚀 ~ PostsController ~ posts:', posts);
+    return plainToInstance(PostPaginatedResponseDto, posts);
   }
 }

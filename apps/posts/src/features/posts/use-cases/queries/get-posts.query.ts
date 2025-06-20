@@ -1,10 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { IFiltering } from 'apps/gate/common/pagination/decorators/filtering.decorator';
-import { IPagination } from 'apps/gate/common/pagination/decorators/pagination.decorator';
-import { ISorting } from 'apps/gate/common/pagination/decorators/sorting.decorator';
-import { Post } from '../../infrastracture/entity/post.entity';
+import { IFiltering } from 'apps/libs/common/pagination/decorators/filtering.decorator';
+import { IPagination } from 'apps/libs/common/pagination/decorators/pagination.decorator';
+import { ISorting } from 'apps/libs/common/pagination/decorators/sorting.decorator';
 import { PostsQueryService } from '../../posts-query.service';
-import { plainToInstance } from 'class-transformer';
+import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 export class GetPostsQuery {
   constructor(
@@ -22,12 +21,7 @@ export class GetPostsQueryHandler implements IQueryHandler<GetPostsQuery> {
     pagination,
     sorting,
     filtering,
-  }: GetPostsQuery): Promise<Post> {
-    const posts = await this.postsQueryService.get(
-      pagination,
-      sorting,
-      filtering,
-    );
-    return plainToInstance(Post, posts);
+  }: GetPostsQuery): Promise<PostPaginatedResponseDto> {
+    return await this.postsQueryService.get(pagination, sorting, filtering);
   }
 }
