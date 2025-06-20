@@ -162,7 +162,14 @@ export class AuthController {
   @GoogleSwagger()
   @Get('google')
   async googleOauth(@Res() res: Response) {
-    await open(this.configService.get('GOOGLE_OAUTH_URI'));
+    try {
+      console.log('google');
+      await open(this.configService.get('GOOGLE_OAUTH_URI'));
+      console.log('google after');
+      res.status(200).json('success');
+    } catch (error) {
+      console.log('🚀 ~ AuthController ~ googleOauth ~ error:', error);
+    }
   }
 
   @Public()
