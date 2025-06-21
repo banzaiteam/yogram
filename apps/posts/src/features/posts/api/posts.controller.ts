@@ -84,14 +84,17 @@ export class PostsController {
         destination: async (req, file, cb) => {
           cb(
             null,
-            await getUploadPath('apps/posts/src/features/posts/uploads', req),
+            await getUploadPath(
+              'POST',
+              'apps/posts/src/features/posts/uploads',
+              req,
+            ),
           );
         },
         filename: (req, file, cb) => {
           cb(null, genFileName(file.originalname));
         },
       }),
-      // todo! not return error message because of stream response in gate/posts.controller
       fileFilter: (req, file, cb) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
           return cb(
@@ -123,7 +126,6 @@ export class PostsController {
     // files in posts/upload not deleting
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
-    throw new ConflictException('vvv');
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, files),
     );

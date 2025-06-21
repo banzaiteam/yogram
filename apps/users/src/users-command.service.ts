@@ -53,7 +53,12 @@ export class UsersCommandService {
       const createProfileDto: CreateProfileDto = {
         user,
         username: createUserDto.username,
+        aboutMe: createUserDto.aboutMe,
       };
+      console.log(
+        '🚀 ~ UsersCommandService ~ createUser ~ createProfileDto:',
+        createProfileDto,
+      );
       await this.profileCommandService.create(
         createProfileDto,
         queryRunner.manager,
@@ -134,6 +139,7 @@ export class UsersCommandService {
         const createProfileDto: CreateProfileDto = {
           user,
           username: createUserDto.username,
+          aboutMe: createUserDto.aboutMe,
         };
         await this.profileCommandService.create(
           createProfileDto,

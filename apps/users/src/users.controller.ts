@@ -65,6 +65,10 @@ export class UsersController {
 
   @Post('users/create')
   async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+    console.log(
+      '🚀 ~ UsersController ~ create ~ createUserDto:',
+      createUserDto,
+    );
     await this.commandBus.execute(new CreateUserCommand(createUserDto));
   }
 

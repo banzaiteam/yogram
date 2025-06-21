@@ -52,17 +52,7 @@ export class PostsController {
     @Res() res: Response,
   ) {
     try {
-      // todo! error 413, bodyparser limit 150 mb does not help
-      // const microserviceResponse =
-      //   await this.gateService.requestHttpServicePost(
-      //     HttpServices.Posts,
-      //     HttpPostsPath.Create,
-      //     req,
-      //     {
-      //       headers: { ...req.headers, postid: v4(), userid: id },
-      //       // responseType: 'stream',
-      //     },
-      //   );
+      // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
         'http://localhost:3004/api/v1/posts/create',
         req,

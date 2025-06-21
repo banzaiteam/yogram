@@ -10,15 +10,30 @@ async function createFolderIfNotExists(folder: string): Promise<void> {
 }
 
 export async function getUploadPath(
+  entity: 'AVATAR' | 'POST',
   uploadDir: string,
   req: Request,
 ): Promise<string> {
-  const postid = req.headers.postid;
-  const userId = req.headers.userid;
-  const uploadsPath = `${uploadDir}/${userId}/${postid}`;
-  req.body.postId = postid;
-  await createFolderIfNotExists(uploadsPath);
-  return uploadsPath;
+  console.log('🚀 ~ entity:', entity);
+  if (entity === 'POST') {
+    const postid = req.headers.postid;
+    const userId = req.headers.userid;
+    const uploadsPath = `${uploadDir}/${userId}/${postid}`;
+    req.body.postId = postid;
+    await createFolderIfNotExists(uploadsPath);
+    return uploadsPath;
+  } else if (entity === 'AVATAR') {
+    const userId = req.headers.userid;
+    const uploadsPath = `${uploadDir}/${userId}`;
+    await createFolderIfNotExists(uploadsPath);
+    return uploadsPath;
+  }
+  // const postid = req.headers.postid;
+  // const userId = req.headers.userid;
+  // const uploadsPath = `${uploadDir}/${userId}/${postid}`;
+  // req.body.postId = postid;
+  // await createFolderIfNotExists(uploadsPath);
+  // return uploadsPath;
 }
 
 export function genFileName(originalname: string) {
