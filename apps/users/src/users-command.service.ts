@@ -38,13 +38,18 @@ export class UsersCommandService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
+    console.log(
+      '🚀 ~ UsersCommandService ~ createUser ~ createUserDto:',
+      createUserDto,
+    );
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       const user = await this.userCommandRepository.create(
         createUserDto,
         queryRunner.manager,
       );
-      await queryRunner.startTransaction();
       const createProfileDto: CreateProfileDto = {
         user,
         username: createUserDto.username,
@@ -68,19 +73,21 @@ export class UsersCommandService {
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
+      console.log('🚀 ~ UsersCommandService ~ createUser ~ error:', error);
+      await queryRunner.rollbackTransaction();
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
           throw new ConflictException(
-            'user with this email/username already exists',
+            `user with this ${error['detail'].substring(error['detail'].indexOf('(') + 1, error['detail'].indexOf(')'))} already exists`,
           );
         }
         if ((error['code'] = '23503')) {
           throw new BadRequestException();
         }
       }
-      await queryRunner.rollbackTransaction();
       throw new InternalServerErrorException(error);
     } finally {
+      console.log('finally');
       await queryRunner.release();
     }
   }
@@ -89,9 +96,8 @@ export class UsersCommandService {
     googleSignupDto: GoogleSignupDto,
   ): Promise<GoogleResponse> {
     // form user does not exists so create provider entity and merge to the form user
+    const queryRunner = this.dataSource.createQueryRunner();
     if (!googleSignupDto.user) {
-      const queryRunner = this.dataSource.createQueryRunner();
-
       try {
         let username = googleSignupDto.username;
         const userWithTheSameUserName =
@@ -163,8 +169,9 @@ export class UsersCommandService {
     }
     // form user exists so merge it to the provider entity
     else {
+      // todo realize with transaction there, maybe not needed
       // update provider's username, email, providerId
-      const queryRunner = this.dataSource.createQueryRunner();
+      // const queryRunner = this.dataSource.createQueryRunner();
       const providerUpdateDto: UpdateProviderDto = {
         username: googleSignupDto.user.username,
         email: googleSignupDto.user.email,

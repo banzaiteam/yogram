@@ -72,10 +72,27 @@ export class PostsController {
           responseType: 'stream',
         },
       );
+
       res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
-    } catch (error) {
-      throw new HttpException(error, error.response.status);
+    } catch (err) {
+      // responseType: 'stream' error handle
+      await new Promise((res) => {
+        let streamString = '';
+        err.response.data.setEncoding('utf8');
+        err.response.data
+          .on('data', (utf8Chunk) => {
+            streamString += utf8Chunk;
+          })
+          .on('end', async () => {
+            err.response.stream = streamString;
+          });
+        setTimeout(() => {
+          res(err);
+        }, 300);
+      }).then((data) => {
+        throw new HttpException(data, data['status']);
+      });
     }
   }
 

@@ -20,7 +20,6 @@ export class UsersQueryService {
 
   async findUserByCriteria(criteria: UserCriteria): Promise<ResponseUserDto> {
     const user = await this.userQueryRepository.findUserByCriteria(criteria);
-    if (!user) throw new NotFoundException('user was not found');
     return user;
   }
 

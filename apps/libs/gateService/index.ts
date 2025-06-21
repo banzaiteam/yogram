@@ -43,7 +43,7 @@ export class GateService {
       );
       return data;
     } catch (error) {
-      console.warn('error postAdapter', error);
+      // console.warn('error postAdapter', error);
       throw new HttpException(error.response.data, error.response.status);
     }
   }

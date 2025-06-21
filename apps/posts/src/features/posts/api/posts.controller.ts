@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
   MaxFileSizeValidator,
@@ -122,6 +123,7 @@ export class PostsController {
     // files in posts/upload not deleting
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
+    throw new ConflictException('vvv');
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, files),
     );

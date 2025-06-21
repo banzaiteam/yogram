@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   MaxLength,
@@ -18,6 +19,12 @@ export class CreateUserDto {
   })
   @MaxLength(30)
   username: string;
+  @IsOptional()
+  @IsString()
+  @MinLength(20, {
+    message: 'aboutMe should be minimum 20 and max 300 characters long',
+  })
+  aboutMe?: string;
   @ApiProperty({
     description: 'email should be unique',
   })
