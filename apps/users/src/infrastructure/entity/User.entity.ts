@@ -11,6 +11,8 @@ export class User extends BaseEntity {
   password: string;
   @Column({ type: 'boolean' })
   verified: boolean = false;
+  @Column({ type: 'varchar', nullable: true, default: null })
+  url: string;
 
   @OneToOne(() => Profile, (profile) => profile.user, {
     eager: true,
