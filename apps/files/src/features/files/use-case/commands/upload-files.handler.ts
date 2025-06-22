@@ -3,7 +3,6 @@ import { FilesCommandService } from '../../../../../../../apps/files/src/files-c
 import { ChunkedFileDto } from '../../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { ProducerService } from '../../../../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
 import { AwsBuckets } from '../../../../../../../apps/libs/Files/constants/aws-buckets.constant';
-import { FilesRoutingKeys } from '../../message-brokers/rabbit/files-routing-keys.constant';
 
 export class UploadFilesCommand {
   constructor(public readonly chunkedFileDto: ChunkedFileDto) {}
@@ -27,10 +26,12 @@ export class UploadFilesCommandHandler
       chunkedFileDto.filesUploadBaseDir,
       response.folderPath,
     ].join('/');
+    // send uploading response to service by rmq
     await this.producerService.emit({
-      routingKey: FilesRoutingKeys.FilesUploaded,
+      routingKey: chunkedFileDto.routingKey,
       payload: response,
     });
+    // delete files/uploads/...
     await this.filesCommandService.deleteLocalFolderWithFiles(delPath);
   }
 }

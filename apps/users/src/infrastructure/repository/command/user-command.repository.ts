@@ -32,6 +32,7 @@ export class UserCommandRepository
     updateUserDto: UpdateUserDto,
     entityManager?: EntityManager,
   ): Promise<User> {
+    console.log('🚀 ~ updateUserDto:', updateUserDto);
     const user = await this.userRepository
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')
@@ -54,11 +55,12 @@ export class UserCommandRepository
       }
     });
 
-    this.userRepository.merge(user, {
+    const merged = this.userRepository.merge(user, {
       ...updateUserDto,
       profile: { ...updateUserDto },
       providers,
     });
+    console.log('🚀 ~ merged:', merged);
     if (entityManager) {
       return await entityManager.save(user);
     }

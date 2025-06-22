@@ -38,6 +38,9 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
 import { Request } from 'express';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
 @Controller()
 export class UsersController {
   constructor(
@@ -117,7 +120,7 @@ export class UsersController {
           }),
         ],
       }),
-      // SharpPipe,
+      SharpPipe,
     )
     file: Express.Multer.File[],
     @Req() req: Request,
@@ -142,6 +145,21 @@ export class UsersController {
     const updateUserDto = payload['updateUserDto'];
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, updateUserDto),
+    );
+  }
+
+  @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploadedAvatars })
+  async updateCreatedUserAvatar(
+    rtKey: string,
+    { payload }: IEvent,
+  ): Promise<void> {
+    let folderPath: string = <string>payload['folderPath'];
+    folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
+    const criteria = {
+      id: folderPath,
+    };
+    return await this.commandBus.execute(
+      new UpdateUserByCriteriaCommand(criteria, { url: payload.url }),
     );
   }
 

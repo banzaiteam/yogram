@@ -20,6 +20,7 @@ import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criter
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 @Injectable()
 export class PostCommandService {
   constructor(
@@ -118,6 +119,7 @@ export class PostCommandService {
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
+          FilesRoutingKeys.FilesUploadedPosts,
           files,
           filesServiceUploadFolderWithoutBasePath,
           uploadServiceUrl,

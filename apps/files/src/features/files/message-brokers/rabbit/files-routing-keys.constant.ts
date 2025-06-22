@@ -1,3 +1,4 @@
 export enum FilesRoutingKeys {
-  FilesUploaded = 'files.uploaded.',
+  FilesUploadedPosts = 'files.uploaded.posts',
+  FilesUploadedAvatars = 'files.uploaded.avatars',
 }

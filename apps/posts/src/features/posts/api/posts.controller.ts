@@ -97,7 +97,7 @@ export class PostsController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file.originalname.match(/\.(JPG|jpg|jpeg|JPEG|png|PNG)$/)) {
           return cb(
             new BadRequestException('Only image files are allowed!'),
             false,
@@ -155,7 +155,7 @@ export class PostsController {
     );
   }
 
-  @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploaded })
+  @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploadedPosts })
   async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
     // todo! if error there need to delete local photos from files and posts
     let folderPath: string = <string>payload['folderPath'];
@@ -164,7 +164,15 @@ export class PostsController {
       id: folderPath,
       fileid: payload['fileId'],
     };
+    console.log(
+      '🚀 ~ PostsController ~ updateCreatedPost ~ criteria:',
+      criteria,
+    );
     const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
+    console.log(
+      '🚀 ~ PostsController ~ updateCreatedPost ~ updatePostDto:',
+      updatePostDto,
+    );
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto),
     );

@@ -19,7 +19,6 @@ export class FilesCommandService {
     files: any,
     bucket: AwsBuckets,
   ): Promise<UploadFilesResponse> {
-    console.log('🚀 ~ FilesCommandService ~ files:', files);
     try {
       return await this.uploaderService.uploadFiles(files, bucket);
     } catch (err) {
@@ -34,7 +33,6 @@ export class FilesCommandService {
       deleteFilesDto.filesServiceUploadFolderWithoutBasePath,
       deleteFilesDto.postId,
     ].join('/');
-    console.log('🚀 ~ FilesCommandService ~ deleteUploadedFiles ~ path:', path);
     return await this.uploaderService.deleteFiles(path);
   }
 

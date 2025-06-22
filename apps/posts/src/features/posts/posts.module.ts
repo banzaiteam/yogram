@@ -47,7 +47,7 @@ import {
     CqrsModule,
     MulterModule.register({}),
     RabbitConsumerModule.register([
-      { files: [FilesBindingKeysEnum.Files_Uploaded_Many] },
+      { posts: [FilesBindingKeysEnum.Files_Uploaded_Many] },
     ]),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Post, File]),

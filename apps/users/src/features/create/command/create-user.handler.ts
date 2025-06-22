@@ -21,6 +21,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     // if user already exists but he is not verified(maybe he didnt get email verif. message or want to recreate acc with other credentials)
     if (createUser && !createUser.verified) {
       const criteria = { email: createUserDto.email };
+      delete createUserDto.id;
       const user = await this.usersCommandService.updateUser(
         criteria,
         createUserDto,

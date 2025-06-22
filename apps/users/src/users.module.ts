@@ -47,6 +47,8 @@ import { ProviderQueryRepositoryProvider } from './providers/query/provider-quer
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
 import { ChunksFileUploaderModule } from 'apps/libs/common/chunks-upload/chunks-file-uploader.module';
+import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
+import { FilesBindingKeysEnum } from 'apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -71,6 +73,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     RabbitProducerModule.register(['users']),
+    RabbitConsumerModule.register([
+      { files: [FilesBindingKeysEnum.Files_Uploaded_Many] },
+    ]),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([User, Profile, Provider]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({

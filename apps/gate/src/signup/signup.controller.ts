@@ -53,7 +53,9 @@ export class SignupController {
 
       res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
+      res.status(201);
     } catch (err) {
+      // console.log('🚀 ~ SignupController ~ err:', err);
       // responseType: 'stream' error handle
       await new Promise((res) => {
         let streamString = '';
@@ -72,8 +74,6 @@ export class SignupController {
         throw new HttpException(data, data['status']);
       });
     }
-    // await this.signupService.create(createUserDto);
-    res.status(201);
   }
 
   @Public()

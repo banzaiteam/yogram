@@ -6,12 +6,14 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { UploadFile } from './interfaces/upload-file.interface';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 @Injectable()
 export class ChunksFileUploader {
   constructor(private readonly httpService: HttpService) {}
 
   async proccessChunksUpload(
+    routingKey: FilesRoutingKeys,
     files: UploadFile[],
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
@@ -43,6 +45,7 @@ export class ChunksFileUploader {
         let chunk = buffer.subarray(startByte, endByte);
         //test
         await this.uploadChunk(
+          routingKey,
           JSON.stringify(chunk),
           totalChunks,
           i,
@@ -58,6 +61,7 @@ export class ChunksFileUploader {
   }
 
   private async uploadChunk(
+    routingKey: FilesRoutingKeys,
     chunk: string,
     totalChunks: number,
     currentChunk: number,
@@ -73,6 +77,7 @@ export class ChunksFileUploader {
       file.originalname,
     ].join('/');
     const chunkedFileDto: ChunkedFileDto = {
+      routingKey,
       fileType: file.fileType,
       filesUploadBaseDir: file.filesUploadBaseDir,
       chunk,

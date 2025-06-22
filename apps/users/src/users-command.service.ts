@@ -27,6 +27,7 @@ import fs from 'fs/promises';
 import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -58,10 +59,12 @@ export class UsersCommandService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      console.log('klfmdsklkflsdkf;skdfd;ls');
       const user = await this.userCommandRepository.create(
         createUserDto,
         queryRunner.manager,
       );
+
       const createProfileDto: CreateProfileDto = {
         user,
         username: createUserDto.username,
@@ -117,11 +120,13 @@ export class UsersCommandService {
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
           throw new ConflictException(
-            `user with this ${error['detail'].substring(error['detail'].indexOf('(') + 1, error['detail'].indexOf(')'))} already exists`,
+            `UsersCommandService error: user with this ${error['detail'].substring(error['detail'].indexOf('(') + 1, error['detail'].indexOf(')'))} already exists`,
           );
         }
         if ((error['code'] = '23503')) {
-          throw new BadRequestException();
+          throw new BadRequestException(
+            'UsersCommandService error: 23503, primary key does not exist on user creation',
+          );
         }
       }
       throw new InternalServerErrorException(error);
@@ -238,6 +243,7 @@ export class UsersCommandService {
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
+          FilesRoutingKeys.FilesUploadedAvatars,
           files,
           filesServiceUploadFolderWithoutBasePath,
           uploadServiceUrl,

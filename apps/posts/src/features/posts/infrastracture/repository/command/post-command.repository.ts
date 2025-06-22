@@ -23,18 +23,12 @@ export class PostCommandRepository
     // todo you should use this queryRunner.manager(entityManager) on save operations because without it typeorm transactions does not work
     const post = new Post({
       id: postDto.postId,
-      userId: postDto.userId,
-      description: null,
-      isPublished: false,
-      files: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
+      ...postDto,
     });
     if (entityManager) {
       return await entityManager.save(post);
     }
-    // const post = new Post(postDto);
+
     return this.postRepo.save(post);
   }
   // todo! make different update for post and file

@@ -30,7 +30,6 @@ export class AwsService implements IUploader {
     file: ChunkedFileDto,
     bucket: AwsBuckets,
   ): Promise<UploadFilesResponse> {
-    console.log('🚀 ~ AwsService ~ file:', file);
     const isBucketExists = await this.isBucketExists(
       bucket,
       this.configService.get('AWS_CCOUNT_ID'),
@@ -40,7 +39,6 @@ export class AwsService implements IUploader {
     }
 
     const pathToFile = [file.filesUploadBaseDir, file.pathToFile].join('/');
-    console.log('🚀 ~ AwsService ~ pathToFile:', pathToFile);
     const openFile = await fs.open(pathToFile, 'r');
     const readable = openFile.createReadStream();
     const chunks = [];
@@ -48,7 +46,6 @@ export class AwsService implements IUploader {
       chunks.push(chunk);
     }
     const buffer = Buffer.concat(chunks);
-    // todo! path to file should be avatars/userid/ or posts/userid/postId !!!!!!!!!
     const client = new Upload({
       client: this.s3Client,
       params: {
@@ -64,9 +61,9 @@ export class AwsService implements IUploader {
     return {
       url: result.Location,
       fileName: file.originalname,
-      fileId: file.fileId,
+      fileId: file?.fileId,
       folderPath: file.filesServiceUploadFolderWithoutBasePath,
-    };
+    } satisfies UploadFilesResponse;
   }
   // todo! if files array passed delete only this files , else all folder
   async deleteFiles(path: string, files?: string[]): Promise<void> {
