@@ -1,8 +1,11 @@
 import { IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { ChunkMetadataDto } from './chunk-metadata.dto';
 import { Type } from 'class-transformer';
+import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 
 export class ChunkedFileDto {
+  @IsString()
+  fileType: FileTypes;
   @IsString()
   filesUploadBaseDir: string;
   @IsString()
@@ -19,7 +22,7 @@ export class ChunkedFileDto {
   @Type(() => ChunkMetadataDto)
   metadata: ChunkMetadataDto;
   @IsString()
-  folderPath: string;
+  filesServiceUploadFolderWithoutBasePath: string;
   @IsString()
   pathToFile: string;
   @IsUUID()

@@ -43,6 +43,7 @@ import { GetPostsQuery } from '../use-cases/queries/get-posts.query';
 import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
 import { Post as PostResponse } from '../infrastracture/entity/post.entity';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 
 @Controller()
 export class PostsController {
@@ -85,7 +86,7 @@ export class PostsController {
           cb(
             null,
             await getUploadPath(
-              'POST',
+              FileTypes.Posts,
               'apps/posts/src/features/posts/uploads',
               req,
             ),

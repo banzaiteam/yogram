@@ -9,6 +9,8 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -32,8 +34,10 @@ import { ProviderQueryService } from './provider-query.service';
 import { GoogleResponse } from './users-command.service';
 import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
 import { diskStorage } from 'multer';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
+import { Request } from 'express';
+import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 @Controller()
 export class UsersController {
   constructor(
@@ -74,13 +78,13 @@ export class UsersController {
 
   @Post('users/create')
   @UseInterceptors(
-    FilesInterceptor('files', 1, {
+    FileInterceptor('file', {
       storage: diskStorage({
         destination: async (req, file, cb) => {
           cb(
             null,
             await getUploadPath(
-              'AVATAR',
+              FileTypes.Avatars,
               'apps/users/src/uploads/avatars',
               req,
             ),
@@ -104,7 +108,7 @@ export class UsersController {
   @Post('users/create')
   async create(
     @Body() createUserDto: CreateUserDto,
-    @UploadedFiles(
+    @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({
@@ -113,16 +117,13 @@ export class UsersController {
           }),
         ],
       }),
-      SharpPipe,
+      // SharpPipe,
     )
-    files: Express.Multer.File[],
+    file: Express.Multer.File[],
+    @Req() req: Request,
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ files:', files);
-    console.log(
-      '🚀 ~ UsersController ~ create ~ createUserDto:',
-      createUserDto,
-    );
-    await this.commandBus.execute(new CreateUserCommand(createUserDto));
+    createUserDto.id = <string>req.headers.id;
+    await this.commandBus.execute(new CreateUserCommand(createUserDto, file));
   }
 
   @Post('users/email-verify')

@@ -21,6 +21,7 @@ import { EmailDto } from '../../../../apps/libs/Users/dto/user/email.dto';
 import { SendVerifyEmailSwagger } from './decorators/swagger/send-verify-email-swagger.decorator';
 import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 import axios from 'axios';
+import { v4 } from 'uuid';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -45,7 +46,7 @@ export class SignupController {
         'http://localhost:3001/api/v1/users/create',
         req,
         {
-          headers: { ...req.headers },
+          headers: { ...req.headers, id: v4() },
           responseType: 'stream',
         },
       );

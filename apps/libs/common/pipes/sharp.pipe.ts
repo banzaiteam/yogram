@@ -13,7 +13,11 @@ export class SharpPipe implements PipeTransform {
     if (!files) {
       throw new BadRequestException('file required');
     }
-
+    if (!Array.isArray(files)) {
+      const file = files;
+      files = [];
+      files.push(file);
+    }
     files = await Promise.all(
       files.map(async (file) => {
         try {

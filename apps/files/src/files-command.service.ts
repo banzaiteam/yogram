@@ -19,6 +19,7 @@ export class FilesCommandService {
     files: any,
     bucket: AwsBuckets,
   ): Promise<UploadFilesResponse> {
+    console.log('🚀 ~ FilesCommandService ~ files:', files);
     try {
       return await this.uploaderService.uploadFiles(files, bucket);
     } catch (err) {
@@ -29,7 +30,10 @@ export class FilesCommandService {
   }
   // todo! if files array passed delete only this files , else all folder
   async deleteUploadedFolderOrFiles(deleteFilesDto: DeletePostFilesDto) {
-    const path = [deleteFilesDto.folderPath, deleteFilesDto.postId].join('/');
+    const path = [
+      deleteFilesDto.filesServiceUploadFolderWithoutBasePath,
+      deleteFilesDto.postId,
+    ].join('/');
     console.log('🚀 ~ FilesCommandService ~ deleteUploadedFiles ~ path:', path);
     return await this.uploaderService.deleteFiles(path);
   }

@@ -13,7 +13,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute({ createUserDto }: CreateUserCommand): Promise<void> {
+  async execute({ createUserDto, file }: CreateUserCommand): Promise<void> {
     let userVerifyEmailDto: UserVerifyEmailDto;
     const createUser = await this.usersQueryService.findUserByCriteria({
       email: createUserDto.email,
@@ -30,7 +30,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         username: user.username,
       };
     } else {
-      const user = await this.usersCommandService.createUser(createUserDto);
+      const user = await this.usersCommandService.createUser(
+        createUserDto,
+        file,
+      );
       userVerifyEmailDto = {
         to: user.email,
         username: user.username,

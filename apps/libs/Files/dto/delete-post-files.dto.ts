@@ -6,7 +6,7 @@ export class DeletePostFilesDto {
   postId: string;
   @ApiProperty({ description: 'path to folder with files in files service' })
   @IsString()
-  folderPath: string;
+  filesServiceUploadFolderWithoutBasePath: string;
   @ApiProperty({
     description:
       'leave empty if need delete folder with all files or pass array of files names',

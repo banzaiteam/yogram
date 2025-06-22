@@ -18,15 +18,8 @@ import { v4 } from 'uuid';
 import { FileStatus } from './constants/file.constant';
 import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
-
-export interface UploadFile
-  extends Omit<
-    Express.Multer.File,
-    'buffer' | 'filename' | 'stream' | 'encoding'
-  > {
-  fileId: string;
-  filesUploadBaseDir: string;
-}
+import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
+import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 @Injectable()
 export class PostCommandService {
   constructor(
@@ -72,6 +65,7 @@ export class PostCommandService {
           post,
         };
         const uploadFile: UploadFile = {
+          fileType: FileTypes.Posts,
           filesUploadBaseDir: 'apps/files/src/features/files/uploads',
           fieldname: file.fieldname,
           mimetype: file.mimetype,
@@ -88,13 +82,16 @@ export class PostCommandService {
           queryRunner.manager,
         );
       }
+      const uploadServiceUrl = [
+        this.configService.get('FILES_SERVICE_URL'),
+        HttpFilesPath.Upload,
+      ].join('/');
       // upload files to files service and delete temporary uploaded photos and chunks to photos service
       this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
         createPostDto.postId,
         uploadFiles,
         [createPostDto.userId, createPostDto.postId].join('/'),
-        HttpFilesPath.Upload,
-        this.configService.get('FILES_SERVICE_URL'),
+        uploadServiceUrl,
       );
 
       await queryRunner.commitTransaction();
@@ -114,18 +111,16 @@ export class PostCommandService {
   sendFilesToFilesServiceAndDeleteTempFilesAfter(
     postId: string,
     files: UploadFile[],
-    folderPath: string,
-    path: string,
-    host: string,
+    filesServiceUploadFolderWithoutBasePath: string,
+    uploadServiceUrl: string,
   ) {
-    console.log('🚀 ~ PostCommandService ~ path:', path);
+    console.log('🚀 ~ PostCommandService ~ path:', uploadServiceUrl);
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
           files,
-          folderPath,
-          path,
-          host,
+          filesServiceUploadFolderWithoutBasePath,
+          uploadServiceUrl,
         ),
       );
       rej(
@@ -138,13 +133,19 @@ export class PostCommandService {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        console.log('error in post-command-service.........', err);
+        console.log('error in post-command-service.........');
         // todo delete post event
         // it delete db post and related files in aws
-        await this.eventBus.publish(
-          new DeletePostEvent(postId, folderPath, path, host),
-        );
-        await fs.rm(files[0].destination, { recursive: true });
+        //   await this.eventBus.publish(
+        //     new DeletePostEvent(
+        //       postId,
+        //       filesServiceUploadFolderWithoutBasePath,
+        //       path,
+        //       host,
+        //     ),
+        //   );
+        //   await fs.rm(files[0].destination, { recursive: true });
+        // });
       });
   }
 
@@ -157,7 +158,7 @@ export class PostCommandService {
 
   async deletePostWithFiles(
     postId: string,
-    folderPath: string,
+    filesServiceUploadFolderWithoutBasePath: string,
     path: string,
     host: string,
   ): Promise<void> {
@@ -175,7 +176,7 @@ export class PostCommandService {
         );
       const deletePostFilesDto: DeletePostFilesDto = {
         postId,
-        folderPath,
+        filesServiceUploadFolderWithoutBasePath,
       };
       await firstValueFrom(
         this.httpService.post([host, path].join('/'), deletePostFilesDto),

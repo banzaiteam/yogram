@@ -46,6 +46,7 @@ import { ProviderQueryService } from './provider-query.service';
 import { ProviderQueryRepositoryProvider } from './providers/query/provider-query-repository.provider';
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
+import { ChunksFileUploaderModule } from 'apps/libs/common/chunks-upload/chunks-file-uploader.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -59,6 +60,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 };
 @Module({
   imports: [
+    ChunksFileUploaderModule,
     CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,

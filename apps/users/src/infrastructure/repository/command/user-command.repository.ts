@@ -20,7 +20,7 @@ export class UserCommandRepository
     createUserDto: CreateUserDto,
     entityManager?: EntityManager,
   ): Promise<User> {
-    const user = new User(createUserDto);
+    const user = new User({ id: createUserDto.id, ...createUserDto });
     if (entityManager) {
       return await entityManager.save(user);
     }
