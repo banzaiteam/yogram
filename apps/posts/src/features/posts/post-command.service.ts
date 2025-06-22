@@ -66,7 +66,7 @@ export class PostCommandService {
         };
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
-          filesUploadBaseDir: 'apps/files/src/features/files/uploads',
+          filesUploadBaseDir: 'apps/files/src/features/files/uploads/posts',
           fieldname: file.fieldname,
           mimetype: file.mimetype,
           size: file.size,
@@ -133,7 +133,7 @@ export class PostCommandService {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        console.log('error in post-command-service.........');
+        console.log('error in post-command-service.........', err);
         // todo delete post event
         // it delete db post and related files in aws
         //   await this.eventBus.publish(
