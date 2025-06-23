@@ -164,15 +164,7 @@ export class PostsController {
       id: folderPath,
       fileid: payload['fileId'],
     };
-    console.log(
-      '🚀 ~ PostsController ~ updateCreatedPost ~ criteria:',
-      criteria,
-    );
     const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
-    console.log(
-      '🚀 ~ PostsController ~ updateCreatedPost ~ updatePostDto:',
-      updatePostDto,
-    );
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto),
     );
