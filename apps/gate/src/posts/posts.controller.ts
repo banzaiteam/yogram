@@ -23,12 +23,15 @@ import { ResponsePostDto } from '../../../../apps/libs/Posts/dto/output/response
 import { plainToInstance } from 'class-transformer';
 import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
+import { ConfigService } from '@nestjs/config';
+import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
+    private readonly configService: ConfigService,
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
   ) {}
@@ -54,7 +57,10 @@ export class PostsController {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
-        'http://localhost:3004/api/v1/posts/create',
+        [
+          this.configService.get('POSTS_SERVICE_URL'),
+          HttpPostsPath.Create,
+        ].join('/'),
         req,
         {
           // generate uuid for posts because of multer call destination method on each uploaded file

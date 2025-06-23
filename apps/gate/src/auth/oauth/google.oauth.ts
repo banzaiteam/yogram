@@ -55,6 +55,7 @@ export class GoogleOauth implements IOauth {
     const provider = await this.usersService.findProviderByProviderId(
       userCredentials.providerId,
     );
+    console.log('🚀 ~ GoogleOauth ~ performOAuth ~ provider:', provider);
     const user = await this.usersService.findUserByCriteria({
       email: userCredentials.email,
     });

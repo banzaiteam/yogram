@@ -195,6 +195,7 @@ export class AuthService {
   }
 
   async google(code: string, userAgent: string, ip: string) {
+    console.log('🚀 ~ AuthService ~ google ~ code:', code);
     const user = await this.googleOauth.performOAuth(code);
     return await this.externalLogin(user, userAgent, ip);
   }
