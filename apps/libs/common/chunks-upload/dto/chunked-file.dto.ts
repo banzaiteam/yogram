@@ -1,8 +1,8 @@
 import { IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { ChunkMetadataDto } from './chunk-metadata.dto';
 import { Type } from 'class-transformer';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
-import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { FileTypes } from '../../../../../apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from '../../../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 export class ChunkedFileDto {
   @IsString()

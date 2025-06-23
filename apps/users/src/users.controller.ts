@@ -33,16 +33,19 @@ import { FindUserByProviderIdQuery } from './features/find-by-providerid/query/f
 import { ResponseProviderDto } from '../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { ProviderQueryService } from './provider-query.service';
 import { GoogleResponse } from './users-command.service';
-import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
+import {
+  genFileName,
+  getUploadPath,
+} from '../../../apps/gate/src/posts/helper';
 import { diskStorage } from 'multer';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
+import { SharpPipe } from '../../../apps/libs/common/pipes/sharp.pipe';
 import { Request } from 'express';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
-import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
-import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
-import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
-import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
+import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
+import { EventSubscribe } from '../../../apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/event.interface';
+import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
 @Controller()
 export class UsersController {
   constructor(

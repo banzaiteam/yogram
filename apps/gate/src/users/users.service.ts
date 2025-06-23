@@ -8,12 +8,12 @@ import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.
 import { UpdateUserCriteria } from '../../../../apps/libs/Users/dto/user/update-user-criteria.dto';
 import { ResponseProviderDto } from '../../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
-import { IPagination } from 'apps/libs/common/pagination/decorators/pagination.decorator';
-import { ISorting } from 'apps/libs/common/pagination/decorators/sorting.decorator';
-import { IFiltering } from 'apps/libs/common/pagination/decorators/filtering.decorator';
+import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
-import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
+import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 
 @Injectable()
 export class UsersService {

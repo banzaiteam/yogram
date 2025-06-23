@@ -6,7 +6,7 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
+import { ResponseProfilePageDto } from '../../../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 
 export const ProfilePageSwagger = () =>
   applyDecorators(

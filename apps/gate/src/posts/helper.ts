@@ -1,4 +1,4 @@
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { FileTypes } from '../../../../apps/libs/Files/constants/file-type.enum';
 import { Request } from 'express';
 import fs from 'node:fs/promises';
 import { extname } from 'node:path';

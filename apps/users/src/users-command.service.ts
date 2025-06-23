@@ -22,12 +22,12 @@ import { UsersQueryService } from './users-query.service';
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
 import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
-import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { ChunksFileUploader } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import fs from 'fs/promises';
-import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
+import { HttpFilesPath } from '../../../apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
-import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 

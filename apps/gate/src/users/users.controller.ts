@@ -23,14 +23,14 @@ import { UpdateUserWithCriteriaDto } from '../../../../apps/libs/Users/dto/user/
 import {
   IPagination,
   PaginationParams,
-} from 'apps/libs/common/pagination/decorators/pagination.decorator';
+} from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from 'apps/libs/common/pagination/decorators/sorting.decorator';
-import { IFiltering } from 'apps/libs/common/pagination/decorators/filtering.decorator';
-import { Public } from 'apps/gate/common/decorators/public.decorator';
-import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
+} from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
 
