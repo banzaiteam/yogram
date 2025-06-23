@@ -131,8 +131,6 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ createUserDto:', createUserDto);
-    console.log('🚀 ~ UsersController ~ file:', file);
     createUserDto.id = <string>req.headers.id;
     await this.commandBus.execute(new CreateUserCommand(createUserDto, file));
   }

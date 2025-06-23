@@ -37,9 +37,11 @@ export class SignupController {
     @Req() req: Request,
   ): Promise<void> {
     try {
+      console.log('signUp');
+
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
-        ['https://users.yogram.ru/api/v1', HttpUsersPath.Create].join('/'),
+        'https://users.yogram.ru/api/v1/users/create',
         req,
         {
           headers: { ...req.headers, id: v4() },
