@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -41,6 +42,7 @@ import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
+import { HashPasswordPipe } from 'apps/libs/common/encryption/hash-password.pipe';
 @Controller()
 export class UsersController {
   constructor(
@@ -110,7 +112,8 @@ export class UsersController {
   )
   @Post('users/create')
   async create(
-    @Body() createUserDto: CreateUserDto,
+    @Req() req: Request,
+    @Body(HashPasswordPipe) createUserDto: CreateUserDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -119,11 +122,11 @@ export class UsersController {
             message: ' file is biiger than 20mb',
           }),
         ],
+        fileIsRequired: false,
       }),
       SharpPipe,
     )
-    file: Express.Multer.File[],
-    @Req() req: Request,
+    file?: Express.Multer.File[],
   ): Promise<void> {
     createUserDto.id = <string>req.headers.id;
     await this.commandBus.execute(new CreateUserCommand(createUserDto, file));

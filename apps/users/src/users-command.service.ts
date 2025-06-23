@@ -48,7 +48,7 @@ export class UsersCommandService {
 
   async createUser(
     createUserDto: CreateUserDto,
-    file: Express.Multer.File[],
+    file?: Express.Multer.File[],
   ): Promise<ResponseUserDto> {
     if (!Array.isArray(file)) {
       const files = file;
@@ -59,7 +59,6 @@ export class UsersCommandService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      console.log('klfmdsklkflsdkf;skdfd;ls');
       const user = await this.userCommandRepository.create(
         createUserDto,
         queryRunner.manager,
@@ -86,31 +85,33 @@ export class UsersCommandService {
         );
       });
 
-      const uploadFile: UploadFile[] = [
-        {
-          fileType: FileTypes.Avatars,
-          filesUploadBaseDir: 'apps/files/src/features/files/uploads/avatars',
-          fieldname: file[0].fieldname,
-          mimetype: file[0].mimetype,
-          size: file[0].size,
-          path: file[0].path,
-          fileId: createUserDto.id,
-          originalname: file[0].filename,
-          destination: file[0].destination,
-        },
-      ];
+      if (!file.length) {
+        const uploadFile: UploadFile[] = [
+          {
+            fileType: FileTypes.Avatars,
+            filesUploadBaseDir: 'apps/files/src/features/files/uploads/avatars',
+            fieldname: file[0].fieldname,
+            mimetype: file[0].mimetype,
+            size: file[0].size,
+            path: file[0].path,
+            fileId: createUserDto.id,
+            originalname: file[0].filename,
+            destination: file[0].destination,
+          },
+        ];
 
-      const uploadServiceUrl = [
-        this.configService.get('FILES_SERVICE_URL'),
-        HttpFilesPath.Upload,
-      ].join('/');
+        const uploadServiceUrl = [
+          this.configService.get('FILES_SERVICE_URL'),
+          HttpFilesPath.Upload,
+        ].join('/');
 
-      this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
-        createUserDto.id,
-        uploadFile,
-        [createUserDto.id].join('/'),
-        uploadServiceUrl,
-      );
+        this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+          createUserDto.id,
+          uploadFile,
+          [createUserDto.id].join('/'),
+          uploadServiceUrl,
+        );
+      }
 
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);

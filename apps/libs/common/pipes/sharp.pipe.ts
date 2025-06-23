@@ -10,9 +10,10 @@ import { pipeline } from 'node:stream/promises';
 
 export class SharpPipe implements PipeTransform {
   async transform(files: Express.Multer.File[], metadata: ArgumentMetadata) {
-    if (!files) {
-      throw new BadRequestException('file required');
-    }
+    // if (!files) {
+    //   throw new BadRequestException('file required');
+    // }
+    if (!files) return null;
     if (!Array.isArray(files)) {
       const file = files;
       files = [];

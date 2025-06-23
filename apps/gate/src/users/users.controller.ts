@@ -1,18 +1,19 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
+  Req,
   Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ResponseUserDto } from '../../../../apps/libs/Users/dto/user/response-user.dto';
 import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find-user-criteria.dto';
 import { plainToInstance } from 'class-transformer';
@@ -27,17 +28,19 @@ import {
   ISorting,
   SortingParams,
 } from 'apps/libs/common/pagination/decorators/sorting.decorator';
-import {
-  FilteringParams,
-  IFiltering,
-} from 'apps/libs/common/pagination/decorators/filtering.decorator';
+import { IFiltering } from 'apps/libs/common/pagination/decorators/filtering.decorator';
 import { Public } from 'apps/gate/common/decorators/public.decorator';
 import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
+import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @ApiExcludeEndpoint()
   @ApiResponse({ status: 201, description: 'user was created' })
@@ -69,25 +72,47 @@ export class UsersController {
     const user = await this.usersService.findUserByCriteria(
       findUserByCriteriaDto,
     );
-    // if (!user) throw new NotFoundException('user was not found');
     return plainToInstance(ResponseUserDto, user);
   }
 
   @Public()
-  @Get('profile/:id/posts')
+  @GetSwagger()
+  @Get(':id/profile/posts')
   async profilePage(
     @Param('id') id: string,
+    @Req() req: Request,
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
-    @FilteringParams(['isPublished', 'userId']) filtering?: IFiltering,
   ): Promise<ResponseProfilePageDto> {
-    const p = await this.usersService.profilePage(
+    const filtering: IFiltering = {
+      filterProperty: 'userId',
+      rule: 'eq',
+      value: id,
+    };
+    let allowScroll: boolean = false;
+    const token = req.headers?.authorization;
+    if (token) {
+      const accessToken = token.split(' ')[1];
+      try {
+        let payload = await this.jwtService.verifyAsync(accessToken.trim());
+        if (payload.id && payload.id === id) {
+          allowScroll = true;
+        }
+      } catch (error) {
+        throw new BadRequestException(
+          'UsersController error: invalid token on profilePage',
+        );
+      }
+    }
+    if (!allowScroll) {
+      pagination.page = 1;
+    }
+
+    return await this.usersService.profilePage(
       id,
       pagination,
       sorting,
       filtering,
     );
-    console.log('🚀 ~ UsersController ~ p:', p);
-    return p;
   }
 }

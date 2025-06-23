@@ -45,6 +45,7 @@ export class UserQueryRepository
       id: user.id,
       email: user.email,
       verified: user.verified,
+      url: user.url,
       username: user.profile.username,
       providers: user.providers,
       profile: user.profile,

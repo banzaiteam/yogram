@@ -7,13 +7,10 @@ import {
   Post,
   Req,
   Res,
-  UsePipes,
 } from '@nestjs/common';
 import { SignupService } from './signup.service';
-import { CreateUserDto } from '../../../../apps/libs/Users/dto/user/create-user.dto';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { HashPasswordPipe } from '../../../../apps/libs/common/encryption/hash-password.pipe';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -33,10 +30,8 @@ export class SignupController {
 
   @Public()
   @SignUpSwagger()
-  @UsePipes(HashPasswordPipe)
   @Post()
   async signUp(
-    // @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
   ): Promise<void> {
@@ -55,7 +50,6 @@ export class SignupController {
       microserviceResponse.data.pipe(res);
       res.status(201);
     } catch (err) {
-      // console.log('🚀 ~ SignupController ~ err:', err);
       // responseType: 'stream' error handle
       await new Promise((res) => {
         let streamString = '';

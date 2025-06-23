@@ -10,7 +10,11 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.useBodyParser('json', { limit: '150mb' });
-  app.useBodyParser('urlencoded', { limit: '150mb', extended: true });
+  app.useBodyParser('urlencoded', {
+    limit: '150mb',
+    parameterLimit: 5000,
+    extended: true,
+  });
 
   app.enableCors({
     allowedHeaders: [
