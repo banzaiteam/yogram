@@ -19,7 +19,7 @@ import { SendVerifyEmailSwagger } from './decorators/swagger/send-verify-email-s
 import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 import axios from 'axios';
 import { v4 } from 'uuid';
-import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
+import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
 
 @ApiTags('SignUp')
 @Controller('signup')
