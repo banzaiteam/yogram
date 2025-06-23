@@ -46,9 +46,9 @@ import { ProviderQueryService } from './provider-query.service';
 import { ProviderQueryRepositoryProvider } from './providers/query/provider-query-repository.provider';
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
-import { ChunksFileUploaderModule } from 'apps/libs/common/chunks-upload/chunks-file-uploader.module';
-import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
-import { FilesBindingKeysEnum } from 'apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
+import { ChunksFileUploaderModule } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.module';
+import { RabbitConsumerModule } from '../../../apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
+import { FilesBindingKeysEnum } from '../../../apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [

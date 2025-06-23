@@ -5,7 +5,7 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { PostPaginatedResponseDto } from '../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 export const GetSwagger = () =>
   applyDecorators(
