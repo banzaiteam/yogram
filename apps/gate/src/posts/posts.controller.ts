@@ -24,7 +24,7 @@ import { plainToInstance } from 'class-transformer';
 import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 import { ConfigService } from '@nestjs/config';
-import { HttpPostsPath } from 'apps/libs/Posts/constants/path.enum';
+import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
 
 @ApiTags('Posts')
 @Controller('posts')
