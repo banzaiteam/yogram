@@ -100,7 +100,7 @@ export class UsersController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+        if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
           return cb(
             new BadRequestException('Only image files are allowed!'),
             false,
@@ -128,6 +128,8 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
+    console.log('🚀 ~ UsersController ~ createUserDto:', createUserDto);
+    console.log('🚀 ~ UsersController ~ file:', file);
     createUserDto.id = <string>req.headers.id;
     await this.commandBus.execute(new CreateUserCommand(createUserDto, file));
   }

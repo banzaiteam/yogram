@@ -11,7 +11,7 @@ export function LoginSwagger() {
       description: ' return set-cookie refresh token and accessToken in body',
       headers: {
         'Set-Cookie': {
-          description: 'refresh_token httpOnly, secure, samesite',
+          description: 'refreshToken httpOnly, secure, samesite',
           schema: { type: 'string' },
         },
       },

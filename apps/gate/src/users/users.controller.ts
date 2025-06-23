@@ -31,8 +31,8 @@ import {
 import { IFiltering } from 'apps/libs/common/pagination/decorators/filtering.decorator';
 import { Public } from 'apps/gate/common/decorators/public.decorator';
 import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
-import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -76,7 +76,7 @@ export class UsersController {
   }
 
   @Public()
-  @GetSwagger()
+  @ProfilePageSwagger()
   @Get(':id/profile/posts')
   async profilePage(
     @Param('id') id: string,

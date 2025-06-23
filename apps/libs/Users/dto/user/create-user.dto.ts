@@ -20,17 +20,13 @@ export class CreateUserDto {
   })
   @MaxLength(30)
   username: string;
-  @IsOptional()
-  @IsString()
-  @MinLength(20, {
-    message: 'aboutMe should be minimum 20 and max 300 characters long',
-  })
-  aboutMe?: string;
+
   @ApiProperty({
     description: 'email should be unique',
   })
   @IsEmail()
   email: string;
+
   @ApiProperty({
     minLength: 4,
     maxLength: 30,
@@ -46,8 +42,29 @@ export class CreateUserDto {
     minSymbols: 1,
   })
   password: string;
+
   @ApiHideProperty()
   @IsOptional()
   @IsUUID()
   id?: string;
+
+  @ApiProperty({
+    description: 'aboutMe should be minimum 20 and max 200 characters long',
+  })
+  @IsOptional()
+  @IsString()
+  @MinLength(20, {
+    message: 'aboutMe should be minimum 20 and max 200 characters long',
+  })
+  @MaxLength(200, {
+    message: 'aboutMe should be minimum 20 and max 200 characters long',
+  })
+  aboutMe?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'The file to upload',
+  })
+  file?: any; // Type 'any' for Swagger's binary format representation
 }

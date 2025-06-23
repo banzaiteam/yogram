@@ -6,11 +6,14 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
-import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { ResponseProfilePageDto } from 'apps/libs/Users/dto/profile/response-profile-page.dto';
 
-export const GetSwagger = () =>
+export const ProfilePageSwagger = () =>
   applyDecorators(
+    ApiHeader({
+      name: 'Authorization',
+      description: ' Authorization with bearer token',
+    }),
     ApiResponse({
       status: 200,
       type: ResponseProfilePageDto,
@@ -46,8 +49,7 @@ export const GetSwagger = () =>
     }),
     ApiOperation({
       description:
-        'api/v1/users/fcf770ce-12e5-40b6-9ffa-5b987492eb8a/profile/posts',
-      summary:
-        'return all user information with avatar url and all posts with photos urls',
+        'not authorized user or not profile owner can only see the first page photos(cant scroll), profile owner can scroll all photos',
+      summary: 'return all user information with paginated posts',
     }),
   );

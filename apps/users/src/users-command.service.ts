@@ -85,7 +85,7 @@ export class UsersCommandService {
         );
       });
 
-      if (!file.length) {
+      if (file.length && file[0] !== null) {
         const uploadFile: UploadFile[] = [
           {
             fileType: FileTypes.Avatars,

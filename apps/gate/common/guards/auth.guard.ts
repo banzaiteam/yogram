@@ -28,11 +28,10 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublic || skipAuth) return true;
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization;
-    if (!token) throw new UnauthorizedException('No Bearer token');
+    const refreshToken = request.cookies?.refreshToken;
+    if (!refreshToken) throw new UnauthorizedException('No refreshToken');
     try {
-      const accessToken = token.split(' ')[1];
-      let payload = await this.jwtService.verifyAsync(accessToken.trim());
+      let payload = await this.jwtService.verifyAsync(refreshToken);
       delete payload.iat;
       delete payload.exp;
       const userAgent = request.headers['user-agent'];

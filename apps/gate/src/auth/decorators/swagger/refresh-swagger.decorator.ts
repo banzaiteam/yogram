@@ -25,7 +25,7 @@ export function RefreshSwagger() {
     }),
     ApiResponse({
       status: 401,
-      description: 'Not Unauthorized',
+      description: '"RefreshGuard: expired/invalid token"',
     }),
   );
 }

@@ -7,7 +7,7 @@ export function GoogleSwagger() {
     ApiOkResponse({
       headers: {
         'Set-Cookie': {
-          description: 'sameSite, secure, httpOnly refresh_token',
+          description: 'sameSite, secure, httpOnly refreshToken',
           schema: { type: 'string' },
         },
       },

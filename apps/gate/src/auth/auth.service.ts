@@ -46,11 +46,11 @@ export class AuthService {
   }
 
   async genRefreshToken(payload: object): Promise<[string, number]> {
-    const refresh_token = await this.jwtService.signAsync(payload, {
+    const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
-    const token = await this.jwtService.verifyAsync(refresh_token);
-    return [refresh_token, token.exp - token.iat];
+    const token = await this.jwtService.verifyAsync(refreshToken);
+    return [refreshToken, token.exp - token.iat];
   }
 
   async proccessLogin(
@@ -59,18 +59,18 @@ export class AuthService {
     ip: string,
   ): Promise<[string, string]> {
     const access_token = await this.genAccessToken({ id: userId });
-    const [refresh_token, expiresAt] = await this.genRefreshToken({
+    const [refreshToken, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
 
     await this.createDeviceSession(
-      refresh_token,
+      refreshToken,
       userId,
       userAgent,
       ip,
       expiresAt,
     );
-    return [access_token, refresh_token];
+    return [access_token, refreshToken];
   }
 
   async createDeviceSession(

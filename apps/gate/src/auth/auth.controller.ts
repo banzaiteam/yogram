@@ -10,6 +10,7 @@ import {
   Query,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -58,12 +59,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const userAgent = req.headers['user-agent'];
-    const [accessToken, refresh_token] = await this.authService.proccessLogin(
+    const [accessToken, refreshToken] = await this.authService.proccessLogin(
       user.id,
       userAgent,
       req.ip,
     );
-    res.cookie('refresh_token', refresh_token, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
@@ -103,7 +104,7 @@ export class AuthController {
   @UseGuards(RefreshGuard)
   @Post('logout')
   async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
-    const currentDeviceToken = req.headers.authorization.split(' ')[1].trim();
+    const currentDeviceToken = req.cookies?.refreshToken;
     return await this.authService.deviceLogout(
       currentDeviceToken,
       logoutAllDto.tokens,
@@ -186,7 +187,7 @@ export class AuthController {
       req.headers['user-agent'],
       req.ip,
     );
-    res.cookie('refresh_token', refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
