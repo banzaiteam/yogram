@@ -1,13 +1,12 @@
 import { applyDecorators, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { EmailDto } from '../../../../../../apps/libs/Users/dto/user/email.dto';
 
 export function SendVerifyEmailSwagger() {
   return applyDecorators(
-    ApiParam({ name: 'email', type: 'string' }),
+    ApiBody({ type: EmailDto }),
     ApiOperation({
-      description:
-        'if token is expired will redirect to the page looks like https://yogram.ru/signup/email-verify/:email',
-      summary: 'Send verify email on the user request',
+      summary: 'Send verify email on user request',
     }),
     HttpCode(HttpStatus.OK),
     ApiResponse({
