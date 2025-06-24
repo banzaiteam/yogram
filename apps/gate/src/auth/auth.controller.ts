@@ -67,7 +67,7 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      secure: false,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
     return { accessToken };

@@ -26,4 +26,13 @@ export class PostsService {
       {},
     );
   }
+
+  async delete(id: string) {
+    const path = [HttpPostsPath.Delete, id].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Posts,
+      path,
+      {},
+    );
+  }
 }

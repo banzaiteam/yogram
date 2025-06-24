@@ -1,4 +1,13 @@
-import { Controller, Get, HttpException, Post, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  Param,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiConsumes, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
@@ -101,5 +110,10 @@ export class PostsController {
   ): Promise<PostPaginatedResponseDto> {
     const posts = await this.postsService.get(pagination, sorting, filtering);
     return plainToInstance(PostPaginatedResponseDto, posts);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.postsService.delete(id);
   }
 }

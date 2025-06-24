@@ -3,8 +3,10 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Patch,
   Post,
@@ -44,6 +46,7 @@ import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
 import { Post as PostResponse } from '../infrastracture/entity/post.entity';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { DeletePostCommand } from '../use-cases/commands/delete-post.handler';
 
 @Controller()
 export class PostsController {
@@ -53,28 +56,6 @@ export class PostsController {
   ) {}
 
   @Post('posts/create')
-  @ApiOperation({
-    summary: 'Create a new post',
-  })
-  @ApiBody({
-    description: 'Post data',
-    schema: {
-      type: 'object',
-      properties: {
-        description: {
-          type: 'string',
-          description: 'Post description text',
-          example: 'This is my awesome post!',
-        },
-      },
-    },
-  })
-  // @ApiConsumes('multipart/form-data')
-  // @ApiResponse({
-  //   status: 201,
-  //   description: 'Post created successfully',
-  //   type: PostViewModel,
-  // })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized - authentication required',
@@ -153,6 +134,11 @@ export class PostsController {
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto),
     );
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    // return await this.commandBus.execute(new DeletePostCommand(id))
   }
 
   @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploadedPosts })

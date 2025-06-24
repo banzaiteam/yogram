@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiCookieAuth,
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
@@ -8,20 +9,18 @@ import {
 
 export function RefreshSwagger() {
   return applyDecorators(
-    ApiHeader({
-      name: 'Authorization',
-      description: ' Authorization with bearer token',
-    }),
     ApiOperation({
       summary: 'Get new access token',
     }),
+    ApiHeader({
+      required: true,
+      name: 'refreshToken in cookies',
+    }),
     ApiOkResponse({
-      headers: {
-        'Set-Cookie': {
-          description: 'access_token',
-          schema: { type: 'string' },
-        },
-      },
+      type: 'string',
+      example:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJhNDA4MmY2LTBlNzMtNDhiYS1hMWJhLTFmODRjMzNmMTQwNSIsImlhdCI6MTc1MDc3MDY0NywiZXhwIjoxNzUwNzcwNzA3fQ.mC859lF1YXUaXpjFsTNoyBRyxun9FBQ_8kWtt7F_6N8',
+      description: 'return accessToken',
     }),
     ApiResponse({
       status: 401,
