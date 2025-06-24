@@ -123,13 +123,17 @@ export class AuthController {
   // forgot password email redirect it to this endpoint to check token and redirect user to the page where he can enter new password
   @Public()
   @ApiExcludeEndpoint()
-  @Get('restore-page/:token')
-  async restorePage(@Param('token') token: string, @Res() res: Response) {
+  @Get('restore-page/:token/:email')
+  async restorePage(
+    @Param('token') token: string,
+    @Param('email') email: string,
+    @Res() res: Response,
+  ) {
     try {
-      const email = await this.authService.restorePage(token);
+      const emailFromToken = await this.authService.restorePage(token);
       res.redirect(
         303,
-        [this.configService.get('RESTORE_PASSWORD_PAGE'), email.email].join(
+        [this.configService.get('RESTORE_PASSWORD_PAGE'), emailFromToken].join(
           '/',
         ),
       ); // restore-password page
@@ -138,7 +142,10 @@ export class AuthController {
         // if invalid/expired token we redirect to the sendForgotPassword email page
         res.redirect(
           303,
-          this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
+          [
+            this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
+            email,
+          ].join('/'),
         );
         throw new BadRequestException(
           'Restore password link is expired, redirect to resend restore password page',

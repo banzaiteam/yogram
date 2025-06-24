@@ -162,7 +162,11 @@ export class AuthService {
       expiresIn: this.configService.get('FORGOT_PASSWORD_TOKEN_EXPIRES'),
     });
 
-    const template = getForgotPasswordTemplate(user.username, token);
+    const template = getForgotPasswordTemplate(
+      user.username,
+      token,
+      email.email,
+    );
     const subject = 'Yogram password restore';
     const restorePasswordDto: RestorePasswordEmailDto = {
       to: user.email,
