@@ -41,7 +41,10 @@ export class SignupController {
 
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
-        'http://users-yogram-service.yogram-ru:3870/api/v1/users/create',
+        [
+          'http://users-yogram-service.yogram-ru:3870/api/v1',
+          HttpUsersPath.Create,
+        ].join('/'),
         req,
         {
           headers: { ...req.headers, id: v4() },
@@ -75,15 +78,22 @@ export class SignupController {
 
   @Public()
   @ApiExcludeEndpoint()
-  @Get('email-verify/:token')
-  async emailVerify(@Param('token') token: string, @Res() res: Response) {
+  @Get('email-verify/:token/:email')
+  async emailVerify(
+    @Param('token') token: string,
+    @Param() email: string,
+    @Res() res: Response,
+  ) {
     try {
       await this.signupService.emailVerify(token);
       res.redirect(303, this.configService.get('LOGIN_PAGE'));
     } catch (err) {
       if (err instanceof TokenExpiredError) {
         // redirect to 'send-verify-email' where unauthorized user should enter email to resend verification email
-        res.redirect(303, this.configService.get('RESEND_EMAIL_VERIFY_PAGE'));
+        res.redirect(
+          303,
+          [this.configService.get('RESEND_EMAIL_VERIFY_PAGE'), email].join('/'),
+        );
       }
     }
   }
@@ -91,8 +101,8 @@ export class SignupController {
   // if verify email link expired should be redirected here
   @Public()
   @SendVerifyEmailSwagger()
-  @Post('send-verify-email')
-  async SendVerifyEmail(@Body() email: EmailDto) {
-    await this.signupService.sendVerifyEmail(email);
+  @Get('send-verify-email/:email')
+  async SendVerifyEmail(@Param('email') email: string) {
+    await this.signupService.sendVerifyEmail({ email });
   }
 }
