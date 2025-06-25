@@ -50,6 +50,20 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Get('logout2')
+  async logout2(@Res({ passthrough: true }) res: Response) {
+    res.cookie('refreshToken', '', {
+      httpOnly: true,
+      sameSite: 'none',
+      // path: '/',
+      // domain: 'localhost',
+      secure: false,
+      maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
+      expires: new Date(),
+    });
+  }
+
+  @Public()
   @UseGuards(LoginGuard)
   @LoginSwagger()
   @Post('login')
