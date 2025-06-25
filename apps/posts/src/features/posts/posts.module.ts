@@ -43,6 +43,7 @@ import {
   DeletePostCommand,
   DeletePostCommandHandler,
 } from './use-cases/commands/delete-post.handler';
+import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 
 @Module({
   imports: [
@@ -54,7 +55,7 @@ import {
       { posts: [FilesBindingKeysEnum.Files_Uploaded_Many] },
     ]),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([Post, File]),
+    TypeOrmModule.forFeature([Post, File, PostsDeleteOubox]),
     // GraphQLModule.forRoot<ApolloFederationDriverConfig>({
     //   driver: ApolloFederationDriver,
     //   autoSchemaFile: {

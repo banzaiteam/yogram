@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { Post } from './infrastracture/entity/post.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { FileCommandService } from './file-command.service';
 import { CreateFileDto } from '../../dto/create-file.dto';
 import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
@@ -21,6 +21,8 @@ import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 @Injectable()
 export class PostCommandService {
   constructor(
@@ -35,6 +37,8 @@ export class PostCommandService {
     private readonly configService: ConfigService,
     private readonly dataSource: DataSource,
     private readonly eventBus: EventBus,
+    @InjectRepository(PostsDeleteOubox)
+    private readonly postsDeleteOutboxRepo: Repository<PostsDeleteOubox>,
   ) {}
   // todo!!!!!!!! saga delete db post/files record on files uploading error !!!!!!!!!!!!!!!!!!!!
   async create(
@@ -173,6 +177,12 @@ export class PostCommandService {
     console.log('🚀 ~ bucketName:', bucketName);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
+    const outBoxModel = this.postsDeleteOutboxRepo.create({
+      bucketName,
+      entityId: postId,
+      pathToFiles: filesServiceUploadFolderWithoutBasePath,
+    });
+    await this.postsDeleteOutboxRepo.save(outBoxModel);
     await queryRunner.startTransaction();
     try {
       // maybe db post deleted but there is post folder with files in uploadService, so try delete files even post in db does not exists
@@ -181,6 +191,18 @@ export class PostCommandService {
         queryRunner.manager,
       );
 
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.log('rollback', err);
+      await queryRunner.rollbackTransaction();
+
+      throw new InternalServerErrorException(
+        `PostCommandService: post ${postId} was not deleted or not exists`,
+      );
+    } finally {
+      await queryRunner.release();
+    }
+    try {
       await firstValueFrom(
         this.httpService.delete(endpoint, {
           params: {
@@ -189,10 +211,7 @@ export class PostCommandService {
           },
         }),
       );
-      await queryRunner.commitTransaction();
     } catch (err) {
-      console.log('rollback', err);
-      await queryRunner.rollbackTransaction();
       if (
         err.response.data.message &&
         err.response.data.message.includes('bucket:')
@@ -203,12 +222,6 @@ export class PostCommandService {
         console.log('🚀 ~ bucketName:', bucketName);
         // todo!!! make saga pattern delete posts(add to db(filesServiceUploadFolderWithoutBasePath, bucketName, attemp++) and launch every 5 sec). There catch if post was not deleted in aws
       }
-
-      throw new InternalServerErrorException(
-        `PostCommandService: post ${postId} was not deleted or not exists`,
-      );
-    } finally {
-      await queryRunner.release();
     }
   }
 

@@ -109,6 +109,7 @@ export class AuthController {
   }
 
   // pass refresh token which is the current session device
+  // to logout all, front need to pass refresh in cookies, then we get userId, then rewrite redis users:token:dsfjsdfjlsdf to users:userId(sAdd) and save all sessions
   @LogoutSwagger()
   @SkipAuthDecorator()
   @UseGuards(RefreshGuard)
@@ -182,6 +183,7 @@ export class AuthController {
   @Get('google')
   async googleOauth(@Res() res: Response) {
     try {
+      //google apis
       await open(this.configService.get('GOOGLE_OAUTH_URI'));
       res.status(200).json('success');
     } catch (error) {
