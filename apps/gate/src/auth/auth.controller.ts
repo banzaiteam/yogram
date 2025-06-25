@@ -72,7 +72,7 @@ export class AuthController {
       sameSite: 'none',
       // path: '/',
       // domain: 'localhost',
-      secure: true,
+      secure: false,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
       expires: new Date(date.getTime() + 86400000),
     });
