@@ -101,6 +101,10 @@ export class PostCommandService {
       console.log('rollback', err);
       await queryRunner.rollbackTransaction();
       await fs.rm(files[0].destination, { recursive: true });
+      // todo!!! check if post delete if error during post upload
+      await this.eventBus.publish(
+        new DeletePostEvent(createPostDto.userId, createPostDto.postId),
+      );
       throw new InternalServerErrorException(
         'PostCommandService: post was not created',
       );
@@ -161,32 +165,41 @@ export class PostCommandService {
   async deletePostWithFiles(
     postId: string,
     filesServiceUploadFolderWithoutBasePath: string,
-    path: string,
-    host: string,
+    endpoint: string,
   ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      // maybe db post deleted but there is post folder with files in uploadService, so try delete files even post in db does not exists
       const postsDelitedAmount = await this.postCommandRepository.delete(
         postId,
         queryRunner.manager,
       );
-      if (postsDelitedAmount < 1 && !postsDelitedAmount)
-        throw new InternalServerErrorException(
-          'PostCommandService: post was not deleted',
-        );
-      const deletePostFilesDto: DeletePostFilesDto = {
-        postId,
-        filesServiceUploadFolderWithoutBasePath,
-      };
+
       await firstValueFrom(
-        this.httpService.post([host, path].join('/'), deletePostFilesDto),
+        this.httpService.delete(endpoint, {
+          params: { folder: filesServiceUploadFolderWithoutBasePath },
+        }),
       );
       await queryRunner.commitTransaction();
     } catch (err) {
       console.log('rollback', err);
       await queryRunner.rollbackTransaction();
+      if (
+        err.response.data.message &&
+        err.response.data.message.includes('bucket:')
+      ) {
+        const bucketName = err.response.data.message.substring(
+          err.response.data.message.lastIndexOf('bucket:') + 7,
+        );
+        console.log('🚀 ~ bucketName:', bucketName);
+        // todo!!! make saga pattern delete posts(add to db(filesServiceUploadFolderWithoutBasePath, bucketName, attemp++) and launch every 5 sec). There catch if post was not deleted in aws
+      }
+
+      throw new InternalServerErrorException(
+        `PostCommandService: post ${postId} was not deleted or not exists`,
+      );
     } finally {
       await queryRunner.release();
     }

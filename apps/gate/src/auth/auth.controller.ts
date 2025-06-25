@@ -67,6 +67,8 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
+      // path: '/',
+      // domain: 'localhost',
       secure: false,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
@@ -114,7 +116,7 @@ export class AuthController {
   // send forgotPassword email to user email
   @Public()
   @ForgotPasswordSwagger()
-  @UseGuards(RecaptchaGuard)
+  // @UseGuards(RecaptchaGuard)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
     await this.authService.forgotPassword(email);

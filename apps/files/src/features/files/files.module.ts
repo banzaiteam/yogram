@@ -11,21 +11,29 @@ import {
   UploadFilesCommand,
   UploadFilesCommandHandler,
 } from './use-case/commands/upload-files.handler';
+import {
+  DeleteFilesCommand,
+  DeleteFilesCommandHandler,
+} from './use-case/commands/delete-files.handler';
 
 @Module({
   imports: [
-    HttpModule,
-    UploadProvidersModule,
-    CqrsModule,
-    RabbitProducerModule.register(['posts']),
+    // HttpModule,
+    // UploadProvidersModule,
+    // CqrsModule,
+    // RabbitProducerModule.register(['posts']),
   ],
-  controllers: [FilesController],
+  controllers: [
+    // FilesController
+  ],
   providers: [
-    FilesCommandService,
-    ChunksFileUploader,
-    GateService,
-    UploadFilesCommand,
-    UploadFilesCommandHandler,
+    // DeleteFilesCommand,
+    // DeleteFilesCommandHandler,
+    // FilesCommandService,
+    // ChunksFileUploader,
+    // GateService,
+    // UploadFilesCommand,
+    // UploadFilesCommandHandler,
   ],
 })
 export class FilesModule {}

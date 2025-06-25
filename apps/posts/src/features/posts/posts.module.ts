@@ -39,6 +39,10 @@ import {
   GetPostsQuery,
   GetPostsQueryHandler,
 } from './use-cases/queries/get-posts.query';
+import {
+  DeletePostCommand,
+  DeletePostCommandHandler,
+} from './use-cases/commands/delete-post.handler';
 
 @Module({
   imports: [
@@ -64,6 +68,8 @@ import {
   ],
   controllers: [PostsController],
   providers: [
+    DeletePostCommandHandler,
+    DeletePostCommand,
     CreatePostCommandHandler,
     PostCommandService,
     FileCommandService,

@@ -11,9 +11,12 @@ export interface UploadFilesResponse {
 export abstract class IUploader {
   abstract uploadFiles(
     files: ChunkedFileDto,
-    bucket: AwsBuckets,
+    bucketName: AwsBuckets,
   ): Promise<UploadFilesResponse>;
-  abstract createBucket(name: string): Promise<string>;
-  abstract isBucketExists(name: string, accountId: string): Promise<boolean>;
-  abstract deleteFiles(path: string): Promise<void>;
+  abstract createBucket(bucketName: string): Promise<string>;
+  abstract isBucketExists(
+    bucketName: string,
+    accountId: string,
+  ): Promise<boolean>;
+  abstract deleteFolder(bucketName: AwsBuckets, path: string): Promise<boolean>;
 }

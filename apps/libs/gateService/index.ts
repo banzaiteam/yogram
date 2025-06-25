@@ -80,6 +80,20 @@ export class GateService {
     }
   }
 
+  async requestHttpServiceDelete(service, path, headers) {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.delete([this.services[service], path].join('/'), {
+          headers,
+        }),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.response.data, error.response.status);
+    }
+  }
+
   async usersHttpServicePost(path, payload, headers) {
     try {
       const { data } = await lastValueFrom(

@@ -113,7 +113,7 @@ export class PostsController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return await this.postsService.delete(id);
+  async delete(@User('id') userId: string, @Param('id') id: string) {
+    return await this.postsService.delete(userId, id);
   }
 }

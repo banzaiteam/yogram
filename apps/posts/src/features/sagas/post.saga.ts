@@ -10,15 +10,7 @@ export class PostSagas {
   deletePost = (events$: Observable<any>): Observable<ICommand> => {
     return events$.pipe(
       ofType(DeletePostEvent),
-      map(
-        (event) =>
-          new DeletePostCommand(
-            event.postId,
-            event.folderPath,
-            event.path,
-            event.host,
-          ),
-      ),
+      map((event) => new DeletePostCommand(event.userId, event.postId)),
     );
   };
 }

@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostCommandService } from '../../post-command.service';
+import { ConfigService } from '@nestjs/config';
+import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
 
 export class DeletePostCommand {
   constructor(
+    public readonly userId: string,
     public readonly postId: string,
-    public readonly folderPath: string,
-    public readonly path: string,
-    public readonly host: string,
   ) {}
 }
 
@@ -14,18 +14,20 @@ export class DeletePostCommand {
 export class DeletePostCommandHandler
   implements ICommandHandler<DeletePostCommand>
 {
-  constructor(private readonly postCommandService: PostCommandService) {}
-  async execute({
-    postId,
-    folderPath,
-    host,
-    path,
-  }: DeletePostCommand): Promise<any> {
+  constructor(
+    private readonly postCommandService: PostCommandService,
+    private readonly configService: ConfigService,
+  ) {}
+  async execute({ userId, postId }: DeletePostCommand): Promise<any> {
+    const folderPath = ['posts', userId, postId].join('/');
+    const deleteServiceUrl = [
+      this.configService.get('FILES_SERVICE_URL'),
+      HttpFilesPath.Delete,
+    ].join('/');
     await this.postCommandService.deletePostWithFiles(
       postId,
       folderPath,
-      host,
-      path,
+      deleteServiceUrl,
     );
   }
 }

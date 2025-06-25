@@ -15,7 +15,8 @@ async function bootstrap() {
     parameterLimit: 5000,
     extended: true,
   });
-
+  // todo! try cors origin: * and app.set('trust proxy', true);
+  // app.set('trust proxy', true);
   app.enableCors({
     allowedHeaders: [
       'Access-Control-Allow-Origin',
@@ -30,6 +31,8 @@ async function bootstrap() {
       'User-Agent',
       'x-recaptcha-token',
     ],
+    exposedHeaders: ['Set-cookie'],
+
     origin: [
       'https://yogram.ru',
       'http://localhost:5173',

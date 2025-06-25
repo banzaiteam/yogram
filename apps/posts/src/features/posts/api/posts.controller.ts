@@ -136,9 +136,14 @@ export class PostsController {
     );
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    // return await this.commandBus.execute(new DeletePostCommand(id))
+  @Delete('posts/delete/:userid/:postid')
+  async delete(
+    @Param('userid') userId: string,
+    @Param('postid') postId: string,
+  ) {
+    console.log('🚀 ~ PostsController ~ postId:', postId);
+    console.log('🚀 ~ PostsController ~ userid:', userId);
+    return await this.commandBus.execute(new DeletePostCommand(userId, postId));
   }
 
   @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploadedPosts })

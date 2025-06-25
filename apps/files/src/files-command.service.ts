@@ -28,12 +28,8 @@ export class FilesCommandService {
     }
   }
   // todo! if files array passed delete only this files , else all folder
-  async deleteUploadedFolderOrFiles(deleteFilesDto: DeletePostFilesDto) {
-    const path = [
-      deleteFilesDto.filesServiceUploadFolderWithoutBasePath,
-      deleteFilesDto.postId,
-    ].join('/');
-    return await this.uploaderService.deleteFiles(path);
+  async deleteUploadedFolder(bucketName: AwsBuckets, folder: string) {
+    return await this.uploaderService.deleteFolder(bucketName, folder);
   }
 
   async deleteLocalFolderWithFiles(path: string) {

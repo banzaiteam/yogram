@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { FilesCommandService } from '../../../../../../../apps/files/src/files-command.service';
-import { DeletePostFilesDto } from '../../../../../../../apps/libs/Files/dto/delete-post-files.dto';
+import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 
 export class DeleteFilesCommand {
-  constructor(public readonly deleteFilesDto: DeletePostFilesDto) {}
+  constructor(public readonly folder: string) {}
 }
 
 @CommandHandler(DeleteFilesCommand)
@@ -12,9 +12,10 @@ export class DeleteFilesCommandHandler
 {
   constructor(private readonly filesCommandService: FilesCommandService) {}
 
-  async execute({ deleteFilesDto }: DeleteFilesCommand): Promise<any> {
-    return await this.filesCommandService.deleteUploadedFolderOrFiles(
-      deleteFilesDto,
+  async execute({ folder }: DeleteFilesCommand): Promise<any> {
+    return await this.filesCommandService.deleteUploadedFolder(
+      AwsBuckets.Files,
+      folder,
     );
   }
 }

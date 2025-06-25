@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import fs from 'node:fs/promises';
 import {
   IUploader,
@@ -7,7 +12,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import {
   CreateBucketCommand,
+  DeleteObjectCommand,
   HeadBucketCommand,
+  ListObjectsV2Command,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
@@ -28,14 +35,15 @@ export class AwsService implements IUploader {
 
   async uploadFiles(
     file: ChunkedFileDto,
-    bucket: AwsBuckets,
+    bucketName: AwsBuckets,
   ): Promise<UploadFilesResponse> {
+    console.log('🚀 ~ AwsService ~ file:', file);
     const isBucketExists = await this.isBucketExists(
-      bucket,
+      bucketName,
       this.configService.get('AWS_CCOUNT_ID'),
     );
     if (!isBucketExists) {
-      await this.createBucket(bucket);
+      await this.createBucket(bucketName);
     }
 
     const pathToFile = [file.filesUploadBaseDir, file.pathToFile].join('/');
@@ -51,7 +59,7 @@ export class AwsService implements IUploader {
       params: {
         Body: buffer,
         ContentLength: file.size,
-        Bucket: bucket,
+        Bucket: bucketName,
         ContentType: file.mimetype,
         Key: [file.fileType, file.pathToFile].join('/'),
       },
@@ -70,9 +78,9 @@ export class AwsService implements IUploader {
     // check if files exists in folder or check delete behavior if files does not exist
   }
 
-  async createBucket(name: string): Promise<string> {
+  async createBucket(bucketName: string): Promise<string> {
     const input = {
-      Bucket: name,
+      Bucket: bucketName,
       LocationConstraint: this.configService.get('AWS_REGION'),
       Location: {
         Type: 'AvailabilityZone',
@@ -88,9 +96,12 @@ export class AwsService implements IUploader {
     }
   }
 
-  async isBucketExists(name: string, accountId: string): Promise<boolean> {
+  async isBucketExists(
+    bucketName: string,
+    accountId: string,
+  ): Promise<boolean> {
     const input = {
-      Bucket: name,
+      Bucket: bucketName,
       ExpectedBucketOwner: accountId,
     };
     try {
@@ -99,6 +110,54 @@ export class AwsService implements IUploader {
       return true;
     } catch (err) {
       return false;
+    }
+  }
+
+  async isFolderExists(bucketName: AwsBuckets, path: string): Promise<boolean> {
+    const input = {
+      Bucket: bucketName,
+      Prefix: path,
+      MaxKeys: 1,
+    };
+    const command = new ListObjectsV2Command(input);
+    const result = await this.s3Client.send(command);
+    if (result.Contents.length > 0) return true;
+    return false;
+  }
+
+  async listObjects(bucketName: AwsBuckets, path: string) {
+    const input = {
+      Bucket: bucketName,
+      Prefix: path,
+    };
+    const command = new ListObjectsV2Command(input);
+    const { Contents } = await this.s3Client.send(command);
+    return Contents;
+  }
+
+  async deleteFolder(bucketName: AwsBuckets, path: string) {
+    const isFolderExists = await this.isFolderExists(bucketName, path);
+    if (!isFolderExists)
+      throw new BadRequestException(
+        `AwsService deleteFolder error: folder ${path} does not exists`,
+      );
+    const content = await this.listObjects(bucketName, path);
+    try {
+      for (let i = 0; i < content.length; i++) {
+        const element = content[i];
+        if (i === 1) {
+          throw Error();
+        }
+        // todo! if during deleting some files left post will not deleted from db, need to launch smth like outbox
+        await this.s3Client.send(
+          new DeleteObjectCommand({ Bucket: bucketName, Key: element.Key }),
+        );
+      }
+      return true;
+    } catch (err) {
+      throw new InternalServerErrorException(
+        `AwsService deleteFolder error: bucket:${bucketName} `,
+      );
     }
   }
 }

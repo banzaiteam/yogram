@@ -27,9 +27,9 @@ export class PostsService {
     );
   }
 
-  async delete(id: string) {
-    const path = [HttpPostsPath.Delete, id].join('/');
-    return await this.gateService.requestHttpServiceGet(
+  async delete(userId: string, postId: string) {
+    const path = [HttpPostsPath.Delete, userId, postId].join('/');
+    return await this.gateService.requestHttpServiceDelete(
       HttpServices.Posts,
       path,
       {},

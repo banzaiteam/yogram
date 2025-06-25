@@ -1,10 +1,10 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Post, Query } from '@nestjs/common';
 import { ChunksFileUploader } from '../../../../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { ChunkedFileDto } from '../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { UploadFilesCommand } from '../use-case/commands/upload-files.handler';
-import { DeletePostFilesDto } from '../../../../../../apps/libs/Files/dto/delete-post-files.dto';
 import { DeleteFilesCommand } from '../use-case/commands/delete-files.handler';
+
 @Controller()
 export class FilesController {
   constructor(
@@ -27,9 +27,8 @@ export class FilesController {
   }
 
   @Delete('files/delete')
-  async delete(@Body() deletePostFilesDto: DeletePostFilesDto) {
-    return await this.commandBus.execute(
-      new DeleteFilesCommand(deletePostFilesDto),
-    );
+  async delete(@Query('folder') folder: string) {
+    console.log('🚀 ~ FilesController ~ delete ~ folder:', folder);
+    return await this.commandBus.execute(new DeleteFilesCommand(folder));
   }
 }
