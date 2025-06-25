@@ -40,6 +40,7 @@ export class PostCommandService {
   async create(
     createPostDto: CreatePostDto,
     files: Express.Multer.File[],
+    bucketName: string,
   ): Promise<Post> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -75,6 +76,7 @@ export class PostCommandService {
           fileId: id,
           originalname: file.filename,
           destination: file.destination,
+          bucketName,
         };
         uploadFiles.push(uploadFile);
         // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
@@ -166,7 +168,9 @@ export class PostCommandService {
     postId: string,
     filesServiceUploadFolderWithoutBasePath: string,
     endpoint: string,
+    bucketName: string,
   ): Promise<void> {
+    console.log('🚀 ~ bucketName:', bucketName);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -179,7 +183,10 @@ export class PostCommandService {
 
       await firstValueFrom(
         this.httpService.delete(endpoint, {
-          params: { folder: filesServiceUploadFolderWithoutBasePath },
+          params: {
+            folder: filesServiceUploadFolderWithoutBasePath,
+            bucket: bucketName,
+          },
         }),
       );
       await queryRunner.commitTransaction();

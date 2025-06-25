@@ -77,6 +77,7 @@ export class ChunksFileUploader {
       file.originalname,
     ].join('/');
     const chunkedFileDto: ChunkedFileDto = {
+      bucketName: file.bucketName,
       routingKey,
       fileType: file.fileType,
       filesUploadBaseDir: file.filesUploadBaseDir,
@@ -88,6 +89,7 @@ export class ChunksFileUploader {
       size: file.size,
       fileId: file.fileId,
       filesServiceUploadFolderWithoutBasePath,
+
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
     console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);

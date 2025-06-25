@@ -4,6 +4,7 @@ import { UsersCommandService } from '../../../users-command.service';
 import { UserVerifyEmailDto } from '../../../../../../apps/libs/Users/dto/user/user-verify-email.dto';
 import { SendVerifyEmailEvent } from '../event/send-verify-email.event';
 import { UsersQueryService } from '../../../../../../apps/users/src/users-query.service';
+import { ConfigService } from '@nestjs/config';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -11,6 +12,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     private readonly usersCommandService: UsersCommandService,
     private readonly usersQueryService: UsersQueryService,
     private readonly eventBus: EventBus,
+    private readonly configService: ConfigService,
   ) {}
 
   async execute({ createUserDto, file }: CreateUserCommand): Promise<void> {
@@ -33,6 +35,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     } else {
       const user = await this.usersCommandService.createUser(
         createUserDto,
+        this.configService.get('BUCKET'),
         file,
       );
       userVerifyEmailDto = {

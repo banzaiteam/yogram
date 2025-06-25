@@ -27,8 +27,12 @@ export class FilesController {
   }
 
   @Delete('files/delete')
-  async delete(@Query('folder') folder: string) {
-    console.log('🚀 ~ FilesController ~ delete ~ folder:', folder);
-    return await this.commandBus.execute(new DeleteFilesCommand(folder));
+  async delete(
+    @Query('folder') folder: string,
+    @Query('bucket') bucket: string,
+  ) {
+    return await this.commandBus.execute(
+      new DeleteFilesCommand(folder, bucket),
+    );
   }
 }

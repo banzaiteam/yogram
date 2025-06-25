@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { PostCommandService } from '../../post-command.service';
 import { Post } from '../../infrastracture/entity/post.entity';
+import { ConfigService } from '@nestjs/config';
 
 export class CreatePostCommand {
   constructor(
@@ -13,10 +14,17 @@ export class CreatePostCommand {
 export class CreatePostCommandHandler
   implements ICommandHandler<CreatePostCommand>
 {
-  constructor(private readonly postCommandService: PostCommandService) {}
+  constructor(
+    private readonly postCommandService: PostCommandService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async execute({ createPostDto, files }: CreatePostCommand): Promise<Post> {
-    const newPost = await this.postCommandService.create(createPostDto, files);
+    const newPost = await this.postCommandService.create(
+      createPostDto,
+      files,
+      this.configService.get('BUCKET'),
+    );
     return newPost;
   }
 }

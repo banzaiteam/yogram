@@ -48,6 +48,7 @@ export class UsersCommandService {
 
   async createUser(
     createUserDto: CreateUserDto,
+    bucketName: string,
     file?: Express.Multer.File[],
   ): Promise<ResponseUserDto> {
     if (!Array.isArray(file)) {
@@ -97,6 +98,7 @@ export class UsersCommandService {
             fileId: createUserDto.id,
             originalname: file[0].filename,
             destination: file[0].destination,
+            bucketName,
           },
         ];
 

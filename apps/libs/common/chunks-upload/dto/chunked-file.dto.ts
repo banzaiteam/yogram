@@ -6,6 +6,8 @@ import { FilesRoutingKeys } from '../../../../../apps/files/src/features/files/m
 
 export class ChunkedFileDto {
   @IsString()
+  bucketName: string;
+  @IsString()
   routingKey: FilesRoutingKeys;
   @IsString()
   fileType: FileTypes;

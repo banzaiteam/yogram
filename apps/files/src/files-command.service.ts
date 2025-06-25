@@ -5,7 +5,6 @@ import {
 } from './features/files/providers/interface/uploader.interface';
 import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 import fs from 'node:fs/promises';
-import { DeletePostFilesDto } from 'apps/libs/Files/dto/delete-post-files.dto';
 
 @Injectable()
 export class FilesCommandService {
@@ -15,10 +14,7 @@ export class FilesCommandService {
     return await this.uploaderService.createBucket(name);
   }
 
-  async uploadFiles(
-    files: any,
-    bucket: AwsBuckets,
-  ): Promise<UploadFilesResponse> {
+  async uploadFiles(files: any, bucket: string): Promise<UploadFilesResponse> {
     try {
       return await this.uploaderService.uploadFiles(files, bucket);
     } catch (err) {
@@ -28,7 +24,7 @@ export class FilesCommandService {
     }
   }
   // todo! if files array passed delete only this files , else all folder
-  async deleteUploadedFolder(bucketName: AwsBuckets, folder: string) {
+  async deleteUploadedFolder(bucketName: string, folder: string) {
     return await this.uploaderService.deleteFolder(bucketName, folder);
   }
 

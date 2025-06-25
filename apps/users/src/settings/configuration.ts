@@ -42,5 +42,6 @@ export const getConfiguration = () => {
     synchronize: process.env.SYNCHRONIZE === 'true',
     dropSchema: process.env.DROP_SCHEMA === 'true',
     RMQ_URL: process.env.RMQ_URL,
+    BUCKET: process.env.BUCKET,
   };
 };

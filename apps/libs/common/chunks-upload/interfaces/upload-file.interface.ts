@@ -8,4 +8,5 @@ export interface UploadFile
   fileId: string;
   filesUploadBaseDir: string;
   fileType: FileTypes;
+  bucketName: string;
 }
