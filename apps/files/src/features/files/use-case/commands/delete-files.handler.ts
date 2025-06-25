@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { FilesCommandService } from '../../../../../../../apps/files/src/files-command.service';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
+import { AwsBuckets } from '../../../../../../../apps/libs/Files/constants/aws-buckets.constant';
 
 export class DeleteFilesCommand {
   constructor(public readonly folder: string) {}
