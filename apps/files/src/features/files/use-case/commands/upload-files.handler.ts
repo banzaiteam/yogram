@@ -22,6 +22,7 @@ export class UploadFilesCommandHandler
       chunkedFileDto,
       AwsBuckets.Files,
     );
+    console.log('🚀 ~ execute ~ response:', response);
     const delPath = [
       chunkedFileDto.filesUploadBaseDir,
       response.folderPath,

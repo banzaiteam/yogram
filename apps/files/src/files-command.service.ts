@@ -24,7 +24,10 @@ export class FilesCommandService {
     }
   }
   // todo! if files array passed delete only this files , else all folder
-  async deleteUploadedFolder(bucketName: string, folder: string) {
+  async deleteUploadedFolder(
+    bucketName: string,
+    folder: string,
+  ): Promise<boolean> {
     return await this.uploaderService.deleteFolder(bucketName, folder);
   }
 

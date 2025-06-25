@@ -30,7 +30,7 @@ export class FilesController {
   async delete(
     @Query('folder') folder: string,
     @Query('bucket') bucket: string,
-  ) {
+  ): Promise<boolean> {
     return await this.commandBus.execute(
       new DeleteFilesCommand(folder, bucket),
     );

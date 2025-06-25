@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { Post } from './infrastracture/entity/post.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { FileCommandService } from './file-command.service';
 import { CreateFileDto } from '../../dto/create-file.dto';
 import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
@@ -23,6 +23,7 @@ import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
+import { BaseDeleteOutBox } from 'apps/libs/common/outbox/base-delete-outbox.entity';
 @Injectable()
 export class PostCommandService {
   constructor(
@@ -89,18 +90,22 @@ export class PostCommandService {
           queryRunner.manager,
         );
       }
+
+      console.log('  await queryRunner.commitTransaction();');
+
       const uploadServiceUrl = [
         this.configService.get('FILES_SERVICE_URL'),
         HttpFilesPath.Upload,
       ].join('/');
-      // upload files to files service and delete temporary uploaded photos and chunks to photos service
+      // upload files one by one to files service and delete temporary uploaded photos and chunks to photos service
       this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+        createPostDto.userId,
         createPostDto.postId,
         uploadFiles,
         [createPostDto.userId, createPostDto.postId].join('/'),
         uploadServiceUrl,
+        // queryRunner,
       );
-
       await queryRunner.commitTransaction();
       return post;
     } catch (err) {
@@ -108,22 +113,25 @@ export class PostCommandService {
       await queryRunner.rollbackTransaction();
       await fs.rm(files[0].destination, { recursive: true });
       // todo!!! check if post delete if error during post upload
-      await this.eventBus.publish(
-        new DeletePostEvent(createPostDto.userId, createPostDto.postId),
-      );
+      // await this.eventBus.publish(
+      //   new DeletePostEvent(createPostDto.userId, createPostDto.postId),
+      // );
       throw new InternalServerErrorException(
         'PostCommandService: post was not created',
       );
     } finally {
       await queryRunner.release();
+      console.log('🚀 ~ PostCommandService ~   await queryRunner.release();:');
     }
   }
 
   sendFilesToFilesServiceAndDeleteTempFilesAfter(
+    userId: string,
     postId: string,
     files: UploadFile[],
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
+    // queryRunner: QueryRunner,
   ) {
     console.log('🚀 ~ PostCommandService ~ path:', uploadServiceUrl);
     new Promise((res, rej) => {
@@ -141,23 +149,20 @@ export class PostCommandService {
         ),
       );
     })
-      .then(async () => {
-        await fs.rm(files[0].destination, { recursive: true });
-      })
+      // .then(async () => {
+      //   await fs.rm(files[0].destination, { recursive: true });
+      //   console.log('then.....');
+
+      //   // await queryRunner.release();
+      // })
       .catch(async (err) => {
-        console.log('error in post-command-service.........', err);
+        // console.log('error in post-command-service.........', err);
+        console.log('catch.....');
+        await this.eventBus.publish(new DeletePostEvent(userId, postId));
+        await fs.rm(files[0].destination, { recursive: true });
+        // await queryRunner.rollbackTransaction();
+        // await queryRunner.release();
         // todo delete post event
-        // it delete db post and related files in aws
-        //   await this.eventBus.publish(
-        //     new DeletePostEvent(
-        //       postId,
-        //       filesServiceUploadFolderWithoutBasePath,
-        //       path,
-        //       host,
-        //     ),
-        //   );
-        //   await fs.rm(files[0].destination, { recursive: true });
-        // });
       });
   }
 
@@ -174,22 +179,21 @@ export class PostCommandService {
     endpoint: string,
     bucketName: string,
   ): Promise<void> {
-    console.log('🚀 ~ bucketName:', bucketName);
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    const outBoxModel = this.postsDeleteOutboxRepo.create({
+    // postsDeleteOutBox init
+    let postsDeleteOutBoxModel = this.postsDeleteOutboxRepo.create({
+      id: postId,
       bucketName,
-      entityId: postId,
       pathToFiles: filesServiceUploadFolderWithoutBasePath,
     });
-    await this.postsDeleteOutboxRepo.save(outBoxModel);
+    postsDeleteOutBoxModel = await this.postsDeleteOutboxRepo.save(
+      postsDeleteOutBoxModel,
+    );
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       // maybe db post deleted but there is post folder with files in uploadService, so try delete files even post in db does not exists
-      const postsDelitedAmount = await this.postCommandRepository.delete(
-        postId,
-        queryRunner.manager,
-      );
+      await this.postCommandRepository.delete(postId, queryRunner.manager);
 
       await queryRunner.commitTransaction();
     } catch (err) {
@@ -201,9 +205,15 @@ export class PostCommandService {
       );
     } finally {
       await queryRunner.release();
+      // post entity was deleted successfully
+      postsDeleteOutBoxModel.entityDeleted = true;
+      await this.postsDeleteOutboxRepo.update(
+        postsDeleteOutBoxModel.id,
+        postsDeleteOutBoxModel,
+      );
     }
     try {
-      await firstValueFrom(
+      const result = await firstValueFrom(
         this.httpService.delete(endpoint, {
           params: {
             folder: filesServiceUploadFolderWithoutBasePath,
@@ -211,6 +221,14 @@ export class PostCommandService {
           },
         }),
       );
+      // all files deleted
+      if (result.data) {
+        postsDeleteOutBoxModel.filesDeleted = true;
+        await this.postsDeleteOutboxRepo.update(
+          postsDeleteOutBoxModel.id,
+          postsDeleteOutBoxModel,
+        );
+      }
     } catch (err) {
       if (
         err.response.data.message &&

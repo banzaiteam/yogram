@@ -104,6 +104,7 @@ export class PostsController {
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<PostResponse> {
+    console.log('🚀 ~ PostsController ~ files:', files);
     // todo! when uploading files and exception throw in post-command-repository/create
     // files in posts/upload not deleting
     createPostDto.userId = <string>req.headers.userid;

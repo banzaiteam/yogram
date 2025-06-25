@@ -37,6 +37,8 @@ export class PostCommandRepository
     updateDto: UpdatePostDto,
     entityManager?: EntityManager,
   ): Promise<Post> {
+    // console.log('🚀 ~ updateDto:', updateDto);
+    // console.log('🚀 ~ criteria:', criteria);
     const post = await this.postRepo
       .createQueryBuilder('posts')
       .innerJoinAndSelect('posts.files', 'files')
@@ -51,22 +53,34 @@ export class PostCommandRepository
     ) {
       files = post.files.map((file) => {
         if (file.id === criteria.fileid) {
+          console.log('🚀  file.id:', file.id);
+          console.log(
+            '🚀 ~ files=post.files.map ~ updateDto?.url:',
+            updateDto?.url,
+          );
+          console.log(
+            '🚀 ~ files=post.files.map ~ updateDto?.status;:',
+            updateDto?.status,
+          );
           file.url = updateDto?.url;
           file.status = updateDto?.status;
         }
         return file;
       });
     }
-
-    this.postRepo.merge(post, {
+    console.log('after for await');
+    // console.log('🚀 ~ files=post.files.map ~ files:', files);
+    const merged = this.postRepo.merge(post, {
       ...updateDto,
       ...files,
     });
     // if transaction then save with entityManager
     if (entityManager) {
-      return await entityManager.save(post);
+      console.log('entityManager update');
+
+      return await entityManager.save(merged);
     }
-    return await this.postRepo.save(post);
+    return await this.postRepo.save(merged);
   }
 
   async delete(postId: string, entityManager?: EntityManager): Promise<number> {

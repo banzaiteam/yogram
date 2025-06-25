@@ -132,18 +132,21 @@ export class AwsService implements IUploader {
     return Contents;
   }
 
-  async deleteFolder(bucketName: string, path: string) {
+  async deleteFolder(bucketName: string, path: string): Promise<boolean> {
     const isFolderExists = await this.isFolderExists(bucketName, path);
     // folder does not exist === deleted
-    if (!isFolderExists) return true;
+    {
+      console.log('isFolderExists return true ');
+      if (!isFolderExists) return true;
+    }
     const content = await this.listObjects(bucketName, path);
     console.log('🚀 ~ AwsService ~ deleteFolder ~ content:', content);
     try {
       for (let i = 0; i < content.length; i++) {
         const element = content[i];
-        if (i === 1) {
-          throw Error();
-        }
+        // if (i === 4) {
+        //   throw Error();
+        // }
         // todo! if during deleting some files left post will not be deleted from db, need to launch smth like outbox
         await this.s3Client.send(
           new DeleteObjectCommand({ Bucket: bucketName, Key: element.Key }),

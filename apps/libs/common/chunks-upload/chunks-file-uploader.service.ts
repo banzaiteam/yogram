@@ -92,7 +92,6 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
-    console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
     await firstValueFrom(
       this.httpService.post(uploadServiceUrl, chunkedFileDto),
@@ -100,18 +99,10 @@ export class ChunksFileUploader {
   }
   // todo! need to pass CHUNKS_DIR and UPLOAD_DIR
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunkedFileDto:',
-      chunkedFileDto,
-    );
     const CHUNKS_DIR = 'apps/files/src/features/files/chunks/avatars';
     const UPLOAD_DIR = 'apps/files/src/features/files/uploads';
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunksPath:',
-      chunksPath,
-    );
 
     await this.createFolderIfNotExists(chunksPath);
     await this.createFolderIfNotExists(

@@ -10,7 +10,6 @@ import {
   Query,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -40,7 +39,6 @@ import { DevicesSwagger } from './decorators/swagger/devices-swagger.decorator';
 import { LogoutAllDto } from './dto/logout-all.dto';
 import { LogoutSwagger } from './decorators/swagger/loggout-swagger.decorator';
 import { RecaptchaGuard } from '../../../../apps/gate/common/guards/recapcha.guard';
-import open from 'open';
 
 @Controller('auth')
 export class AuthController {
@@ -125,7 +123,7 @@ export class AuthController {
   // send forgotPassword email to user email
   @Public()
   @ForgotPasswordSwagger()
-  // @UseGuards(RecaptchaGuard)
+  @UseGuards(RecaptchaGuard)
   @Post('forgot-password')
   async forgotPassword(@Body() email: EmailDto): Promise<void> {
     await this.authService.forgotPassword(email);
@@ -184,8 +182,9 @@ export class AuthController {
   async googleOauth(@Res() res: Response) {
     try {
       //google apis
-      await open(this.configService.get('GOOGLE_OAUTH_URI'));
-      res.status(200).json('success');
+      // await open(this.configService.get('GOOGLE_OAUTH_URI'));
+      // res.status(200).json('success');
+      res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
     } catch (error) {
       throw new InternalServerErrorException(
         'AuthController: cant open oauth link',
