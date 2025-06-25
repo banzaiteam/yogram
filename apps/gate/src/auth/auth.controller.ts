@@ -64,13 +64,17 @@ export class AuthController {
       userAgent,
       req.ip,
     );
+    const date = new Date();
+    console.log('date====', new Date(date.getTime() + 86400000));
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
       // path: '/',
       // domain: 'localhost',
-      secure: false,
+      secure: true,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
+      expires: new Date(date.getTime() + 86400000),
     });
     return { accessToken };
   }
