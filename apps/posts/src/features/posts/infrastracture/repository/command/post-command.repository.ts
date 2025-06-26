@@ -37,8 +37,6 @@ export class PostCommandRepository
     updateDto: UpdatePostDto,
     entityManager?: EntityManager,
   ): Promise<Post> {
-    // console.log('🚀 ~ updateDto:', updateDto);
-    // console.log('🚀 ~ criteria:', criteria);
     const post = await this.postRepo
       .createQueryBuilder('posts')
       .innerJoinAndSelect('posts.files', 'files')
@@ -51,33 +49,26 @@ export class PostCommandRepository
       Object.keys(updateDto).includes('url') ||
       Object.keys(updateDto).includes('status')
     ) {
-      files = post.files.map((file) => {
-        if (file.id === criteria.fileid) {
-          console.log('🚀  file.id:', file.id);
-          console.log(
-            '🚀 ~ files=post.files.map ~ updateDto?.url:',
-            updateDto?.url,
-          );
-          console.log(
-            '🚀 ~ files=post.files.map ~ updateDto?.status;:',
-            updateDto?.status,
-          );
-          file.url = updateDto?.url;
-          file.status = updateDto?.status;
-        }
-        return file;
-      });
+      files = await Promise.all(
+        post.files.map(async (file) => {
+          if (file.id === criteria.fileid) {
+            file.url = updateDto?.url;
+            file.status = updateDto?.status;
+          }
+          return file;
+        }),
+      );
     }
-    console.log('after for await');
-    // console.log('🚀 ~ files=post.files.map ~ files:', files);
-    const merged = this.postRepo.merge(post, {
-      ...updateDto,
-      ...files,
-    });
+
+    const merged = await Promise.resolve(
+      this.postRepo.merge(post, {
+        ...updateDto,
+        ...files,
+      }),
+    );
+
     // if transaction then save with entityManager
     if (entityManager) {
-      console.log('entityManager update');
-
       return await entityManager.save(merged);
     }
     return await this.postRepo.save(merged);

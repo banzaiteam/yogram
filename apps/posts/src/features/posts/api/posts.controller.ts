@@ -130,7 +130,7 @@ export class PostsController {
     @Body()
     payload: UpdatePostCriteria & UpdatePostDto,
   ): Promise<void> {
-    const criteria = payload['criteria'];
+    const criteria = { id: payload['criteria'] };
     const updatePostDto = payload['updatePostDto'];
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto),
@@ -142,8 +142,6 @@ export class PostsController {
     @Param('userid') userId: string,
     @Param('postid') postId: string,
   ) {
-    console.log('🚀 ~ PostsController ~ postId:', postId);
-    console.log('🚀 ~ PostsController ~ userid:', userId);
     return await this.commandBus.execute(new DeletePostCommand(userId, postId));
   }
 

@@ -29,7 +29,7 @@ export class MailService implements IMailer {
     const subject = 'Yogram account verification';
     const html = `<p>Hello ${userVerifyEmailDto.username},</p>
         <p>Welcome to our community! You created account but it still need to be verified.</p>
-        <p>please click on the activation link <a href=${path}/api/v1/signup/email-verify/${token}>verify link</a></p>`;
+        <p>please click on the activation link <a href=${path}/api/v1/signup/email-verify/${token}/${payload.email}>verify link</a></p>`;
     try {
       const result = await this.mailerService.sendMail({
         ...userVerifyEmailDto,

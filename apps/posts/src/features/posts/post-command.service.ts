@@ -91,8 +91,6 @@ export class PostCommandService {
         );
       }
 
-      console.log('  await queryRunner.commitTransaction();');
-
       const uploadServiceUrl = [
         this.configService.get('FILES_SERVICE_URL'),
         HttpFilesPath.Upload,
@@ -131,7 +129,6 @@ export class PostCommandService {
     files: UploadFile[],
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
-    // queryRunner: QueryRunner,
   ) {
     console.log('🚀 ~ PostCommandService ~ path:', uploadServiceUrl);
     new Promise((res, rej) => {
@@ -149,19 +146,14 @@ export class PostCommandService {
         ),
       );
     })
-      // .then(async () => {
-      //   await fs.rm(files[0].destination, { recursive: true });
-      //   console.log('then.....');
-
-      //   // await queryRunner.release();
-      // })
+      .then(async () => {
+        await fs.rm(files[0].destination, { recursive: true });
+      })
       .catch(async (err) => {
-        // console.log('error in post-command-service.........', err);
+        console.log('error in post-command-service.........', err);
         console.log('catch.....');
         await this.eventBus.publish(new DeletePostEvent(userId, postId));
         await fs.rm(files[0].destination, { recursive: true });
-        // await queryRunner.rollbackTransaction();
-        // await queryRunner.release();
         // todo delete post event
       });
   }
@@ -170,7 +162,23 @@ export class PostCommandService {
     criteria: UpdatePostCriteria,
     updatePostDto: UpdatePostDto,
   ): Promise<Post> {
-    return await this.postCommandRepository.update(criteria, updatePostDto);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const saved = await this.postCommandRepository.update(
+        criteria,
+        updatePostDto,
+        queryRunner.manager,
+      );
+      await queryRunner.commitTransaction();
+      return saved;
+    } catch (error) {
+      console.log('🚀 ~ PostCommandService rollback:', error);
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async deletePostWithFiles(

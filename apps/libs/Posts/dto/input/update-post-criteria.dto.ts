@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsOptional, IsUUID, ValidateNested } from 'class-validator';
+import { CriteriaDto } from './criteria.dto';
+import { Type } from 'class-transformer';
 
 ApiProperty({
-  description: 'find post which should be updated by postId or fileId',
+  description: 'find post by postId or fileId which should be updated ',
 });
 export class UpdatePostCriteria {
   @IsOptional()
@@ -11,4 +13,7 @@ export class UpdatePostCriteria {
   @IsOptional()
   @IsUUID()
   fileid?: string;
+  @IsUUID()
+  @IsOptional()
+  userId?: string;
 }

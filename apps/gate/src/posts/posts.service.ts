@@ -6,6 +6,7 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { ISorting } from '../../../libs/common/pagination/decorators/sorting.decorator';
 import { IFiltering } from '../../../libs/common/pagination/decorators/filtering.decorator';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -32,6 +33,15 @@ export class PostsService {
     return await this.gateService.requestHttpServiceDelete(
       HttpServices.Posts,
       path,
+      {},
+    );
+  }
+
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<void> {
+    return this.gateService.requestHttpServicePatch(
+      HttpServices.Posts,
+      HttpPostsPath.Update,
+      { criteria: id, updatePostDto },
       {},
     );
   }

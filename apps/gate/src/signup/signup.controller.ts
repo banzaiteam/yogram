@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
@@ -14,12 +13,10 @@ import { Request, Response } from 'express';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { TokenExpiredError } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { EmailDto } from '../../../../apps/libs/Users/dto/user/email.dto';
 import { SendVerifyEmailSwagger } from './decorators/swagger/send-verify-email-swagger.decorator';
 import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 import axios from 'axios';
 import { v4 } from 'uuid';
-import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -37,14 +34,9 @@ export class SignupController {
     @Req() req: Request,
   ): Promise<void> {
     try {
-      console.log('signUp');
-
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
-        [
-          'http://users-yogram-service.yogram-ru:3870/api/v1',
-          HttpUsersPath.Create,
-        ].join('/'),
+        'http://users-yogram-service.yogram-ru:3870/api/v1/users/create',
         req,
         {
           headers: { ...req.headers, id: v4() },
@@ -78,15 +70,22 @@ export class SignupController {
 
   @Public()
   @ApiExcludeEndpoint()
-  @Get('email-verify/:token')
-  async emailVerify(@Param('token') token: string, @Res() res: Response) {
+  @Get('email-verify/:token/:email')
+  async emailVerify(
+    @Param('token') token: string,
+    @Param() email: string,
+    @Res() res: Response,
+  ) {
     try {
       await this.signupService.emailVerify(token);
       res.redirect(303, this.configService.get('LOGIN_PAGE'));
     } catch (err) {
       if (err instanceof TokenExpiredError) {
         // redirect to 'send-verify-email' where unauthorized user should enter email to resend verification email
-        res.redirect(303, this.configService.get('RESEND_EMAIL_VERIFY_PAGE'));
+        res.redirect(
+          303,
+          [this.configService.get('RESEND_EMAIL_VERIFY_PAGE'), email].join('/'),
+        );
       }
     }
   }
@@ -94,8 +93,8 @@ export class SignupController {
   // if verify email link expired should be redirected here
   @Public()
   @SendVerifyEmailSwagger()
-  @Post('send-verify-email')
-  async SendVerifyEmail(@Body() email: EmailDto) {
-    await this.signupService.sendVerifyEmail(email);
+  @Get('send-verify-email/:email')
+  async SendVerifyEmail(@Param('email') email: string) {
+    await this.signupService.sendVerifyEmail({ email });
   }
 }

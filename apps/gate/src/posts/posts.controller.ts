@@ -1,9 +1,11 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   HttpException,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -34,6 +36,7 @@ import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output
 import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 import { ConfigService } from '@nestjs/config';
 import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
+import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -115,5 +118,13 @@ export class PostsController {
   @Delete(':id')
   async delete(@User('id') userId: string, @Param('id') id: string) {
     return await this.postsService.delete(userId, id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<void> {
+    return await this.postsService.update(id, updatePostDto);
   }
 }
