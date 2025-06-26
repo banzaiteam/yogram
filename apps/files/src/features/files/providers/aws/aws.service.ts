@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -18,7 +17,6 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
 
 @Injectable()
@@ -137,7 +135,6 @@ export class AwsService implements IUploader {
     const isFolderExists = await this.isFolderExists(bucketName, path);
     // folder does not exist === deleted
     {
-      console.log('isFolderExists return true ');
       if (!isFolderExists) return true;
     }
     const content = await this.listObjects(bucketName, path);

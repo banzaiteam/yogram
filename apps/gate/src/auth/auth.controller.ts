@@ -181,9 +181,6 @@ export class AuthController {
   @Get('google')
   async googleOauth(@Res() res: Response) {
     try {
-      //google apis
-      // await open(this.configService.get('GOOGLE_OAUTH_URI'));
-      // res.status(200).json('success');
       res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
     } catch (error) {
       throw new InternalServerErrorException(

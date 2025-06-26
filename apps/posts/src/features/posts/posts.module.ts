@@ -44,6 +44,7 @@ import {
   DeletePostCommandHandler,
 } from './use-cases/commands/delete-post.handler';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
+import { PostSagas } from '../sagas/post.saga';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
   ],
   controllers: [PostsController],
   providers: [
+    PostSagas,
     DeletePostCommandHandler,
     DeletePostCommand,
     CreatePostCommandHandler,

@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { Post } from './infrastracture/entity/post.entity';
-import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { FileCommandService } from './file-command.service';
 import { CreateFileDto } from '../../dto/create-file.dto';
 import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
@@ -12,7 +12,6 @@ import fs from 'node:fs/promises';
 import { EventBus } from '@nestjs/cqrs';
 import { DeletePostEvent } from './use-cases/events/delete-post.event';
 import { HttpService } from '@nestjs/axios';
-import { DeletePostFilesDto } from 'apps/libs/Files/dto/delete-post-files.dto';
 import { firstValueFrom } from 'rxjs';
 import { v4 } from 'uuid';
 import { FileStatus } from './constants/file.constant';
@@ -130,7 +129,6 @@ export class PostCommandService {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ) {
-    console.log('🚀 ~ PostCommandService ~ path:', uploadServiceUrl);
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
@@ -140,21 +138,24 @@ export class PostCommandService {
           uploadServiceUrl,
         ),
       );
-      rej(
-        new InternalServerErrorException(
-          'PostCommandService: photos was not uploaded',
-        ),
-      );
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        console.log('error in post-command-service.........', userId, postId);
-        console.log('catch.....');
-        await this.eventBus.publish(new DeletePostEvent(userId, postId));
-        await fs.rm(files[0].destination, { recursive: true });
-        // todo delete post event
+        try {
+          console.log(
+            'error in post-command-service...',
+            err.response?.data?.message,
+          );
+          await this.eventBus.publish(new DeletePostEvent(userId, postId));
+          await fs.rm(files[0].destination, { recursive: true });
+        } catch (error) {
+          // todo! use server side events to send error to the client
+          throw new InternalServerErrorException(
+            'files uploading error in promise...',
+          );
+        }
       });
   }
 
@@ -188,7 +189,6 @@ export class PostCommandService {
     bucketName: string,
   ): Promise<void> {
     // postsDeleteOutBox init
-    console.log('in deletePostWithFiles....');
     let postsDeleteOutBoxModel = this.postsDeleteOutboxRepo.create({
       id: postId,
       bucketName,
