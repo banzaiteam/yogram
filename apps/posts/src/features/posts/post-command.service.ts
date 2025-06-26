@@ -111,9 +111,9 @@ export class PostCommandService {
       await queryRunner.rollbackTransaction();
       await fs.rm(files[0].destination, { recursive: true });
       // todo!!! check if post delete if error during post upload
-      // await this.eventBus.publish(
-      //   new DeletePostEvent(createPostDto.userId, createPostDto.postId),
-      // );
+      await this.eventBus.publish(
+        new DeletePostEvent(createPostDto.userId, createPostDto.postId),
+      );
       throw new InternalServerErrorException(
         'PostCommandService: post was not created',
       );
@@ -202,6 +202,7 @@ export class PostCommandService {
     try {
       // maybe db post deleted but there is post folder with files in uploadService, so try delete files even post in db does not exists
       await this.postCommandRepository.delete(postId, queryRunner.manager);
+      console.log('in deletePostWithFiles....');
 
       await queryRunner.commitTransaction();
     } catch (err) {
