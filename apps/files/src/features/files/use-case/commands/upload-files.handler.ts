@@ -3,6 +3,7 @@ import { FilesCommandService } from '../../../../../../../apps/files/src/files-c
 import { ChunkedFileDto } from '../../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { ProducerService } from '../../../../../../../apps/libs/common/message-brokers/rabbit/providers/producer.service';
 import { AwsBuckets } from '../../../../../../../apps/libs/Files/constants/aws-buckets.constant';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class UploadFilesCommand {
   constructor(public readonly chunkedFileDto: ChunkedFileDto) {}
@@ -18,21 +19,31 @@ export class UploadFilesCommandHandler
   ) {}
 
   async execute({ chunkedFileDto }: UploadFilesCommand): Promise<any> {
-    const response = await this.filesCommandService.uploadFiles(
-      chunkedFileDto,
-      AwsBuckets.Files,
-    );
-    console.log('🚀 ~ execute ~ response:', response);
-    const delPath = [
-      chunkedFileDto.filesUploadBaseDir,
-      response.folderPath,
-    ].join('/');
-    // send uploading response to service by rmq
-    await this.producerService.emit({
-      routingKey: chunkedFileDto.routingKey,
-      payload: response,
-    });
-    // delete files/uploads/...
-    await this.filesCommandService.deleteLocalFolderWithFiles(delPath);
+    try {
+      const response = await this.filesCommandService.uploadFiles(
+        chunkedFileDto,
+        AwsBuckets.Files,
+      );
+      const delPath = [
+        chunkedFileDto.filesUploadBaseDir,
+        response.folderPath,
+      ].join('/');
+      // send uploading response to service by rmq
+      await this.producerService.emit({
+        routingKey: chunkedFileDto.routingKey,
+        payload: response,
+      });
+      // delete files/uploads/...
+      await this.filesCommandService.deleteLocalFolderWithFiles(delPath);
+    } catch (error) {
+      const delPath = [
+        chunkedFileDto.filesUploadBaseDir,
+        chunkedFileDto.filesServiceUploadFolderWithoutBasePath,
+      ].join('/');
+      await this.filesCommandService.deleteLocalFolderWithFiles(delPath);
+      throw new InternalServerErrorException(
+        'FilesCommandService error: files was not uploaded',
+      );
+    }
   }
 }

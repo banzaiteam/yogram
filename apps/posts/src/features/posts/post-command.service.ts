@@ -150,7 +150,7 @@ export class PostCommandService {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        console.log('error in post-command-service.........', err);
+        console.log('error in post-command-service.........', userId, postId);
         console.log('catch.....');
         await this.eventBus.publish(new DeletePostEvent(userId, postId));
         await fs.rm(files[0].destination, { recursive: true });
@@ -188,6 +188,7 @@ export class PostCommandService {
     bucketName: string,
   ): Promise<void> {
     // postsDeleteOutBox init
+    console.log('in deletePostWithFiles....');
     let postsDeleteOutBoxModel = this.postsDeleteOutboxRepo.create({
       id: postId,
       bucketName,
@@ -202,7 +203,6 @@ export class PostCommandService {
     try {
       // maybe db post deleted but there is post folder with files in uploadService, so try delete files even post in db does not exists
       await this.postCommandRepository.delete(postId, queryRunner.manager);
-      console.log('in deletePostWithFiles....');
 
       await queryRunner.commitTransaction();
     } catch (err) {

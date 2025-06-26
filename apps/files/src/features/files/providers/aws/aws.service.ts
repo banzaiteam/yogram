@@ -63,6 +63,7 @@ export class AwsService implements IUploader {
     });
 
     const result = await client.done();
+    // throw Error();
     return {
       url: result.Location,
       fileName: file.originalname,
@@ -140,7 +141,7 @@ export class AwsService implements IUploader {
       if (!isFolderExists) return true;
     }
     const content = await this.listObjects(bucketName, path);
-    console.log('🚀 ~ AwsService ~ deleteFolder ~ content:', content);
+
     try {
       for (let i = 0; i < content.length; i++) {
         const element = content[i];

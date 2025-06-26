@@ -19,6 +19,7 @@ export class DeletePostCommandHandler
     private readonly configService: ConfigService,
   ) {}
   async execute({ userId, postId }: DeletePostCommand): Promise<any> {
+    console.log('in DeletePostCommandHandler....');
     const folderPath = ['posts', userId, postId].join('/');
     const deleteServiceUrl = [
       this.configService.get('FILES_SERVICE_URL'),
