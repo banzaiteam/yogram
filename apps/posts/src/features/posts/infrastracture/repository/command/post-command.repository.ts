@@ -31,7 +31,7 @@ export class PostCommandRepository
 
     return this.postRepo.save(post);
   }
-  // todo! make different update for post and file
+
   async update(
     criteria: UpdatePostCriteria,
     updateDto: UpdatePostDto,

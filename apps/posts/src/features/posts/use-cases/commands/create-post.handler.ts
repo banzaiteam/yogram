@@ -19,12 +19,11 @@ export class CreatePostCommandHandler
     private readonly configService: ConfigService,
   ) {}
 
-  async execute({ createPostDto, files }: CreatePostCommand): Promise<Post> {
-    const newPost = await this.postCommandService.create(
+  async execute({ createPostDto, files }: CreatePostCommand): Promise<void> {
+    await this.postCommandService.create(
       createPostDto,
       files,
       this.configService.get('BUCKET'),
     );
-    return newPost;
   }
 }

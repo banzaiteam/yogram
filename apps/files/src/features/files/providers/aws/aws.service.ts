@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -17,6 +18,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
 
 @Injectable()
@@ -68,10 +70,6 @@ export class AwsService implements IUploader {
       fileId: file?.fileId,
       folderPath: file.filesServiceUploadFolderWithoutBasePath,
     } satisfies UploadFilesResponse;
-  }
-  // todo! if files array passed delete only this files , else all folder
-  async deleteFiles(path: string, files?: string[]): Promise<void> {
-    // check if files exists in folder or check delete behavior if files does not exist
   }
 
   async createBucket(bucketName: string): Promise<string> {

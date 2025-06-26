@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { Post } from './infrastracture/entity/post.entity';
@@ -40,22 +44,24 @@ export class PostCommandService {
     @InjectRepository(PostsDeleteOubox)
     private readonly postsDeleteOutboxRepo: Repository<PostsDeleteOubox>,
   ) {}
-  // todo!!!!!!!! saga delete db post/files record on files uploading error !!!!!!!!!!!!!!!!!!!!
+
   async create(
     createPostDto: CreatePostDto,
     files: Express.Multer.File[],
     bucketName: string,
-  ): Promise<Post> {
+  ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+    let uploadFiles: UploadFile[] = [];
     try {
       // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
       const post = await this.postCommandRepository.create(
         createPostDto,
         queryRunner.manager,
       );
-      let uploadFiles: UploadFile[] = [];
+      // todo? send post websocket here
+
       for (let file of files) {
         const id = v4();
         const date = new Date();
@@ -72,6 +78,7 @@ export class PostCommandService {
         };
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
+          // todo? make env variable
           filesUploadBaseDir: 'apps/files/src/features/files/uploads/posts',
           fieldname: file.fieldname,
           mimetype: file.mimetype,
@@ -84,52 +91,54 @@ export class PostCommandService {
         };
         uploadFiles.push(uploadFile);
         // todo you should use this queryRunner.manager on save operations because without it typeorm transactions does not work
-        await this.fileCommandService.create(
+        const files = await this.fileCommandService.create(
           createFileDto,
           queryRunner.manager,
         );
       }
 
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.log('rollback');
+      await queryRunner.rollbackTransaction();
+      // delete local files during error
+      await fs.rm(files[0].destination, { recursive: true });
+      throw new InternalServerErrorException(
+        'PostCommandService error: post was not created because of database error',
+      );
+    } finally {
+      await queryRunner.release();
+    }
+
+    try {
       const uploadServiceUrl = [
         this.configService.get('FILES_SERVICE_URL'),
         HttpFilesPath.Upload,
       ].join('/');
+
       // upload files one by one to files service and delete temporary uploaded photos and chunks to photos service
-      this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+      await this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
         createPostDto.userId,
         createPostDto.postId,
         uploadFiles,
         [createPostDto.userId, createPostDto.postId].join('/'),
         uploadServiceUrl,
-        // queryRunner,
       );
-      await queryRunner.commitTransaction();
-      return post;
-    } catch (err) {
-      console.log('rollback', err);
-      await queryRunner.rollbackTransaction();
-      await fs.rm(files[0].destination, { recursive: true });
-      // todo!!! check if post delete if error during post upload
-      await this.eventBus.publish(
-        new DeletePostEvent(createPostDto.userId, createPostDto.postId),
-      );
+    } catch (error) {
       throw new InternalServerErrorException(
-        'PostCommandService: post was not created',
+        'PostCommandService error: post was not created because of files upload error',
       );
-    } finally {
-      await queryRunner.release();
-      console.log('🚀 ~ PostCommandService ~   await queryRunner.release();:');
     }
   }
 
-  sendFilesToFilesServiceAndDeleteTempFilesAfter(
+  async sendFilesToFilesServiceAndDeleteTempFilesAfter(
     userId: string,
     postId: string,
     files: UploadFile[],
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ) {
-    new Promise((res, rej) => {
+    await new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
           FilesRoutingKeys.FilesUploadedPosts,
@@ -137,25 +146,19 @@ export class PostCommandService {
           filesServiceUploadFolderWithoutBasePath,
           uploadServiceUrl,
         ),
-      );
+      ),
+        rej(new Error());
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        try {
-          console.log(
-            'error in post-command-service...',
-            err.response?.data?.message,
-          );
-          await this.eventBus.publish(new DeletePostEvent(userId, postId));
-          await fs.rm(files[0].destination, { recursive: true });
-        } catch (error) {
-          // todo! use server side events to send error to the client
-          throw new InternalServerErrorException(
-            'files uploading error in promise...',
-          );
-        }
+        console.log(err.response?.data?.message);
+        // delete post with uploaded files during error
+        await this.eventBus.publish(new DeletePostEvent(userId, postId));
+        // delete local files during error
+        await fs.rm(files[0].destination, { recursive: true });
+        throw new Error();
       });
   }
 
@@ -177,6 +180,7 @@ export class PostCommandService {
     } catch (error) {
       console.log('🚀 ~ PostCommandService rollback:', error);
       await queryRunner.rollbackTransaction();
+      throw new HttpException(error.response, error.response.httpStatusCode);
     } finally {
       await queryRunner.release();
     }
@@ -206,7 +210,7 @@ export class PostCommandService {
 
       await queryRunner.commitTransaction();
     } catch (err) {
-      console.log('rollback', err);
+      console.log('rollback deletePostWithFiles', err);
       await queryRunner.rollbackTransaction();
 
       throw new InternalServerErrorException(

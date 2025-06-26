@@ -51,7 +51,7 @@ export class PostsController {
   @ApiHeaders([
     {
       name: 'Authorization',
-      description: ' Authorization with bearer token',
+      description: 'Authorization with bearer token',
     },
   ])
   @ApiConsumes('multipart/form-data')
@@ -84,6 +84,7 @@ export class PostsController {
       res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
     } catch (err) {
+      console.log('🚀 ~ PostsController ~ err:', err);
       // responseType: 'stream' error handle
       await new Promise((res) => {
         let streamString = '';
