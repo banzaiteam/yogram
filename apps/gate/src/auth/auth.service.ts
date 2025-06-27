@@ -186,8 +186,9 @@ export class AuthService {
     }
   }
 
-  async restorePage(token: string) {
-    return await this.jwtService.verifyAsync(token);
+  async restorePage(token: string): Promise<string> {
+    const response = await this.jwtService.verifyAsync(token.trim());
+    return response.email;
   }
 
   async restorePassword(restorePasswordDto: RestorePasswordDto): Promise<void> {

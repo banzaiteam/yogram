@@ -148,6 +148,7 @@ export class AuthController {
       ); // restore-password page
     } catch (err) {
       if (err instanceof TokenExpiredError) {
+        console.log('🚀 ~ AuthController ~ err:', err);
         // if invalid/expired token we redirect to the sendForgotPassword email page
         res.redirect(
           303,
@@ -155,9 +156,6 @@ export class AuthController {
             this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
             email,
           ].join('/'),
-        );
-        throw new BadRequestException(
-          'Restore password link is expired, redirect to resend restore password page',
         );
       }
     }
