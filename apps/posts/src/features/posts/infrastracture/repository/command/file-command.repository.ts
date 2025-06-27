@@ -17,7 +17,7 @@ export class FileCommandRepository
   async create(fileDto: any, entityManager?: EntityManager): Promise<File> {
     // todo you should use this queryRunner.manager(entityManager) on save operations because without it typeorm transactions does not work
     if (entityManager) {
-      const file = new File(fileDto);
+      const file = new File({ ...fileDto, postid: fileDto.postid });
       return await entityManager.save(file);
     }
     const file = new File(fileDto);

@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Body,
-  ConflictException,
   Controller,
   Delete,
   Get,
@@ -11,12 +10,13 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiResponse } from '@nestjs/swagger';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
@@ -47,13 +47,36 @@ import { Post as PostResponse } from '../infrastracture/entity/post.entity';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { DeletePostCommand } from '../use-cases/commands/delete-post.handler';
+import EventEmmiter from 'events';
+import { SseEvents } from 'apps/posts/src/constants/sse-events.enum';
 
 @Controller()
 export class PostsController {
+  private readonly postEmmiter: EventEmmiter;
+
   constructor(
     private commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) {
+    this.postEmmiter = new EventEmmiter();
+  }
+
+  @Get('posts-sse')
+  postCreated(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      this.postEmmiter.on(SseEvents.FIleUploaded, (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+    } catch (error) {
+      console.log('🚀 ~ PostsController ~ posts-sse ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
 
   @Post('posts/create')
   @ApiResponse({
@@ -133,7 +156,7 @@ export class PostsController {
     const criteria = { id: payload['criteria'] };
     const updatePostDto = payload['updatePostDto'];
     return await this.commandBus.execute(
-      new UpdatePostCommand(criteria, updatePostDto),
+      new UpdatePostCommand(criteria, updatePostDto, this.postEmmiter),
     );
   }
 
@@ -156,7 +179,7 @@ export class PostsController {
     };
     const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
     return await this.commandBus.execute(
-      new UpdatePostCommand(criteria, updatePostDto),
+      new UpdatePostCommand(criteria, updatePostDto, this.postEmmiter),
     );
   }
 }

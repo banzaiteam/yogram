@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
 import { PostCommandService } from '../../post-command.service';
-import { Post } from '../../infrastracture/entity/post.entity';
 import { ConfigService } from '@nestjs/config';
 
 export class CreatePostCommand {

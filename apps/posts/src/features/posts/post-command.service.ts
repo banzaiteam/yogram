@@ -27,6 +27,7 @@ import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 import { BaseDeleteOutBox } from 'apps/libs/common/outbox/base-delete-outbox.entity';
+
 @Injectable()
 export class PostCommandService {
   constructor(
@@ -60,8 +61,6 @@ export class PostCommandService {
         createPostDto,
         queryRunner.manager,
       );
-      // todo? send post websocket here
-
       for (let file of files) {
         const id = v4();
         const date = new Date();
@@ -74,6 +73,7 @@ export class PostCommandService {
           updatedAt: date,
           deletedAt: null,
           status: FileStatus.Pending,
+          postid: createPostDto.postId,
           post,
         };
         const uploadFile: UploadFile = {
@@ -175,6 +175,7 @@ export class PostCommandService {
         updatePostDto,
         queryRunner.manager,
       );
+      console.log('🚀 ~ PostCommandService ~ saved:', saved);
       await queryRunner.commitTransaction();
       return saved;
     } catch (error) {

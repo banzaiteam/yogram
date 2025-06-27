@@ -29,4 +29,6 @@ export class CreateFileDto {
   @Type(() => Post)
   @ValidateNested()
   post: Post;
+  @IsUUID()
+  postid: string;
 }

@@ -18,10 +18,6 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ uploadServiceUrl:',
-      uploadServiceUrl,
-    );
     // todo devide files on chunks
     const filesCount = files.length;
     let currentFile = 0;

@@ -60,6 +60,7 @@ export class PostCommandRepository
       );
     }
 
+    console.log('🚀 ~ post:', post);
     const merged = await Promise.resolve(
       this.postRepo.merge(post, {
         ...updateDto,

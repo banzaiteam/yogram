@@ -17,6 +17,9 @@ export class File extends BaseEntity {
   @Column({ type: 'enum', enum: FileStatus, default: FileStatus.Pending })
   status: FileStatus;
 
+  @Column({ type: 'uuid', nullable: true })
+  postId: string;
+
   @ManyToOne(() => Post, (post) => post.files, { onDelete: 'CASCADE' })
   @JoinColumn()
   post: Post;

@@ -17,6 +17,7 @@ import { SendVerifyEmailSwagger } from './decorators/swagger/send-verify-email-s
 import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 import axios from 'axios';
 import { v4 } from 'uuid';
+import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -36,7 +37,10 @@ export class SignupController {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const microserviceResponse = await axios.post(
-        'https://users-yogram-service.yogram-ru:3870/api/v1/users/create',
+        [
+          this.configService.get('USERS_SERVICE_URL'),
+          HttpUsersPath.Create,
+        ].join('/'),
         req,
         {
           headers: { ...req.headers, id: v4() },
