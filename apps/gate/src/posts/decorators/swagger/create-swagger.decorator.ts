@@ -4,6 +4,7 @@ import {
   ApiConsumes,
   ApiHeaders,
   ApiOperation,
+  ApiProduces,
   ApiProperty,
   ApiResponse,
 } from '@nestjs/swagger';
@@ -22,8 +23,12 @@ export const CreateSwagger = () =>
     ApiResponse({
       status: 201,
       description: 'post created',
+    }),
+    ApiResponse({
+      description: 'posts-sse-file',
       type: ResponseFileDto,
     }),
+    ApiProduces('text/event-stream'),
     ApiResponse({
       status: 500,
       description:
@@ -31,8 +36,8 @@ export const CreateSwagger = () =>
     }),
     ApiOperation({
       description:
-        'create post, get uploaded photos one-by-one via SSE then enter or left empty post description, after call patch /posts/publish/{id} with optional body {description:"..."}. To get uploaded files you need to listen SSE via https://posts.yogram.ru/api/v1/posts-sse-file, where you can get uploaded photos objects one-by-one during paraller uploading. All errors will be returned by usual http response.',
-      summary: 'upload new post with up to 10 photos(each 20mb max)',
+        'create post, get uploaded photos one-by-one via SSE then enter or left empty post description, after call patch /posts/publish/{id} with optional body {description:"..."} to save and publish post. You need to listen SSE via https://posts.yogram.ru/api/v1/posts-sse-file to get uploaded photos objects one-by-one during paraller uploading. All errors will be returned by usual http response.',
+      summary: 'upload a post with up to 10 photos(each 20mb max)',
     }),
   );
 
