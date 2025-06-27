@@ -18,6 +18,11 @@ export const ProfilePageSwagger = () =>
       status: 200,
       type: ResponseProfilePageDto,
       isArray: true,
+      description: 'success',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'user was not found',
     }),
     ApiParam({
       name: 'id',

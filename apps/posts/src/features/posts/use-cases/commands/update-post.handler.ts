@@ -28,9 +28,12 @@ export class UpdatePostCommandHandler
       criteria,
       updatePostDto,
     );
-    const updatedFile = updatedPost.files.filter(
-      (file) => file.id === criteria.fileid,
-    );
+    const updatedFile = updatedPost.files.filter((file) => {
+      if (file.id === criteria.fileid) {
+        delete file.deletedAt;
+        return file;
+      }
+    });
     postEmmiter.emit(SseEvents.FIleUploaded, updatedFile[0]);
   }
 }

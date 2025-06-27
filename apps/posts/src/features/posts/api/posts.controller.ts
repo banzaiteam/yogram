@@ -61,16 +61,22 @@ export class PostsController {
     this.postEmmiter = new EventEmmiter();
   }
 
-  @Get('posts-sse')
-  postCreated(@Req() req: Request, @Res() res: Response) {
+  @Get('posts-sse-file')
+  fileUploaded(@Req() req: Request, @Res() res: Response) {
     try {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         Connection: 'keep-alive',
       });
+      res.flushHeaders();
+
       this.postEmmiter.on(SseEvents.FIleUploaded, (data) => {
         res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+
+      req.on('close', () => {
+        res.end();
       });
     } catch (error) {
       console.log('🚀 ~ PostsController ~ posts-sse ~ error:', error);

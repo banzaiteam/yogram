@@ -10,7 +10,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { ApiConsumes, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
 import { User } from '../auth/decorators/user.decorator';
@@ -30,13 +30,16 @@ import {
   FilteringParams,
   IFiltering,
 } from '../../../libs/common/pagination/decorators/filtering.decorator';
-import { ResponsePostDto } from '../../../../apps/libs/Posts/dto/output/response-post.dto';
 import { plainToInstance } from 'class-transformer';
 import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 import { ConfigService } from '@nestjs/config';
 import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
 import { UpdatePostDto } from '../../../../apps/libs/Posts/dto/input/update-post.dto';
+import { CreateSwagger } from './decorators/swagger/create-swagger.decorator';
+import { DeleteSwagger } from './decorators/swagger/delete-swagger.decorator';
+import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
+import { PublishSwagger } from './decorators/swagger/publish-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -48,18 +51,7 @@ export class PostsController {
     private readonly httpService: HttpService,
   ) {}
 
-  @ApiHeaders([
-    {
-      name: 'Authorization',
-      description: 'Authorization with bearer token',
-    },
-  ])
-  @ApiConsumes('multipart/form-data')
-  @ApiResponse({
-    status: 201,
-    description: 'post was created',
-    type: ResponsePostDto,
-  })
+  @CreateSwagger()
   @Post()
   async create(
     @User('id') id: string,
@@ -116,16 +108,31 @@ export class PostsController {
     return plainToInstance(PostPaginatedResponseDto, posts);
   }
 
+  @DeleteSwagger()
   @Delete(':id')
   async delete(@User('id') userId: string, @Param('id') id: string) {
     return await this.postsService.delete(userId, id);
   }
 
+  @UpdateSwagger()
   @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<void> {
+    return await this.postsService.update(id, updatePostDto);
+  }
+
+  @PublishSwagger()
+  @Patch('publish/:id')
+  async publish(
+    @Param('id') id: string,
+    @Body() description?: Pick<UpdatePostDto, 'description'>,
+  ) {
+    const updatePostDto = {
+      description: description['description'],
+      isPublished: true,
+    };
     return await this.postsService.update(id, updatePostDto);
   }
 }

@@ -45,7 +45,6 @@ export class PostsQueryRepository
         files: true,
       },
     });
-    console.log('🚀 ~ data:', data);
     const paginatedResponse: PostPaginatedResponseDto = {
       items: data[0],
       totalItems: data[1],
