@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
@@ -40,19 +41,26 @@ import {
 import { diskStorage } from 'multer';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { SharpPipe } from '../../../apps/libs/common/pipes/sharp.pipe';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
 import { EventSubscribe } from '../../../apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
 import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/event.interface';
 import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
+import EventEmmiter from 'node:events';
+import { SseEvents } from 'apps/posts/src/constants/sse-events.enum';
+import { SseUsersEvents } from './constants/sse-events.enum';
 @Controller()
 export class UsersController {
+  private readonly usersEmmiter: EventEmmiter;
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly providerQueryService: ProviderQueryService,
-  ) {}
+  ) {
+    this.usersEmmiter = new EventEmmiter();
+  }
 
   @Get('users/login/:email')
   async userLogin(@Param() email: string): Promise<ResponseLoginDto | null> {
@@ -164,9 +172,11 @@ export class UsersController {
     const criteria = {
       id: folderPath,
     };
-    return await this.commandBus.execute(
+    const updatedUser = await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, { url: payload.url }),
     );
+    console.log('🚀 ~ UsersController ~ updatedUser:', updatedUser);
+    this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, updatedUser);
   }
 
   @Post('users/google')
@@ -176,5 +186,27 @@ export class UsersController {
     return await this.commandBus.execute(
       new CreateUserGoogleCommand(googleSignupDto),
     );
+  }
+
+  @Get('users-sse-avatar')
+  avatarUploaded(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+      this.usersEmmiter.on(SseUsersEvents.AvatarUploaded, (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('🚀 ~ UsersController ~ avatar-sse ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
   }
 }

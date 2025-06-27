@@ -55,12 +55,11 @@ export class UserCommandRepository
       }
     });
 
-    const merged = this.userRepository.merge(user, {
+    this.userRepository.merge(user, {
       ...updateUserDto,
       profile: { ...updateUserDto },
       providers,
     });
-    console.log('🚀 ~ merged:', merged);
     if (entityManager) {
       return await entityManager.save(user);
     }

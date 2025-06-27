@@ -21,8 +21,7 @@ export const CreateSwagger = () =>
     ApiBody({ type: UploadPhoto }),
     ApiResponse({
       status: 201,
-      description:
-        'To get uploaded files you need to listen SSE via https://posts.yogram.ru/api/v1/posts-sse-file, where you can get uploaded photos objects one-by-one during paraller uploading. All errors will be returned by usuall http response',
+      description: 'post created',
       type: ResponseFileDto,
     }),
     ApiResponse({
@@ -32,7 +31,7 @@ export const CreateSwagger = () =>
     }),
     ApiOperation({
       description:
-        'create post, get uploaded photos one-by-one then enter or left empty post description, after call patch /posts/publish/{id} with body {description:"..."}',
+        'create post, get uploaded photos one-by-one via SSE then enter or left empty post description, after call patch /posts/publish/{id} with optional body {description:"..."}. To get uploaded files you need to listen SSE via https://posts.yogram.ru/api/v1/posts-sse-file, where you can get uploaded photos objects one-by-one during paraller uploading. All errors will be returned by usual http response.',
       summary: 'upload new post with up to 10 photos(each 20mb max)',
     }),
   );

@@ -40,13 +40,12 @@ export class UserQueryRepository
         providerId: criteria?.providerId,
       })
       .getOne();
-    console.log('🚀 ~ user:', user);
     if (!user) return null;
     const mappedUser = {
       id: user.id,
       email: user.email,
       verified: user.verified,
-      url: null,
+      url: user.url,
       username: user.profile.username,
       providers: user.providers,
       profile: user.profile,
