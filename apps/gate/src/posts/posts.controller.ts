@@ -36,7 +36,7 @@ import { PostPaginatedResponseDto } from '../../../../apps/libs/Posts/dto/output
 import { GetSwagger } from './decorators/swagger/get-swagger.decorator';
 import { ConfigService } from '@nestjs/config';
 import { HttpPostsPath } from '../../../../apps/libs/Posts/constants/path.enum';
-import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { UpdatePostDto } from '../../../../apps/libs/Posts/dto/input/update-post.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
