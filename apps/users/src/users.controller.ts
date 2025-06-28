@@ -91,7 +91,6 @@ export class UsersController {
     return await this.providerQueryService.findProviderByProviderId(providerId);
   }
 
-  @Post('users/create')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -174,7 +173,6 @@ export class UsersController {
     const updatedUser = await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, { url: payload.url }),
     );
-    console.log('🚀 ~ UsersController ~ updatedUser:', updatedUser);
     this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, updatedUser);
   }
 

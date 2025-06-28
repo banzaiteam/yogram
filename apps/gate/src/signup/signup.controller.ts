@@ -18,6 +18,7 @@ import { SignUpSwagger } from './decorators/swagger/signup-swagger.decorator';
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
+import { SseAvatarSwagger } from './decorators/swagger/sse-avatar-swagger.decorator';
 
 @ApiTags('SignUp')
 @Controller('signup')
@@ -27,6 +28,7 @@ export class SignupController {
     private readonly configService: ConfigService,
   ) {}
 
+  @SseAvatarSwagger()
   @Public()
   @Get('sse-avatar')
   async avatarUploaded(@Req() req: Request, @Res() res: Response) {

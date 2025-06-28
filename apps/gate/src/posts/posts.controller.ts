@@ -43,6 +43,9 @@ import { PublishSwagger } from './decorators/swagger/publish-swagger.decorator';
 import EventEmitter from 'events';
 import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
 import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
+import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swagger.decorator';
+import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
+import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -57,6 +60,7 @@ export class PostsController {
     this.postEmitter = new EventEmitter();
   }
 
+  @SseFileSwagger()
   @Get('sse-file')
   async fileUploaded(@Req() req: Request, @Res() res: Response) {
     try {
@@ -88,6 +92,7 @@ export class PostsController {
     }
   }
 
+  @SseCancelTokenSwagger()
   @Get('sse-cancel-token')
   getCancelToken(@Req() req: Request, @Res() res: Response) {
     try {
@@ -111,6 +116,7 @@ export class PostsController {
     }
   }
 
+  @CancelPostSwagger()
   @Post('cancel')
   async cancelUpload(@Body() cancelUploadDto: CancelUploadDto) {
     return await this.postsService.cancelUpload(cancelUploadDto);
