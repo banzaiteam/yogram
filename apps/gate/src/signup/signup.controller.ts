@@ -28,6 +28,37 @@ export class SignupController {
   ) {}
 
   @Public()
+  @Get('sse-avatar')
+  async avatarUploaded(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+
+      const microserviceResponse = await axios.get(
+        [this.configService.get('USERS_SERVICE_URL'), 'users/sse-avatar'].join(
+          '/',
+        ),
+        {
+          headers: { ...req.headers },
+          responseType: 'stream',
+        },
+      );
+      microserviceResponse.data.pipe(res);
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('🚀 ~ SignupController ~ users/sse-avatar ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
+
+  @Public()
   @SignUpSwagger()
   @Post()
   async signUp(

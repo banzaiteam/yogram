@@ -40,16 +40,81 @@ import { CreateSwagger } from './decorators/swagger/create-swagger.decorator';
 import { DeleteSwagger } from './decorators/swagger/delete-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
 import { PublishSwagger } from './decorators/swagger/publish-swagger.decorator';
+import EventEmitter from 'events';
+import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
+import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
+  private readonly postEmitter: EventEmitter;
   constructor(
     private readonly postsService: PostsService,
     private readonly configService: ConfigService,
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
-  ) {}
+  ) {
+    this.postEmitter = new EventEmitter();
+  }
+
+  @Get('sse-file')
+  async fileUploaded(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+
+      const microserviceResponse = await axios.get(
+        [this.configService.get('POSTS_SERVICE_URL'), 'posts/sse-file'].join(
+          '/',
+        ),
+        {
+          // generate uuid for posts because of multer call destination method on each uploaded file
+          headers: { ...req.headers },
+          responseType: 'stream',
+        },
+      );
+      microserviceResponse.data.pipe(res);
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('🚀 ~ PostsController ~ posts-sse ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
+
+  @Get('sse-cancel-token')
+  getCancelToken(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+
+      this.postEmitter.on(SsePostsEvents.CancelToken, (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('PostsController ~ sse-cancel-token ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
+
+  @Post('cancel')
+  async cancelUpload(@Body() cancelUploadDto: CancelUploadDto) {
+    return await this.postsService.cancelUpload(cancelUploadDto);
+  }
 
   @CreateSwagger()
   @Post()
@@ -60,6 +125,11 @@ export class PostsController {
   ) {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
+      const postid = v4();
+      this.postEmitter.emit(SsePostsEvents.CancelToken, {
+        userId: id,
+        postId: postid,
+      });
       const microserviceResponse = await axios.post(
         [
           this.configService.get('POSTS_SERVICE_URL'),
@@ -68,7 +138,7 @@ export class PostsController {
         req,
         {
           // generate uuid for posts because of multer call destination method on each uploaded file
-          headers: { ...req.headers, postid: v4(), userid: id },
+          headers: { ...req.headers, postid, userid: id },
           responseType: 'stream',
         },
       );

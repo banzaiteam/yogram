@@ -3,4 +3,5 @@ export enum HttpPostsPath {
   Get = 'posts/get',
   Delete = 'posts/delete',
   Update = 'posts/update',
+  Cancel = 'posts/cancel',
 }

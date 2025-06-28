@@ -48,7 +48,6 @@ import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message
 import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/event.interface';
 import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
 import EventEmmiter from 'node:events';
-import { SseEvents } from 'apps/posts/src/constants/sse-events.enum';
 import { SseUsersEvents } from './constants/sse-events.enum';
 @Controller()
 export class UsersController {
@@ -188,7 +187,7 @@ export class UsersController {
     );
   }
 
-  @Get('users-sse-avatar')
+  @Get('users/sse-avatar')
   avatarUploaded(@Req() req: Request, @Res() res: Response) {
     try {
       res.writeHead(200, {
@@ -205,7 +204,7 @@ export class UsersController {
         res.end();
       });
     } catch (error) {
-      console.log('🚀 ~ UsersController ~ avatar-sse ~ error:', error);
+      console.log('🚀 ~ UsersController ~ users/sse-avatar ~ error:', error);
       res.write(`data: ${error}\n\n`);
     }
   }

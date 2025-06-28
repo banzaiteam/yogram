@@ -7,6 +7,7 @@ import { ISorting } from '../../../libs/common/pagination/decorators/sorting.dec
 import { IFiltering } from '../../../libs/common/pagination/decorators/filtering.decorator';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
 
 @Injectable()
 export class PostsService {
@@ -24,6 +25,15 @@ export class PostsService {
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Posts,
       path,
+      {},
+    );
+  }
+
+  async cancelUpload(cancelUploadDto: CancelUploadDto) {
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Posts,
+      HttpPostsPath.Cancel,
+      cancelUploadDto,
       {},
     );
   }

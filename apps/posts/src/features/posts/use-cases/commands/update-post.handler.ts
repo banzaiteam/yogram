@@ -3,7 +3,7 @@ import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criter
 import { UpdatePostDto } from '../../../../../../../apps/libs/Posts/dto/input/update-post.dto';
 import { PostCommandService } from '../../post-command.service';
 import EventEmmiter from 'events';
-import { SseEvents } from '../../../../../../../apps/posts/src/constants/sse-events.enum';
+import { SsePostsEvents } from '../../../../../../../apps/posts/src/constants/sse-events.enum';
 
 export class UpdatePostCommand {
   constructor(
@@ -34,6 +34,6 @@ export class UpdatePostCommandHandler
         return file;
       }
     });
-    postEmmiter.emit(SseEvents.FIleUploaded, updatedFile[0]);
+    postEmmiter.emit(SsePostsEvents.FIleUploaded, updatedFile[0]);
   }
 }

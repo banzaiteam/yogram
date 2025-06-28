@@ -15,7 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -48,7 +48,9 @@ import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-pagina
 import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { DeletePostCommand } from '../use-cases/commands/delete-post.handler';
 import EventEmmiter from 'events';
-import { SseEvents } from 'apps/posts/src/constants/sse-events.enum';
+import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
+import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
+import { DeletePostEvent } from '../use-cases/events/delete-post.event';
 
 @Controller()
 export class PostsController {
@@ -56,12 +58,13 @@ export class PostsController {
 
   constructor(
     private commandBus: CommandBus,
+    private readonly eventBus: EventBus,
     private readonly queryBus: QueryBus,
   ) {
     this.postEmmiter = new EventEmmiter();
   }
 
-  @Get('posts-sse-file')
+  @Get('posts/sse-file')
   fileUploaded(@Req() req: Request, @Res() res: Response) {
     try {
       res.writeHead(200, {
@@ -71,7 +74,7 @@ export class PostsController {
       });
       res.flushHeaders();
 
-      this.postEmmiter.on(SseEvents.FIleUploaded, (data) => {
+      this.postEmmiter.on(SsePostsEvents.FIleUploaded, (data) => {
         res.write(`data: ${JSON.stringify(data)}\n\n`);
       });
 
@@ -84,11 +87,13 @@ export class PostsController {
     }
   }
 
+  @Post('posts/cancel')
+  async cancelUpload(@Body() cancelUploadDto: CancelUploadDto) {
+    const { userId, postId } = cancelUploadDto;
+    return await this.eventBus.publish(new DeletePostEvent(userId, postId));
+  }
+
   @Post('posts/create')
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - authentication required',
-  })
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       storage: diskStorage({
@@ -133,9 +138,6 @@ export class PostsController {
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<PostResponse> {
-    console.log('🚀 ~ PostsController ~ files:', files);
-    // todo! when uploading files and exception throw in post-command-repository/create
-    // files in posts/upload not deleting
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
@@ -176,7 +178,6 @@ export class PostsController {
 
   @EventSubscribe({ routingKey: FilesRoutingKeys.FilesUploadedPosts })
   async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
-    // todo! if error there need to delete local photos from files and posts
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
     const criteria = {

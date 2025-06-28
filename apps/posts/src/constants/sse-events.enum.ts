@@ -1,3 +1,4 @@
-export enum SseEvents {
+export enum SsePostsEvents {
   'FIleUploaded' = 'fileUploaded',
+  'CancelToken' = 'cancelToken',
 }
