@@ -5,7 +5,7 @@ import {
   ApiProduces,
   ApiResponse,
 } from '@nestjs/swagger';
-import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
+import { CancelUploadDto } from '../../../../../../apps/libs/Posts/dto/input/cancel-upload.dto';
 
 export const SseCancelTokenSwagger = () =>
   applyDecorators(

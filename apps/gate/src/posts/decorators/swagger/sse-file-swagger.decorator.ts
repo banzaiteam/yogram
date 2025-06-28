@@ -5,7 +5,7 @@ import {
   ApiProduces,
   ApiResponse,
 } from '@nestjs/swagger';
-import { ResponseFileDto } from 'apps/libs/Posts/dto/output/response-file.dto';
+import { ResponseFileDto } from '../../../../../../apps/libs/Posts/dto/output/response-file.dto';
 
 export const SseFileSwagger = () =>
   applyDecorators(
