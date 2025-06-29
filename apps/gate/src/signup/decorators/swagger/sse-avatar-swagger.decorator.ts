@@ -5,7 +5,7 @@ import {
   ApiProduces,
   ApiResponse,
 } from '@nestjs/swagger';
-import { ResponseFileDto } from '../../../../../../apps/libs/Posts/dto/output/response-file.dto';
+import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
 
 export const SseAvatarSwagger = () =>
   applyDecorators(
@@ -16,7 +16,7 @@ export const SseAvatarSwagger = () =>
       },
     ]),
     ApiResponse({
-      type: ResponseFileDto,
+      type: UserAvatarDto,
     }),
     ApiResponse({
       status: 500,

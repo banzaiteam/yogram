@@ -49,6 +49,7 @@ import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/eve
 import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
+import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
 @Controller()
 export class UsersController {
   private readonly usersEmmiter: EventEmmiter;
@@ -195,10 +196,11 @@ export class UsersController {
     const updatedUser = await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, { url: payload.url }),
     );
-    this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, {
+    const userAvatar: UserAvatarDto = {
       id: updatedUser.id,
       url: updatedUser.url,
-    });
+    };
+    this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, userAvatar);
   }
 
   @Post('users/google')
