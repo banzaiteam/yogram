@@ -27,6 +27,8 @@ import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 import { BaseDeleteOutBox } from 'apps/libs/common/outbox/base-delete-outbox.entity';
+import { SsePostsEvents } from '../../constants/sse-events.enum';
+import EventEmitter from 'node:events';
 
 @Injectable()
 export class PostCommandService {
@@ -50,6 +52,7 @@ export class PostCommandService {
     createPostDto: CreatePostDto,
     files: Express.Multer.File[],
     bucketName: string,
+    postEmitter: EventEmitter,
   ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -61,6 +64,10 @@ export class PostCommandService {
         createPostDto,
         queryRunner.manager,
       );
+      postEmitter.emit(SsePostsEvents.CancelToken, {
+        userId: post.userId,
+        postId: post.id,
+      });
       for (let file of files) {
         const id = v4();
         const date = new Date();

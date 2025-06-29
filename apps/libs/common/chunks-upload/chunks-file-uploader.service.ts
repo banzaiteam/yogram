@@ -5,20 +5,26 @@ import { pipeline } from 'node:stream/promises';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { UploadFile } from './interfaces/upload-file.interface';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 @Injectable()
 export class ChunksFileUploader {
   constructor(private readonly httpService: HttpService) {}
-
+  /**
+   * Take array of files uploaded by multer, divide each file by chunks and then send them to uploadChunk method which send chunk by chunk to proccessComposeFile which must be called at consumer service.
+   * @param {string} routingKey - routing key for rabbitMq which link queue with exchange.
+   * @param {UploadFile[]} files - array of files. The type is extended from Express.Multer.File and modified
+   * @param {string} filesServiceUploadFolderWithoutBasePath - part of path(smth like userIdfolder/postIdFolder) where files should be uploaded at files microservice. It will be composed with base uplods path
+   * @param {string} uploadServiceUrl - full path to files service
+   * @returns {Promise<void>}
+   */
   async proccessChunksUpload(
     routingKey: FilesRoutingKeys,
     files: UploadFile[],
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    // todo devide files on chunks
+    // devide files on chunks
     const filesCount = files.length;
     let currentFile = 0;
     for await (const file of files) {
@@ -39,7 +45,6 @@ export class ChunksFileUploader {
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
         let chunk = buffer.subarray(startByte, endByte);
-        //test
         await this.uploadChunk(
           routingKey,
           JSON.stringify(chunk),
@@ -56,6 +61,19 @@ export class ChunksFileUploader {
     }
   }
 
+  /**
+   * Upload file's chunks obe-by-one to file service
+   * @param {string} routingKey - routing key for rabbitMq which link queue with exchange.
+   * @param {string} chunk - file chunk in Buffer
+   * @param {number} totalChunks - number of total chunks which file was devided to
+   * @param {number} currentChunk - number of current chunk
+   * @param {number} filesCount - total number of files
+   * @param {number} currentFile - number of current file
+   * @param {UploadFile} file - current file object
+   * @param {string} filesServiceUploadFolderWithoutBasePath - part of path(smth like userIdfolder/postIdFolder) where files should be uploaded at files microservice. It will be composed with base uplods path
+   * @param {string} uploadServiceUrl - full path to files service
+   * @returns {Promise<void>}
+   */
   private async uploadChunk(
     routingKey: FilesRoutingKeys,
     chunk: string,
@@ -67,7 +85,7 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    // todo upload chunk to posts microservice
+    // upload chunk to files microservice
     const pathToFile = [
       filesServiceUploadFolderWithoutBasePath,
       file.originalname,
@@ -93,7 +111,12 @@ export class ChunksFileUploader {
       this.httpService.post(uploadServiceUrl, chunkedFileDto),
     );
   }
-  // todo! need to pass CHUNKS_DIR and UPLOAD_DIR
+
+  /**
+   * Get chunks at file service, save them to disk, then when all chunks will be delivered(currentChunk===totalChunks) - starts the proccess of composing this chunked file to single file using assembleChunks method
+   * @param {ChunkedFileDto} chunkedFileDto - file: ChunkedFileDto type
+   * @returns {Promise<void>}
+   */
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
     const CHUNKS_DIR = 'apps/files/src/features/files/chunks/avatars';
     const UPLOAD_DIR = 'apps/files/src/features/files/uploads';
@@ -135,7 +158,7 @@ export class ChunksFileUploader {
         ].join('/'),
         'w',
       );
-      // todo write chunk to file
+      // write chunk to file
       const writable = writableChunk.createWriteStream();
 
       await pipeline(stream, writable);
@@ -165,6 +188,14 @@ export class ChunksFileUploader {
     }
   }
 
+  /**
+   * compose chunked file to single file, on success delete folder with chunks
+   * @param {string} filename - filename
+   * @param {number} totalChunks - number of total chunks which file was devided to
+   * @param {string} chunksDirPath - path to dir with chunks which should be deleted after end of composing chunks to the file
+   * @param {string} uploadsPath - path to file service where the file must be uploaded
+   * @returns {Promise<void>}
+   */
   private async assembleChunks(
     filename: string,
     totalChunks: number,
@@ -172,8 +203,7 @@ export class ChunksFileUploader {
     uploadsPath: string,
   ): Promise<void> {
     try {
-      // todo write chunk files to file
-      // await this.createFolderIfNotExists(uploadsPath);
+      // write chunk files to file
       const file = await fs.open(`${uploadsPath}`, 'w');
       const writer = file.createWriteStream();
 
@@ -194,8 +224,6 @@ export class ChunksFileUploader {
         await fs.unlink(chunkPath);
       }
       writer.end();
-      // todo check error
-      // throw new Error();
       await fs.rm(chunksDirPath, { recursive: true });
     } catch (error) {
       await fs.rm(chunksDirPath, { recursive: true });

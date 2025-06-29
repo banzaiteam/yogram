@@ -61,6 +61,28 @@ export class UsersController {
     this.usersEmmiter = new EventEmmiter();
   }
 
+  @Get('users/sse-avatar')
+  avatarUploaded(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+      this.usersEmmiter.on(SseUsersEvents.AvatarUploaded, (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('🚀 ~ UsersController ~ users/sse-avatar ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
+
   @Get('users/login/:email')
   async userLogin(@Param() email: string): Promise<ResponseLoginDto | null> {
     return await this.queryBus.execute(new UserLoginQuery(email['email']));
@@ -173,7 +195,10 @@ export class UsersController {
     const updatedUser = await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, { url: payload.url }),
     );
-    this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, updatedUser);
+    this.usersEmmiter.emit(SseUsersEvents.AvatarUploaded, {
+      id: updatedUser.id,
+      url: updatedUser.url,
+    });
   }
 
   @Post('users/google')
@@ -183,27 +208,5 @@ export class UsersController {
     return await this.commandBus.execute(
       new CreateUserGoogleCommand(googleSignupDto),
     );
-  }
-
-  @Get('users/sse-avatar')
-  avatarUploaded(@Req() req: Request, @Res() res: Response) {
-    try {
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      });
-      res.flushHeaders();
-      this.usersEmmiter.on(SseUsersEvents.AvatarUploaded, (data) => {
-        res.write(`data: ${JSON.stringify(data)}\n\n`);
-      });
-
-      req.on('close', () => {
-        res.end();
-      });
-    } catch (error) {
-      console.log('🚀 ~ UsersController ~ users/sse-avatar ~ error:', error);
-      res.write(`data: ${error}\n\n`);
-    }
   }
 }

@@ -94,7 +94,7 @@ export class PostsController {
 
   @SseCancelTokenSwagger()
   @Get('sse-cancel-token')
-  getCancelToken(@Req() req: Request, @Res() res: Response) {
+  async getCancelToken(@Req() req: Request, @Res() res: Response) {
     try {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
@@ -103,9 +103,17 @@ export class PostsController {
       });
       res.flushHeaders();
 
-      this.postEmitter.on(SsePostsEvents.CancelToken, (data) => {
-        res.write(`data: ${JSON.stringify(data)}\n\n`);
-      });
+      const microserviceResponse = await axios.get(
+        [
+          this.configService.get('POSTS_SERVICE_URL'),
+          'posts/sse-cancel-token',
+        ].join('/'),
+        {
+          headers: { ...req.headers },
+          responseType: 'stream',
+        },
+      );
+      microserviceResponse.data.pipe(res);
 
       req.on('close', () => {
         res.end();
@@ -132,10 +140,6 @@ export class PostsController {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const postid = v4();
-      this.postEmitter.emit(SsePostsEvents.CancelToken, {
-        userId: id,
-        postId: postid,
-      });
       const microserviceResponse = await axios.post(
         [
           this.configService.get('POSTS_SERVICE_URL'),

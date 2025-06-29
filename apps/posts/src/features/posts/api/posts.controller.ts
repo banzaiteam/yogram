@@ -64,6 +64,29 @@ export class PostsController {
     this.postEmmiter = new EventEmmiter();
   }
 
+  @Get('posts/sse-cancel-token')
+  getCancelToken(@Req() req: Request, @Res() res: Response) {
+    try {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      });
+      res.flushHeaders();
+
+      this.postEmmiter.on(SsePostsEvents.CancelToken, (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      });
+
+      req.on('close', () => {
+        res.end();
+      });
+    } catch (error) {
+      console.log('PostsController ~ sse-cancel-token ~ error:', error);
+      res.write(`data: ${error}\n\n`);
+    }
+  }
+
   @Get('posts/sse-file')
   fileUploaded(@Req() req: Request, @Res() res: Response) {
     try {
@@ -141,7 +164,7 @@ export class PostsController {
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
-      new CreatePostCommand(createPostDto, files),
+      new CreatePostCommand(createPostDto, files, this.postEmmiter),
     );
   }
 
