@@ -5,7 +5,7 @@ import {
   ApiProduces,
   ApiResponse,
 } from '@nestjs/swagger';
-import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
+import { UserAvatarDto } from '../../../../../../apps/libs/Users/dto/user/user-avatar.dto';
 
 export const SseAvatarSwagger = () =>
   applyDecorators(
