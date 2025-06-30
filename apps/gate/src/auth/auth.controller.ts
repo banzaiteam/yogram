@@ -71,7 +71,7 @@ export class AuthController {
     const date = new Date();
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'none',
+      // sameSite: 'none',
       secure: false,
       maxAge: 120000,
       expires: new Date(
