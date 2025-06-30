@@ -50,7 +50,11 @@ export class AuthController {
   @Public()
   @Get('logout2')
   async logout2(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      expires: this.configService.get('REFRESH_TOKEN_EXPIRES'),
+    });
   }
 
   @Public()
@@ -69,14 +73,14 @@ export class AuthController {
       req.ip,
     );
     const date = new Date();
-    const ddd = new Date(date.getTime() + 86400000 * 2);
-    console.log('🚀 ~ AuthController ~ ddd:', ddd);
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
       secure: true,
-      // maxAge: 120000,
-      expires: new Date(date.getTime() + 86400000 * 2),
+      maxAge: this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      // expires: new Date(
+      //   date.getTime() + this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      // ),
     });
     return { accessToken };
   }
