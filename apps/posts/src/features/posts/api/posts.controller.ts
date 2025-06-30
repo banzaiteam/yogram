@@ -125,7 +125,7 @@ export class PostsController {
             null,
             await getUploadPath(
               FileTypes.Posts,
-              'apps/posts/src/features/posts/uploads/posts',
+              '/home/node/dist/posts/src/features/posts/uploads/posts',
               req,
             ),
           );

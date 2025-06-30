@@ -12,10 +12,10 @@ USER node
 # Create app directory (with user `node`)
 RUN mkdir -p /home/node/dist/${SERVICE}
 
-RUN mkdir apps/posts/src/features/posts/uploads/posts
-VOLUME apps/posts/src/features/posts/uploads/posts
-
 WORKDIR /home/node/dist/${SERVICE}
+
+RUN mkdir -p /home/node/dist/posts/src/features/posts/uploads/posts
+VOLUME /home/node/dist/posts/src/features/posts/uploads/posts
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
