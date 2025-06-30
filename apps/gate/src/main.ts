@@ -31,7 +31,7 @@ async function bootstrap() {
       'User-Agent',
       'x-recaptcha-token',
     ],
-    exposedHeaders: ['Set-cookie'],
+    // exposedHeaders: ['Set-cookie'],
 
     origin: [
       'https://yogram.ru',

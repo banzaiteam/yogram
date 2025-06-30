@@ -47,11 +47,11 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Public()
-  @Get('logout2')
-  async logout2(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true });
-  }
+  // @Public()
+  // @Get('logout2')
+  // async logout2(@Res({ passthrough: true }) res: Response) {
+  //   res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+  // }
 
   @Public()
   @UseGuards(LoginGuard)
