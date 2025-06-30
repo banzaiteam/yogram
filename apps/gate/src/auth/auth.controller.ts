@@ -54,7 +54,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      maxAge: 60000,
     });
   }
 
