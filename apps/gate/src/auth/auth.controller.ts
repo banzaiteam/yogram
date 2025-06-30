@@ -53,7 +53,8 @@ export class AuthController {
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
-      expires: this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      sameSite: 'none',
+      maxAge: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
   }
 
