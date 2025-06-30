@@ -69,9 +69,11 @@ export class AuthController {
       req.ip,
     );
     const date = new Date();
+    const ddd = new Date(date.getTime() + 86400000 * 2);
+    console.log('🚀 ~ AuthController ~ ddd:', ddd);
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      // sameSite: 'none',
+      sameSite: 'none',
       secure: false,
       // maxAge: 120000,
       expires: new Date(date.getTime() + 86400000 * 2),
