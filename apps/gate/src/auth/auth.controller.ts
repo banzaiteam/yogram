@@ -53,7 +53,7 @@ export class AuthController {
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
-      // sameSite: 'none',
+      sameSite: 'none',
       maxAge: 0,
     });
   }
