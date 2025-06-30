@@ -33,4 +33,4 @@ RUN yarn build:${SERVICE}
 
 EXPOSE ${PORT}
 
-CMD yarn 'start:posts'
+CMD yarn 'start:files'
