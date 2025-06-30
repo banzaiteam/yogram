@@ -73,10 +73,8 @@ export class AuthController {
       httpOnly: true,
       // sameSite: 'none',
       secure: false,
-      maxAge: 120000,
-      // expires: new Date(
-      //   date.getTime() + this.configService.get('REFRESH_TOKEN_EXPIRES'),
-      // ),
+      // maxAge: 120000,
+      expires: new Date(date.getTime() + 86400000 * 2),
     });
     return { accessToken };
   }
