@@ -25,6 +25,8 @@ export class CreatePostCommandHandler
     files,
     postEmitter,
   }: CreatePostCommand): Promise<void> {
+    console.log('BUCKET = ', this.configService.get('BUCKET'));
+
     await this.postCommandService.create(
       createPostDto,
       files,

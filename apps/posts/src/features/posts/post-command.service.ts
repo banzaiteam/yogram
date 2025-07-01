@@ -201,14 +201,14 @@ export class PostCommandService {
     bucketName: string,
   ): Promise<void> {
     // postsDeleteOutBox init
-    let postsDeleteOutBoxModel = this.postsDeleteOutboxRepo.create({
-      id: postId,
-      bucketName,
-      pathToFiles: filesServiceUploadFolderWithoutBasePath,
-    });
-    postsDeleteOutBoxModel = await this.postsDeleteOutboxRepo.save(
-      postsDeleteOutBoxModel,
-    );
+    // let postsDeleteOutBoxModel = this.postsDeleteOutboxRepo.create({
+    //   id: postId,
+    //   bucketName,
+    //   pathToFiles: filesServiceUploadFolderWithoutBasePath,
+    // });
+    // postsDeleteOutBoxModel = await this.postsDeleteOutboxRepo.save(
+    //   postsDeleteOutBoxModel,
+    // );
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -227,11 +227,11 @@ export class PostCommandService {
     } finally {
       await queryRunner.release();
       // post entity was deleted successfully
-      postsDeleteOutBoxModel.entityDeleted = true;
-      await this.postsDeleteOutboxRepo.update(
-        postsDeleteOutBoxModel.id,
-        postsDeleteOutBoxModel,
-      );
+      // postsDeleteOutBoxModel.entityDeleted = true;
+      // await this.postsDeleteOutboxRepo.update(
+      //   postsDeleteOutBoxModel.id,
+      //   postsDeleteOutBoxModel,
+      // );
     }
     try {
       const result = await firstValueFrom(
@@ -244,11 +244,11 @@ export class PostCommandService {
       );
       // all files deleted
       if (result.data) {
-        postsDeleteOutBoxModel.filesDeleted = true;
-        await this.postsDeleteOutboxRepo.update(
-          postsDeleteOutBoxModel.id,
-          postsDeleteOutBoxModel,
-        );
+        // postsDeleteOutBoxModel.filesDeleted = true;
+        // await this.postsDeleteOutboxRepo.update(
+        //   postsDeleteOutBoxModel.id,
+        //   postsDeleteOutBoxModel,
+        // );
       }
     } catch (err) {
       if (
