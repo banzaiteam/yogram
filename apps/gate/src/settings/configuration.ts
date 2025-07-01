@@ -61,5 +61,7 @@ export const getConfiguration = () => {
     REDIS_USER: process.env.REDIS_USER,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     BUCKET: process.env.BUCKET,
+    POSTS_SERVICE_URL: process.env.POSTS_SERVICE_URL,
+    USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
   };
 };

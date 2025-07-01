@@ -20,5 +20,8 @@ export const getConfiguration = () => {
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT || process.env.POSTS_PORT,
     RMQ_URL: process.env.RMQ_URL,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
+    AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
   };
 };
