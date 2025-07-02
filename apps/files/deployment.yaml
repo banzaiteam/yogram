@@ -22,23 +22,133 @@ spec:
              - containerPort: PORT_CONTAINER
 
            env:
-             - name: AWS_SECRET_KEY
+             - name: USERS_PROD_SERVICE_URL
                valueFrom:
                  secretKeyRef:
-                   name: files-yogram-production-config-secret
-                   key: AWS_SECRET_KEY
-             - name: AWS_REGION
+                   name: gate-yogram-production-config-secret
+                   key: USERS_PROD_SERVICE_URL
+             - name: JWT_SECRET
                valueFrom:
                  secretKeyRef:
-                   name: files-yogram-production-config-secret
-                   key: AWS_REGION
+                   name: gate-yogram-production-config-secret
+                   key: JWT_SECRET
+             - name: VERIFY_TOKEN_EXPIRES
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: VERIFY_TOKEN_EXPIRES
+             - name: ACCESS_TOKEN_EXPIRES
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: ACCESS_TOKEN_EXPIRES
+             - name: REFRESH_TOKEN_EXPIRES
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: REFRESH_TOKEN_EXPIRES
+             - name: RESEND_EMAIL_VERIFY_PAGE
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: RESEND_EMAIL_VERIFY_PAGE
+             - name: SEND_RESTORE_PASSWORD_EMAIL_PAGE
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: SEND_RESTORE_PASSWORD_EMAIL_PAGE
+             - name: RESTORE_PASSWORD_PAGE
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: RESTORE_PASSWORD_PAGE
+             - name: LOGIN_PAGE
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: LOGIN_PAGE
+             - name: RECAPTCHA_HOSTNAME
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: RECAPTCHA_HOSTNAME
+             - name: RECAPTCHA_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: RECAPTCHA_URL
+             - name: RECAPTCHA_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: RECAPTCHA_SECRET_KEY
+             - name: GOOGLE_OAUTH_URI
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: GOOGLE_OAUTH_URI
+             - name: GOOGLE_CLIENT_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: GOOGLE_CLIENT_ID
+             - name: GOOGLE_CLIENT_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: GOOGLE_CLIENT_SECRET
+             - name: GOOGLE_REDIRECT_URI
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: GOOGLE_REDIRECT_URI
              - name: RMQ_URL
                valueFrom:
                  secretKeyRef:
-                   name: files-yogram-production-config-secret
+                   name: gate-yogram-production-config-secret
                    key: RMQ_URL
-             - name: AWS_ACCESS_KEY
+             - name: FORGOT_PASSWORD_TOKEN_EXPIRES
                valueFrom:
                  secretKeyRef:
-                   name: files-yogram-production-config-secret
-                   key: AWS_ACCESS_KEY
+                   name: gate-yogram-production-config-secret
+                   key: FORGOT_PASSWORD_TOKEN_EXPIRES
+             - name: POSTS_PROD_SERVICE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: POSTS_PROD_SERVICE_URL
+             - name: REDIS_USER
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: REDIS_USER
+             - name: REDIS_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: REDIS_PASSWORD
+             - name: REDIS_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: REDIS_HOST
+             - name: REDIS_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: REDIS_PORT
+             - name: USERS_SERVICE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: USERS_SERVICE_URL
+             - name: POSTS_SERVICE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: POSTS_SERVICE_URL
+             - name: NODE_ENV
+               valueFrom:
+                 secretKeyRef:
+                   name: gate-yogram-production-config-secret
+                   key: NODE_ENV
