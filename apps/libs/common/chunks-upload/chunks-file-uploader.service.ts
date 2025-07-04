@@ -114,7 +114,10 @@ export class ChunksFileUploader {
     console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
     await firstValueFrom(
-      this.httpService.post(uploadServiceUrl, chunkedFileDto),
+      this.httpService.post(
+        'http://files-yogram-service.yogram-ru:3927/api/v1/files/upload',
+        chunkedFileDto,
+      ),
     );
   }
 
