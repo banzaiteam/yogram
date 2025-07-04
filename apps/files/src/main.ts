@@ -9,7 +9,6 @@ async function bootstrap() {
   const { port, env, host } = applyAppSettings(app);
   app.useBodyParser('json', { limit: '150mb' });
   app.useBodyParser('urlencoded', { limit: '150mb', extended: true });
-  console.log('🚀 ~ bootstrap ~ port:', port);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await app.listen(process.env.port ?? 3005);

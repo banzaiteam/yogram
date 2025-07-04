@@ -6,6 +6,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { UploadFile } from './interfaces/upload-file.interface';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import axios from 'axios';
 
 @Injectable()
 export class ChunksFileUploader {
@@ -113,12 +114,12 @@ export class ChunksFileUploader {
     };
     console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
-    await firstValueFrom(
-      this.httpService.post(
-        'http://files-yogram-service.yogram-ru:3927/api/v1/files/upload',
-        chunkedFileDto,
-      ),
+    // await firstValueFrom(
+    await axios.post(
+      'http://files-yogram-service.yogram-ru:3927/api/v1/files/upload',
+      chunkedFileDto,
     );
+    // );
   }
 
   /**
