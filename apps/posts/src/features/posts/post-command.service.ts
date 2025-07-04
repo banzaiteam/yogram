@@ -67,6 +67,7 @@ export class PostCommandService {
         createPostDto,
         queryRunner.manager,
       );
+      console.log('🚀 ~ PostCommandService ~ post:', post);
       postEmitter.emit(SsePostsEvents.CancelToken, {
         userId: post.userId,
         postId: post.id,

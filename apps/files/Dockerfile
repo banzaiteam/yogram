@@ -16,8 +16,8 @@ WORKDIR /home/node/dist/${SERVICE}
 RUN mkdir -p /home/node/dist/files/src/features/files/chunks
 VOLUME /home/node/dist/files/src/features/files/chunks
 
-RUN mkdir -p /home/node/dist/files/src/features/files/uploads
-VOLUME /home/node/dist/files/src/features/files/uploads
+RUN mkdir -p /home/node/dist/files/src/features/files/uploads/posts
+VOLUME /home/node/dist/files/src/features/files/uploads/posts
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
