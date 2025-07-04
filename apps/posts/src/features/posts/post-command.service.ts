@@ -127,7 +127,7 @@ export class PostCommandService {
 
     try {
       const uploadServiceUrl = [
-        this.configService.get('FILES_SERVICE_URL'),
+        'http://files-yogram-service.yogram-ru:3927/api/v1',
         HttpFilesPath.Upload,
       ].join('/');
 
