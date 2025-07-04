@@ -20,6 +20,7 @@ export class PostCommandRepository
     postDto: CreatePostDto,
     entityManager?: EntityManager,
   ): Promise<Post> {
+    console.log('🚀 ~ postDto:', postDto);
     // todo you should use this queryRunner.manager(entityManager) on save operations because without it typeorm transactions does not work
     const post = new Post({
       id: postDto.postId,

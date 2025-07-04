@@ -54,6 +54,9 @@ export class PostCommandService {
     bucketName: string,
     postEmitter: EventEmitter,
   ): Promise<void> {
+    console.log('🚀 ~ PostCommandService ~ bucketName:', bucketName);
+    console.log('🚀 ~ PostCommandService ~ createPostDto:', createPostDto);
+    console.log('🚀 ~ PostCommandService ~ files:', files);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
