@@ -28,7 +28,7 @@ export class DeletePostCommandHandler
       postId,
       folderPath,
       deleteServiceUrl,
-      this.configService.get('BUCKET'),
+      'yogram-files',
     );
   }
 }

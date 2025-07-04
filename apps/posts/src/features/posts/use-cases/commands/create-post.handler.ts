@@ -31,7 +31,7 @@ export class CreatePostCommandHandler
     await this.postCommandService.create(
       createPostDto,
       files,
-      this.configService.get('BUCKET'),
+      'yogram-files',
       postEmitter,
     );
   }
