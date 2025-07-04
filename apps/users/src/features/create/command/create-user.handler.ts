@@ -35,7 +35,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     } else {
       const user = await this.usersCommandService.createUser(
         createUserDto,
-        'yogram-files',
+        this.configService.get('BUCKET'),
         file,
       );
       userVerifyEmailDto = {

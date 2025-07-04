@@ -24,11 +24,12 @@ export class DeletePostCommandHandler
       this.configService.get('FILES_SERVICE_URL'),
       HttpFilesPath.Delete,
     ].join('/');
+    console.log('🚀 ~ execute ~ deleteServiceUrl:', deleteServiceUrl);
     await this.postCommandService.deletePostWithFiles(
       postId,
       folderPath,
       deleteServiceUrl,
-      'yogram-files',
+      this.configService.get('BUCKET'),
     );
   }
 }

@@ -89,7 +89,8 @@ export class PostCommandService {
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
           // todo? make env variable
-          filesUploadBaseDir: 'apps/files/src/features/files/uploads/posts',
+          filesUploadBaseDir:
+            '/home/node/dist/files/src/features/files/uploads/posts',
           fieldname: file.fieldname,
           mimetype: file.mimetype,
           size: file.size,
@@ -127,7 +128,7 @@ export class PostCommandService {
 
     try {
       const uploadServiceUrl = [
-        'http://files-yogram-service.yogram-ru:3927/api/v1',
+        this.configService.get('FILES_SERVICE_URL'),
         HttpFilesPath.Upload,
       ].join('/');
 

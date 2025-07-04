@@ -25,8 +25,6 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   }
   return defaultEnvFilePath;
 };
-console.log('AT POSTS MODULE...');
-
 @Module({
   imports: [
     PostsModule,
