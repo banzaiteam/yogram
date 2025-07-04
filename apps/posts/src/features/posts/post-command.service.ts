@@ -120,6 +120,11 @@ export class PostCommandService {
       await queryRunner.release();
     }
 
+    console.log(
+      'fiels service url ===',
+      this.configService.get('FILES_SERVICE_URL'),
+    );
+
     try {
       const uploadServiceUrl = [
         this.configService.get('FILES_SERVICE_URL'),
