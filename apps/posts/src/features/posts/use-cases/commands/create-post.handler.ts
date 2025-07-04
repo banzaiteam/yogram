@@ -26,7 +26,7 @@ export class CreatePostCommandHandler
     postEmitter,
   }: CreatePostCommand): Promise<void> {
     console.log('BUCKET = ', this.configService.get('BUCKET'));
-    console.log('POSTGRES_URL = ', this.configService.get('POSTGRES_URL'));
+    console.log('POSTGRES_URL = ', this.configService.get('RMQ_URL'));
 
     await this.postCommandService.create(
       createPostDto,
