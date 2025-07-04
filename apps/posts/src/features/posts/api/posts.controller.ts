@@ -51,6 +51,7 @@ import EventEmmiter from 'events';
 import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
 import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
 import { DeletePostEvent } from '../use-cases/events/delete-post.event';
+import fs from 'fs/promises';
 
 @Controller()
 export class PostsController {
@@ -161,6 +162,10 @@ export class PostsController {
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<PostResponse> {
+    const filesInDir = await fs.readdir(
+      '/home/node/dist/posts/src/features/posts/uploads/posts',
+    );
+    console.log('🚀 ~ PostsController ~ filesInDir:', filesInDir);
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
