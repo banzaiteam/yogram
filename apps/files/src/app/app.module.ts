@@ -6,7 +6,7 @@ import {
 
 import { ConfigModule } from '@nestjs/config';
 import { getConfiguration } from '../settings/configuration';
-import { FilesModule } from '../features/files/files.module';
+import { FilesModule } from '../files.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
