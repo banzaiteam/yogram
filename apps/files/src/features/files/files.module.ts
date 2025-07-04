@@ -18,22 +18,20 @@ import {
 
 @Module({
   imports: [
-    // HttpModule,
-    // UploadProvidersModule,
-    // CqrsModule,
-    // RabbitProducerModule.register(['posts']),
+    HttpModule,
+    UploadProvidersModule,
+    CqrsModule,
+    RabbitProducerModule.register(['posts']),
   ],
-  controllers: [
-    // FilesController
-  ],
+  controllers: [FilesController],
   providers: [
-    // DeleteFilesCommand,
-    // DeleteFilesCommandHandler,
-    // FilesCommandService,
-    // ChunksFileUploader,
-    // GateService,
-    // UploadFilesCommand,
-    // UploadFilesCommandHandler,
+    DeleteFilesCommand,
+    DeleteFilesCommandHandler,
+    FilesCommandService,
+    ChunksFileUploader,
+    GateService,
+    UploadFilesCommand,
+    UploadFilesCommandHandler,
   ],
 })
 export class FilesModule {}
