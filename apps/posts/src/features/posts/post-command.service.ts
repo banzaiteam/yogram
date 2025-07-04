@@ -169,7 +169,10 @@ export class PostCommandService {
         await fs.rm(files[0].destination, { recursive: true });
       })
       .catch(async (err) => {
-        console.log(err.response?.data?.message);
+        console.log(
+          'error in sendFilesToFilesServiceAndDeleteTempFilesAfter = ',
+          err.response?.data?.message,
+        );
         // delete post with uploaded files during error
         await this.eventBus.publish(new DeletePostEvent(userId, postId));
         // delete local files during error

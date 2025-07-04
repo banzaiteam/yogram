@@ -85,11 +85,16 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ uploadServiceUrl:',
+      uploadServiceUrl,
+    );
     // upload chunk to files microservice
     const pathToFile = [
       filesServiceUploadFolderWithoutBasePath,
       file.originalname,
     ].join('/');
+    console.log('🚀 ~ ChunksFileUploader ~ pathToFile:', pathToFile);
     const chunkedFileDto: ChunkedFileDto = {
       bucketName: file.bucketName,
       routingKey,
@@ -106,6 +111,7 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
+    console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
     await firstValueFrom(
       this.httpService.post(uploadServiceUrl, chunkedFileDto),
