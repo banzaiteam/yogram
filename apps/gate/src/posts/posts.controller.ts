@@ -46,8 +46,7 @@ import { CancelUploadDto } from '../../../../apps/libs/Posts/dto/input/cancel-up
 import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swagger.decorator';
 import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
-import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 
 @ApiTags('Posts')
 @Controller('posts')
