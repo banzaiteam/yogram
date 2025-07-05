@@ -46,6 +46,8 @@ import { CancelUploadDto } from '../../../../apps/libs/Posts/dto/input/cancel-up
 import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swagger.decorator';
 import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
+import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -216,10 +218,12 @@ export class PostsController {
     return await this.postsService.update(id, updatePostDto);
   }
 
-  @Get('test')
+  @Get('files/test')
   test() {
-    return this.httpService.get(
-      'http://files-yogram-service.yogram-ru:3930/api/v1/files/test',
+    return this.gateService.requestHttpServiceGet(
+      HttpServices.Files,
+      'files/test',
+      {},
     );
   }
 }
