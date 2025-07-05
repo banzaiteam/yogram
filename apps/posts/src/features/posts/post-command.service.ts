@@ -123,7 +123,7 @@ export class PostCommandService {
     }
 
     console.log(
-      'fiels service url ===',
+      'fiels service url1 ===',
       this.configService.get('FILES_SERVICE_URL'),
     );
 
