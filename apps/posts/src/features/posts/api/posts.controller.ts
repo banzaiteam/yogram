@@ -208,6 +208,10 @@ export class PostsController {
   async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
+    console.log(
+      '🚀 ~ PostsController ~ updateCreatedPost ~ folderPath:',
+      folderPath,
+    );
     const criteria = {
       id: folderPath,
       fileid: payload['fileId'],

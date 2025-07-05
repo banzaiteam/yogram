@@ -10,14 +10,10 @@ export class FilesController {
   constructor(
     private readonly chunksFileUploader: ChunksFileUploader,
     private readonly commandBus: CommandBus,
-  ) {
-    console.log('files controller constructor...');
-  }
+  ) {}
 
   @Post('files/upload')
   async uploadFile(@Body() chunkedFileDto: ChunkedFileDto) {
-    console.log('@Post(files/upload)');
-
     await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
     if (
       chunkedFileDto.metadata.currentChunk ===
@@ -38,11 +34,5 @@ export class FilesController {
     return await this.commandBus.execute(
       new DeleteFilesCommand(folder, bucket),
     );
-  }
-
-  @Get('files/test')
-  test() {
-    console.log('files/test');
-    return 'answer';
   }
 }

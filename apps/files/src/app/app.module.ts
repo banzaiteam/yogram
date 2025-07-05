@@ -13,8 +13,6 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/files/src/.env.development',
     'apps/files/src/.env',
   ];
-  console.log('at getEnvFilePath.....');
-
   if (env === EnvironmentMode.TESTING) {
     return ['apps/files/src/.env.test', ...defaultEnvFilePath];
   }

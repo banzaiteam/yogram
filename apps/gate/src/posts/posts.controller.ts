@@ -216,13 +216,4 @@ export class PostsController {
     };
     return await this.postsService.update(id, updatePostDto);
   }
-
-  @Get('files/test')
-  test() {
-    return this.gateService.requestHttpServiceGet(
-      HttpServices.Files,
-      'files/test',
-      {},
-    );
-  }
 }

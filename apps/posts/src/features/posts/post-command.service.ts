@@ -195,7 +195,6 @@ export class PostCommandService {
         updatePostDto,
         queryRunner.manager,
       );
-      console.log('🚀 ~ PostCommandService ~ saved:', saved);
       await queryRunner.commitTransaction();
       return saved;
     } catch (error) {

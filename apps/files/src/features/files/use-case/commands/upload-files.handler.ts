@@ -19,11 +19,13 @@ export class UploadFilesCommandHandler
   ) {}
 
   async execute({ chunkedFileDto }: UploadFilesCommand): Promise<any> {
+    console.log('🚀 ~ execute ~ chunkedFileDto:', chunkedFileDto);
     try {
       const response = await this.filesCommandService.uploadFiles(
         chunkedFileDto,
         AwsBuckets.Files,
       );
+      console.log('🚀 ~ execute ~ response:', response);
       const delPath = [
         chunkedFileDto.filesUploadBaseDir,
         response.folderPath,
