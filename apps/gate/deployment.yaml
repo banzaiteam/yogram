@@ -152,8 +152,8 @@ spec:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
                   key: FILES_SERVICE_URL
-            - name: NODE_ENV
+            - name: FILES_PROD_SERVICE_URL
               valueFrom:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
-                  key: NODE_ENV
+                  key: FILES_PROD_SERVICE_URL

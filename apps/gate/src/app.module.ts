@@ -19,6 +19,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/gate/src/.env.development',
     'apps/gate/src/.env',
   ];
+  console.log('in getEnvFilePath....');
+
   if (env === EnvironmentMode.TESTING) {
     return ['apps/gate/src/.env.test', ...defaultEnvFilePath];
   }
@@ -94,4 +96,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}
