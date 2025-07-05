@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ChunksFileUploader } from '../../../../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { ChunkedFileDto } from '../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 import { CommandBus } from '@nestjs/cqrs';
@@ -36,5 +36,11 @@ export class FilesController {
     return await this.commandBus.execute(
       new DeleteFilesCommand(folder, bucket),
     );
+  }
+
+  @Get('files/test')
+  test() {
+    console.log('files/test');
+    return 'answer';
   }
 }

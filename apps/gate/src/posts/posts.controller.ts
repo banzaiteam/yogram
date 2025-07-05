@@ -215,4 +215,11 @@ export class PostsController {
     };
     return await this.postsService.update(id, updatePostDto);
   }
+
+  @Get('test')
+  test() {
+    return this.httpService.get(
+      'http://files-yogram-service.yogram-ru:3930/api/v1/files/test',
+    );
+  }
 }
