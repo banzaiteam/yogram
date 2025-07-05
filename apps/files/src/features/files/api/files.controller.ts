@@ -10,7 +10,9 @@ export class FilesController {
   constructor(
     private readonly chunksFileUploader: ChunksFileUploader,
     private readonly commandBus: CommandBus,
-  ) {}
+  ) {
+    console.log('files controller constructor...');
+  }
 
   @Post('files/upload')
   async uploadFile(@Body() chunkedFileDto: ChunkedFileDto) {
