@@ -116,7 +116,7 @@ export class ChunksFileUploader {
 
     // await firstValueFrom(
     await axios.post(
-      'http://files-yogram-service.yogram-ru:3927/api/v1/files/upload',
+      'http://files-yogram-service.yogram-ru:3930/api/v1/files/upload',
       chunkedFileDto,
     );
     // );
