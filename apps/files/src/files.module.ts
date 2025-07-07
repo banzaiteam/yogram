@@ -21,7 +21,7 @@ import {
     HttpModule,
     UploadProvidersModule,
     CqrsModule,
-    RabbitProducerModule.register(['posts']),
+    RabbitProducerModule.register(['posts', 'files']),
   ],
   controllers: [FilesController],
   providers: [

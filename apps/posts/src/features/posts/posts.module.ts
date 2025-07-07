@@ -53,7 +53,7 @@ import { PostSagas } from '../sagas/post.saga';
     CqrsModule,
     MulterModule.register({}),
     RabbitConsumerModule.register([
-      { posts: [FilesBindingKeysEnum.Files_Uploaded_Many] },
+      { posts: [FilesBindingKeysEnum.Files_Uploaded_Posts] },
     ]),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Post, File, PostsDeleteOubox]),

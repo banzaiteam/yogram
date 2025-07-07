@@ -3,6 +3,7 @@ import { IQueueBindings } from 'apps/libs/common/message-brokers/interfaces/queu
 export enum FilesBindingKeysEnum {
   Files_Uploaded_One = 'files.uploaded.*',
   Files_Uploaded_Many = 'files.uploaded.#',
+  Files_Uploaded_Posts = 'files.uploaded.posts',
 }
 
 export const filesQueuesBindings: IQueueBindings[] = [
