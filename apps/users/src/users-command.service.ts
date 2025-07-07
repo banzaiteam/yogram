@@ -90,7 +90,7 @@ export class UsersCommandService {
         const uploadFile: UploadFile[] = [
           {
             fileType: FileTypes.Avatars,
-            filesUploadBaseDir: 'apps/files/src/features/files/uploads/avatars',
+            filesUploadBaseDir: '/home/node/dist/users/src/uploads/avatars',
             fieldname: file[0].fieldname,
             mimetype: file[0].mimetype,
             size: file[0].size,
@@ -101,11 +101,16 @@ export class UsersCommandService {
             bucketName,
           },
         ];
+        console.log('🚀 ~ UsersCommandService ~ uploadFile:', uploadFile);
 
         const uploadServiceUrl = [
           this.configService.get('FILES_SERVICE_URL'),
           HttpFilesPath.Upload,
         ].join('/');
+        console.log(
+          '🚀 ~ UsersCommandService ~ uploadServiceUrl:',
+          uploadServiceUrl,
+        );
 
         this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
           createUserDto.id,
