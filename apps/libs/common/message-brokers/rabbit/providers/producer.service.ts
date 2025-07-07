@@ -28,6 +28,7 @@ export class ProducerService {
   }
 
   public async emit(event: IEvent, exchange: string = 'exchange1') {
+    console.log('🚀 ~ ProducerService ~ emit ~ event:', event);
     const content = event;
     return await this.channelWrapper.publish(
       exchange,
