@@ -12,9 +12,7 @@ import {
   Req,
   Res,
   UploadedFile,
-  UploadedFiles,
   UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -39,7 +37,7 @@ import {
   getUploadPath,
 } from '../../../apps/gate/src/posts/helper';
 import { diskStorage } from 'multer';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { SharpPipe } from '../../../apps/libs/common/pipes/sharp.pipe';
 import { Request, Response } from 'express';
 import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
@@ -122,7 +120,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              'apps/users/src/uploads/avatars',
+              '/home/node/dist/users/src/uploads/avatars',
               req,
             ),
           );

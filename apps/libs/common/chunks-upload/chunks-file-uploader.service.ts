@@ -86,16 +86,11 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ uploadServiceUrl:',
-      uploadServiceUrl,
-    );
     // upload chunk to files microservice
     const pathToFile = [
       filesServiceUploadFolderWithoutBasePath,
       file.originalname,
     ].join('/');
-    console.log('🚀 ~ ChunksFileUploader ~ pathToFile:', pathToFile);
     const chunkedFileDto: ChunkedFileDto = {
       bucketName: file.bucketName,
       routingKey,
@@ -112,13 +107,9 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
-    console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
     // await firstValueFrom(
-    await axios.post(
-      'http://files-yogram-service.yogram-ru:3930/api/v1/files/upload',
-      chunkedFileDto,
-    );
+    await axios.post(uploadServiceUrl, chunkedFileDto);
     // );
   }
 
@@ -128,12 +119,7 @@ export class ChunksFileUploader {
    * @returns {Promise<void>}
    */
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunkedFileDto:',
-      chunkedFileDto,
-    );
     const CHUNKS_DIR = '/home/node/dist/files/src/features/files/chunks';
-    const UPLOAD_DIR = '/home/node/dist/files/src/features/files/uploads';
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
 

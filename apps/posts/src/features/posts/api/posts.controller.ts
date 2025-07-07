@@ -157,15 +157,11 @@ export class PostsController {
           }),
         ],
       }),
-      SharpPipe,
+      // SharpPipe,
     )
     files: Express.Multer.File[],
     @Req() req: Request,
   ): Promise<PostResponse> {
-    const filesInDir = await fs.readdir(
-      '/home/node/dist/posts/src/features/posts/uploads/posts',
-    );
-    console.log('🚀 ~ PostsController ~ filesInDir:', filesInDir);
     createPostDto.userId = <string>req.headers.userid;
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
@@ -208,10 +204,6 @@ export class PostsController {
   async updateCreatedPost(rtKey: string, { payload }: IEvent): Promise<void> {
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
-    console.log(
-      '🚀 ~ PostsController ~ updateCreatedPost ~ folderPath:',
-      folderPath,
-    );
     const criteria = {
       id: folderPath,
       fileid: payload['fileId'],
