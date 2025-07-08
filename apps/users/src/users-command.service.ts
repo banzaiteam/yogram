@@ -23,7 +23,7 @@ import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
 import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
 import { ChunksFileUploader } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
-import fs from 'fs/promises';
+import fs, { readdir } from 'fs/promises';
 import { HttpFilesPath } from '../../../apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
 import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
@@ -90,7 +90,8 @@ export class UsersCommandService {
         const uploadFile: UploadFile[] = [
           {
             fileType: FileTypes.Avatars,
-            filesUploadBaseDir: '/home/node/dist/users/src/uploads/avatars',
+            filesUploadBaseDir:
+              '/home/node/dist/files/src/features/files/uploads/avatar',
             fieldname: file[0].fieldname,
             mimetype: file[0].mimetype,
             size: file[0].size,
@@ -107,10 +108,6 @@ export class UsersCommandService {
           this.configService.get('FILES_SERVICE_URL'),
           HttpFilesPath.Upload,
         ].join('/');
-        console.log(
-          '🚀 ~ UsersCommandService ~ uploadServiceUrl:',
-          uploadServiceUrl,
-        );
 
         this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
           createUserDto.id,
@@ -265,6 +262,10 @@ export class UsersCommandService {
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
+        console.log(
+          'deleted avatar files after upload',
+          await readdir(files[0].destination, { recursive: true }),
+        );
       })
       .catch(async (err) => {
         console.log('error in user-command-service.........', err);
