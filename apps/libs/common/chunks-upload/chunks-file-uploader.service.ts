@@ -122,6 +122,14 @@ export class ChunksFileUploader {
     const CHUNKS_DIR = '/home/node/dist/files/src/features/files/chunks';
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunksPath:',
+      chunksPath,
+    );
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ uploadsPath:',
+      uploadsPath,
+    );
 
     await this.createFolderIfNotExists(chunksPath);
     await this.createFolderIfNotExists(
