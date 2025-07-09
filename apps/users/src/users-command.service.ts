@@ -264,7 +264,7 @@ export class UsersCommandService {
         await fs.rm(files[0].destination, { recursive: true });
         console.log(
           'deleted avatar files after upload',
-          await readdir(files[0].destination, { recursive: true }),
+          await readdir(files[0].destination),
         );
       })
       .catch(async (err) => {

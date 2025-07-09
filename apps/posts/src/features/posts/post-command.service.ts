@@ -114,7 +114,7 @@ export class PostCommandService {
       await fs.rm(files[0].destination, { recursive: true });
       console.log(
         'deleted posts files after error',
-        await readdir(files[0].destination, { recursive: true }),
+        await readdir(files[0].destination),
       );
       throw new InternalServerErrorException(
         'PostCommandService error: post was not created because of database error',
@@ -171,7 +171,7 @@ export class PostCommandService {
         await fs.rm(files[0].destination, { recursive: true });
         console.log(
           'deleted posts files after upload',
-          await readdir(files[0].destination, { recursive: true }),
+          await readdir(files[0].destination),
         );
       })
       .catch(async (err) => {
