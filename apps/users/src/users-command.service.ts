@@ -105,7 +105,7 @@ export class UsersCommandService {
         console.log('🚀 ~ UsersCommandService ~ uploadFile:', uploadFile);
 
         const uploadServiceUrl = [
-          this.configService.get('FILES_SERVICE_URL'),
+          'http://files-yogram-service.yogram-ru:3930/api/v1',
           HttpFilesPath.Upload,
         ].join('/');
 
