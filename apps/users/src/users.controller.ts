@@ -187,8 +187,10 @@ export class UsersController {
     rtKey: string,
     { payload }: IEvent,
   ): Promise<void> {
+    console.log('🚀 ~ UsersController ~ payload:', payload);
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
+    console.log('🚀 ~ UsersController ~ folderPath:', folderPath);
     const criteria = {
       id: folderPath,
     };

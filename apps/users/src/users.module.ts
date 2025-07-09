@@ -73,9 +73,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     RabbitProducerModule.register(['users']),
-    RabbitConsumerModule.register([
-      { files: [FilesBindingKeysEnum.Files_Uploaded_Many] },
-    ]),
+    RabbitConsumerModule.register([{ files: ['files.uploaded.avatars'] }]),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([User, Profile, Provider]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
