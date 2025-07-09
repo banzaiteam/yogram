@@ -262,10 +262,10 @@ export class UsersCommandService {
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
-        console.log(
-          'deleted avatar files after upload',
-          await readdir(files[0].destination),
-        );
+        // console.log(
+        //   'deleted avatar files after upload',
+        //   await readdir(files[0].destination, { recursive: true }),
+        // );
       })
       .catch(async (err) => {
         console.log('error in user-command-service.........', err);

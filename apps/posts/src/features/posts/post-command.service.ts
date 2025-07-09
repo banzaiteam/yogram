@@ -112,10 +112,10 @@ export class PostCommandService {
       await queryRunner.rollbackTransaction();
       // delete local files during error
       await fs.rm(files[0].destination, { recursive: true });
-      console.log(
-        'deleted posts files after error',
-        await readdir(files[0].destination),
-      );
+      // console.log(
+      //   'deleted posts files after error',
+      //   await readdir(files[0].destination),
+      // );
       throw new InternalServerErrorException(
         'PostCommandService error: post was not created because of database error',
       );
@@ -169,10 +169,10 @@ export class PostCommandService {
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
-        console.log(
-          'deleted posts files after upload',
-          await readdir(files[0].destination),
-        );
+        // console.log(
+        //   'deleted posts files after upload',
+        //   await readdir(files[0].destination),
+        // );
       })
       .catch(async (err) => {
         console.log(
