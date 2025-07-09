@@ -12,7 +12,7 @@ import { CreateFileDto } from '../../dto/create-file.dto';
 import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
-import fs, { readdir } from 'node:fs/promises';
+import fs from 'node:fs/promises';
 import { EventBus } from '@nestjs/cqrs';
 import { DeletePostEvent } from './use-cases/events/delete-post.event';
 import { HttpService } from '@nestjs/axios';
@@ -112,10 +112,6 @@ export class PostCommandService {
       await queryRunner.rollbackTransaction();
       // delete local files during error
       await fs.rm(files[0].destination, { recursive: true });
-      // console.log(
-      //   'deleted posts files after error',
-      //   await readdir(files[0].destination),
-      // );
       throw new InternalServerErrorException(
         'PostCommandService error: post was not created because of database error',
       );
@@ -169,10 +165,6 @@ export class PostCommandService {
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
-        // console.log(
-        //   'deleted posts files after upload',
-        //   await readdir(files[0].destination),
-        // );
       })
       .catch(async (err) => {
         console.log(

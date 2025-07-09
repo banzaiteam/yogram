@@ -105,7 +105,7 @@ export class UsersCommandService {
         console.log('🚀 ~ UsersCommandService ~ uploadFile:', uploadFile);
 
         const uploadServiceUrl = [
-          'http://files-yogram-service.yogram-ru:3930/api/v1',
+          this.configService.get('FILES_SERVICE_URL'),
           HttpFilesPath.Upload,
         ].join('/');
 
@@ -262,10 +262,6 @@ export class UsersCommandService {
     })
       .then(async () => {
         await fs.rm(files[0].destination, { recursive: true });
-        // console.log(
-        //   'deleted avatar files after upload',
-        //   await readdir(files[0].destination, { recursive: true }),
-        // );
       })
       .catch(async (err) => {
         console.log('error in user-command-service.........', err);
