@@ -157,7 +157,7 @@ export class PostsController {
           }),
         ],
       }),
-      // SharpPipe,
+      SharpPipe,
     )
     files: Express.Multer.File[],
     @Req() req: Request,
