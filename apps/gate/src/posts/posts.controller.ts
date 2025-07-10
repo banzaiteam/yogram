@@ -168,7 +168,7 @@ export class PostsController {
       // responseType: 'stream' error handle
       await new Promise((res) => {
         let streamString = '';
-        err.response.data.setEncoding('utf8');
+        // err.response.data.setEncoding('utf8');
         err.response.data
           .on('data', (utf8Chunk) => {
             streamString += utf8Chunk;
