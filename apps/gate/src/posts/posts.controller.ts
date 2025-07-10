@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -46,6 +47,7 @@ import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swa
 import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -135,11 +137,15 @@ export class PostsController {
   @CreateSwagger()
   @Post()
   async create(
-    @User('id') id: string,
+    @User() user: LoggedUserDto,
     @Req() req: Request,
     @Res() res: Response,
   ) {
     try {
+      if (!user.verified)
+        throw new BadRequestException(
+          'PostsController error: cant create post, user`s account not verified',
+        );
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const postid = v4();
       const microserviceResponse = await axios.post(
@@ -150,7 +156,7 @@ export class PostsController {
         req,
         {
           // generate uuid for posts because of multer call destination method on each uploaded file
-          headers: { ...req.headers, postid, userid: id },
+          headers: { ...req.headers, postid, userid: user.id },
           responseType: 'stream',
         },
       );

@@ -23,6 +23,11 @@ export const CreateSwagger = () =>
       description: 'post created',
     }),
     ApiResponse({
+      status: 400,
+      description:
+        'PostsController error: cant create post, user`s account not verified',
+    }),
+    ApiResponse({
       status: 500,
       description:
         'PostCommandService error: post was not created because of database error | PostCommandService error: post was not created because of files upload error',
