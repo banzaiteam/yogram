@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -48,8 +47,8 @@ export class AuthController {
   ) {}
 
   @Public()
-  @Get('logout2')
-  async logout2(@Res({ passthrough: true }) res: Response) {
+  @Get('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
@@ -113,17 +112,17 @@ export class AuthController {
 
   // pass refresh token which is the current session device
   // to logout all, front need to pass refresh in cookies, then we get userId, then rewrite redis users:token:dsfjsdfjlsdf to users:userId(sAdd) and save all sessions
-  @LogoutSwagger()
-  @SkipAuthDecorator()
-  @UseGuards(RefreshGuard)
-  @Post('logout')
-  async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
-    const currentDeviceToken = req.cookies?.refreshToken;
-    return await this.authService.deviceLogout(
-      currentDeviceToken,
-      logoutAllDto.tokens,
-    );
-  }
+  // @LogoutSwagger()
+  // @SkipAuthDecorator()
+  // @UseGuards(RefreshGuard)
+  // @Post('logout')
+  // async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
+  //   const currentDeviceToken = req.cookies?.refreshToken;
+  //   return await this.authService.deviceLogout(
+  //     currentDeviceToken,
+  //     logoutAllDto.tokens,
+  //   );
+  // }
 
   // send forgotPassword email to user email
   @Public()
