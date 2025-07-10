@@ -45,6 +45,8 @@ import {
 } from './use-cases/commands/delete-post.handler';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 import { PostSagas } from '../sagas/post.saga';
+import { CommentCommandRepository } from './infrastracture/repository/command/comment-command.repository';
+import { ICommentCommandRepository } from './interfaces/comment-command-repository.interface';
 
 @Module({
   imports: [
@@ -83,6 +85,7 @@ import { PostSagas } from '../sagas/post.saga';
     GetPostsQuery,
     GetPostsQueryHandler,
     { provide: IPostCommandRepository, useClass: PostCommandRepository },
+    { provide: ICommentCommandRepository, useClass: CommentCommandRepository },
     { provide: IFileCommandRepository, useClass: FileCommandRepository },
   ],
 })

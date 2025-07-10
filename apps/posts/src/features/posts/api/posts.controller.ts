@@ -14,7 +14,6 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
 import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -51,7 +50,8 @@ import EventEmmiter from 'events';
 import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
 import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
 import { DeletePostEvent } from '../use-cases/events/delete-post.event';
-import fs from 'fs/promises';
+import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
+import { CreateCommentCommand } from '../use-cases/commands/create-comment.handler';
 
 @Controller()
 export class PostsController {
@@ -211,6 +211,12 @@ export class PostsController {
     const updatePostDto = { url: payload['url'], status: FileStatus.Ready };
     return await this.commandBus.execute(
       new UpdatePostCommand(criteria, updatePostDto, this.postEmmiter),
+    );
+  }
+
+  async createComment(createCommentDto: CreateCommentDto) {
+    return await this.commandBus.execute(
+      new CreateCommentCommand(createCommentDto),
     );
   }
 }
