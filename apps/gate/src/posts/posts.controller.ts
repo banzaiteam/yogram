@@ -47,7 +47,7 @@ import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swa
 import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
-import { LoggedUserDto } from 'apps/libs/Users/dto/user/logged-user.dto';
+import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
