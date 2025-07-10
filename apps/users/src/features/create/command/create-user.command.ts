@@ -1,5 +1,8 @@
 import { CreateUserDto } from 'apps/libs/Users/dto/user/create-user.dto';
 
 export class CreateUserCommand {
-  constructor(public readonly createUserDto: CreateUserDto) {}
+  constructor(
+    public readonly createUserDto: CreateUserDto,
+    public readonly file?: Express.Multer.File[],
+  ) {}
 }

@@ -4,6 +4,7 @@ import { UsersCommandService } from '../../../users-command.service';
 import { UserVerifyEmailDto } from '../../../../../../apps/libs/Users/dto/user/user-verify-email.dto';
 import { SendVerifyEmailEvent } from '../event/send-verify-email.event';
 import { UsersQueryService } from '../../../../../../apps/users/src/users-query.service';
+import { ConfigService } from '@nestjs/config';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -11,9 +12,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     private readonly usersCommandService: UsersCommandService,
     private readonly usersQueryService: UsersQueryService,
     private readonly eventBus: EventBus,
+    private readonly configService: ConfigService,
   ) {}
 
-  async execute({ createUserDto }: CreateUserCommand): Promise<void> {
+  async execute({ createUserDto, file }: CreateUserCommand): Promise<void> {
     let userVerifyEmailDto: UserVerifyEmailDto;
     const createUser = await this.usersQueryService.findUserByCriteria({
       email: createUserDto.email,
@@ -21,6 +23,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     // if user already exists but he is not verified(maybe he didnt get email verif. message or want to recreate acc with other credentials)
     if (createUser && !createUser.verified) {
       const criteria = { email: createUserDto.email };
+      delete createUserDto.id;
       const user = await this.usersCommandService.updateUser(
         criteria,
         createUserDto,
@@ -30,7 +33,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         username: user.username,
       };
     } else {
-      const user = await this.usersCommandService.createUser(createUserDto);
+      const user = await this.usersCommandService.createUser(
+        createUserDto,
+        this.configService.get('BUCKET'),
+        file,
+      );
       userVerifyEmailDto = {
         to: user.email,
         username: user.username,

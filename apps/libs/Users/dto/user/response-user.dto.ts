@@ -10,6 +10,8 @@ export class ResponseUserDto {
   @Expose()
   email: string;
   @Expose()
+  url: string;
+  @Expose()
   verified: boolean;
   @Expose()
   @Type(() => ResponseProfileDto)

@@ -8,10 +8,19 @@ import { UpdateUserDto } from '../../../../apps/libs/Users/dto/user/update-user.
 import { UpdateUserCriteria } from '../../../../apps/libs/Users/dto/user/update-user-criteria.dto';
 import { ResponseProviderDto } from '../../../../apps/libs/Users/dto/provider/response-provider.dto';
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
+import { PostsService } from '../posts/posts.service';
+import { plainToInstance } from 'class-transformer';
+import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly gateService: GateService) {}
+  constructor(
+    private readonly gateService: GateService,
+    private readonly postsService: PostsService,
+  ) {}
 
   async findUserByCriteria(
     findUserByCriteriaDto: FindUserByCriteriaDto,
@@ -69,6 +78,17 @@ export class UsersService {
       { criteria, updateUserDto },
       {},
     );
+  }
+
+  async profilePage(
+    id: string,
+    pagination: IPagination,
+    sorting: ISorting,
+    filtering: IFiltering,
+  ): Promise<ResponseProfilePageDto> {
+    const user = await this.findUserByCriteria({ id });
+    const posts = await this.postsService.get(pagination, sorting, filtering);
+    return plainToInstance(ResponseProfilePageDto, { user, posts });
   }
 
   makeQueryStringFromObject(query: object): string {

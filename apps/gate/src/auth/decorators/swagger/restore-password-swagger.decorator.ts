@@ -5,7 +5,8 @@ export function RestorePasswordSwagger() {
   return applyDecorators(
     ApiOperation({
       summary: 'save new password and redirect to the login page',
-      description: 'call when user entered new password',
+      description:
+        'call when user entered new password. User email is in the email url',
     }),
     ApiResponse({
       status: 200,

@@ -7,6 +7,9 @@ export class Profile extends BaseEntity {
   @Column({ type: 'varchar', length: '30', unique: true })
   username: string;
 
+  @Column({ type: 'varchar', nullable: true, length: 300 })
+  aboutMe: string;
+
   @OneToOne(() => User, (user) => user.profile, {
     onDelete: 'CASCADE',
   })

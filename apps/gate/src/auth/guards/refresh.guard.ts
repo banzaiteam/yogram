@@ -16,11 +16,13 @@ export class RefreshGuard implements CanActivate {
     private readonly usersService: UsersService,
   ) {}
   async canActivate(context: ExecutionContext) {
-    console.log('RefreshGuard');
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization;
-    if (!token) throw new UnauthorizedException('No Bearer token');
-    const refreshToken = token.split(' ')[1].trim();
+    const refreshToken = request.cookies?.refreshToken;
+    console.log(
+      '🚀 ~ RefreshGuard ~ canActivate ~ refreshToken:',
+      refreshToken,
+    );
+    if (!refreshToken) throw new UnauthorizedException('No refreshToken');
     let payload;
     try {
       // if token is dead we delete session and throw unauthorized

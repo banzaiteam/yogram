@@ -94,4 +94,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

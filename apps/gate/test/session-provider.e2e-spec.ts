@@ -1,7 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-
-import { AppModule } from '../src/app.module';
 import request from 'supertest';
 import { UsersModule } from '../../../apps/users/src/users.module';
 

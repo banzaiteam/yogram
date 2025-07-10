@@ -50,6 +50,4 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   controllers: [AppController],
   providers: [],
 })
-
 export class AppModule {}
-

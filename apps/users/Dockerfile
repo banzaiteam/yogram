@@ -14,6 +14,9 @@ RUN mkdir -p /home/node/dist/${SERVICE}
 
 WORKDIR /home/node/dist/${SERVICE}
 
+RUN mkdir -p /home/node/dist/users/src/uploads/avatars
+VOLUME /home/node/dist/users/src/uploads/avatars
+
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)

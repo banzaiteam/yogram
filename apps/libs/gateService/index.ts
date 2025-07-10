@@ -15,17 +15,18 @@ export class GateService {
     private readonly configService: ConfigService,
   ) {
     // FIXME check env and route path on k8s
-    this.env =
-      this.configService.get('NODE_ENV') === 'DEVELOPMENT' ||
-      this.configService.get('NODE_ENV') === 'TESTING';
-    this.usersHttpService = this.env
-      ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
-      : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
+    // this.env =
+    //   this.configService.get('NODE_ENV') === 'DEVELOPMENT' ||
+    //   this.configService.get('NODE_ENV') === 'TESTING';
+    // this.usersHttpService = this.env
+    //   ? `http://localhost:${this.configService.get('USERS_PORT')}/api/v1`
+    //   : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
     // remove all constructor before this line
     // example for normal switch service throw config in micro
     Object.assign(this.services, {
       POSTS: this.configService.get('POSTS_SERVICE_URL'),
       USERS: this.configService.get('USERS_SERVICE_URL'),
+      FILES: this.configService.get('FILES_SERVICE_URL'),
     });
   }
 
@@ -42,7 +43,7 @@ export class GateService {
       );
       return data;
     } catch (error) {
-      console.warn('error postAdapter', error);
+      // console.warn('error postAdapter', error);
       throw new HttpException(error.response.data, error.response.status);
     }
   }
@@ -71,6 +72,20 @@ export class GateService {
             headers,
           },
         ),
+      );
+      return data;
+    } catch (error) {
+      console.warn('error postAdapter', error);
+      throw new HttpException(error.response.data, error.response.status);
+    }
+  }
+
+  async requestHttpServiceDelete(service, path, headers) {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.delete([this.services[service], path].join('/'), {
+          headers,
+        }),
       );
       return data;
     } catch (error) {

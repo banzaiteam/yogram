@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -17,7 +21,6 @@ import { SignupService } from '../signup/signup.service';
 import { GoogleOauth } from './oauth/google.oauth';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { SessionProvider } from './session/session.provider';
-import { Device } from './session/types/device.type';
 import { Session } from './session/types/session.type';
 import { ResponseDeviceDto } from './dto/response-device.dto';
 import { plainToInstance } from 'class-transformer';
@@ -43,15 +46,11 @@ export class AuthService {
   }
 
   async genRefreshToken(payload: object): Promise<[string, number]> {
-    const refresh_token = await this.jwtService.signAsync(payload, {
+    const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRES'),
     });
-    console.log(
-      '🚀 ~ AuthService ~ genRefreshToken ~ refresh_token:',
-      refresh_token,
-    );
-    const token = await this.jwtService.verifyAsync(refresh_token);
-    return [refresh_token, token.exp - token.iat];
+    const token = await this.jwtService.verifyAsync(refreshToken);
+    return [refreshToken, token.exp - token.iat];
   }
 
   async proccessLogin(
@@ -60,19 +59,18 @@ export class AuthService {
     ip: string,
   ): Promise<[string, string]> {
     const access_token = await this.genAccessToken({ id: userId });
-    const [refresh_token, expiresAt] = await this.genRefreshToken({
+    const [refreshToken, expiresAt] = await this.genRefreshToken({
       id: userId,
     });
-    console.log('proccessLogin');
 
     await this.createDeviceSession(
-      refresh_token,
+      refreshToken,
       userId,
       userAgent,
       ip,
       expiresAt,
     );
-    return [access_token, refresh_token];
+    return [access_token, refreshToken];
   }
 
   async createDeviceSession(
@@ -156,16 +154,19 @@ export class AuthService {
 
   async forgotPassword(email: EmailDto) {
     const user = await this.usersService.findUserByCriteria(email);
-    // if (!user) {
-    //   throw new UnauthorizedException('User with this email doesnt exist');
-    // }
-    // if (!user.verified) throw new BadRequestException('user is not verified');
+    if (!user) {
+      throw new NotFoundException('user with this email was not found');
+    }
     const payload = { email: user.email };
     const token = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('FORGOT_PASSWORD_TOKEN_EXPIRES'),
     });
 
-    const template = getForgotPasswordTemplate(user.username, token);
+    const template = getForgotPasswordTemplate(
+      user.username,
+      token,
+      email.email,
+    );
     const subject = 'Yogram password restore';
     const restorePasswordDto: RestorePasswordEmailDto = {
       to: user.email,
@@ -185,8 +186,9 @@ export class AuthService {
     }
   }
 
-  async restorePage(token: string) {
-    return await this.jwtService.verifyAsync(token);
+  async restorePage(token: string): Promise<string> {
+    const response = await this.jwtService.verifyAsync(token.trim());
+    return response.email;
   }
 
   async restorePassword(restorePasswordDto: RestorePasswordDto): Promise<void> {
@@ -198,22 +200,20 @@ export class AuthService {
   }
 
   async google(code: string, userAgent: string, ip: string) {
+    console.log('🚀 ~ AuthService ~ google ~ code:', code);
     const user = await this.googleOauth.performOAuth(code);
     return await this.externalLogin(user, userAgent, ip);
   }
 
   async externalLogin(user: LoggedUserDto, userAgent: string, ip: string) {
-    console.log('🚀 ~ AuthService ~ externalLogin ~ ip:', ip);
-    console.log('🚀 ~ AuthService ~ externalLogin ~ userAgent:', userAgent);
-    console.log('externalLogin');
     const payloadAccess = { id: user.id };
     const payloadRefresh = { id: user.id };
-    const access_token = await this.genAccessToken(payloadAccess);
-    const [refresh_token, expiresAt] =
+    const accessToken = await this.genAccessToken(payloadAccess);
+    const [refreshToken, expiresAt] =
       await this.genRefreshToken(payloadRefresh);
 
     await this.createDeviceSession(
-      refresh_token,
+      refreshToken,
       user.id,
       userAgent,
       ip,
@@ -222,7 +222,7 @@ export class AuthService {
 
     await this.updateDeviceLastSeen(user.id, [ip, userAgent].join('-'));
 
-    return [access_token, refresh_token, user];
+    return { accessToken, refreshToken, user };
   }
 
   async authMe(id: string): Promise<ResponseUserDto> {

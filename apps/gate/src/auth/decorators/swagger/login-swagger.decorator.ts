@@ -11,7 +11,7 @@ export function LoginSwagger() {
       description: ' return set-cookie refresh token and accessToken in body',
       headers: {
         'Set-Cookie': {
-          description: 'refresh_token httpOnly, secure, samesite',
+          description: 'refreshToken httpOnly, secure, samesite',
           schema: { type: 'string' },
         },
       },
@@ -24,7 +24,8 @@ export function LoginSwagger() {
     }),
     ApiResponse({
       status: 401,
-      description: 'invalid login/password or not verified',
+      description:
+        'invalid login/password or not verified / you created account using oAuth2, please create new password using forgotPassword',
     }),
     ApiResponse({
       status: 404,

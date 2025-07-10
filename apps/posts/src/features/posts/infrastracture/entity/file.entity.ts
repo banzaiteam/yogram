@@ -5,7 +5,7 @@ import { FileStatus } from '../../constants/file.constant';
 
 @Entity('files')
 export class File extends BaseEntity {
-  @Column({ type: 'varchar', length: '50' })
+  @Column({ type: 'varchar', length: '100' })
   fileName: string;
 
   @Column({ type: 'varchar', length: '200', default: null })
@@ -16,6 +16,9 @@ export class File extends BaseEntity {
 
   @Column({ type: 'enum', enum: FileStatus, default: FileStatus.Pending })
   status: FileStatus;
+
+  @Column({ type: 'uuid', nullable: true })
+  postId: string;
 
   @ManyToOne(() => Post, (post) => post.files, { onDelete: 'CASCADE' })
   @JoinColumn()

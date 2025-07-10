@@ -7,10 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../../../apps/gate/common/guards/auth.guard';
 import { AuthModule } from '../auth/auth.module';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
   imports: [
     forwardRef(() => AuthModule),
+    PostsModule,
     HttpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

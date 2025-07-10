@@ -12,7 +12,12 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
-  const SERVICES_NAMES = ['USERS', 'POSTS'];
+  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES'];
+  console.log(
+    'process.env.NODE_ENV in getonfigturation = ',
+    process.env.NODE_ENV,
+  );
+
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {
       Object.assign(acc, {
@@ -36,6 +41,7 @@ export const getConfiguration = () => {
     PORT: process.env.PORT || process.env.GATE_PORT,
     USERS_PORT: process.env.USERS_PORT,
     POSTS_PORT: process.env.POSTS_PORT,
+    FILES_PORT: process.env.FILES_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     ACCESS_TOKEN_EXPIRES: process.env.ACCESS_TOKEN_EXPIRES,
     REFRESH_TOKEN_EXPIRES: process.env.REFRESH_TOKEN_EXPIRES,
@@ -59,5 +65,9 @@ export const getConfiguration = () => {
     REDIS_PORT: process.env.REDIS_PORT,
     REDIS_USER: process.env.REDIS_USER,
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+    BUCKET: process.env.BUCKET,
+    POSTS_SERVICE_URL: process.env.POSTS_SERVICE_URL,
+    USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
+    FILES_SERVICE_URL: process.env.FILES_SERVICE_URL,
   };
 };

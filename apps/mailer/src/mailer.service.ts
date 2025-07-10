@@ -16,8 +16,9 @@ export class MailService implements IMailer {
 
   async sendUserVerifyEmail(userVerifyEmailDto: UserVerifyEmailDto) {
     const payload = { email: userVerifyEmailDto.to };
+    const expiresIn = parseInt(this.configService.get('VERIFY_TOKEN_EXPIRES'));
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get('VERIFY_TOKEN_EXPIRES'),
+      expiresIn: expiresIn / 1000,
     });
     let path: string;
     if (process.env.NODE_ENV !== undefined) {
@@ -28,7 +29,7 @@ export class MailService implements IMailer {
     const subject = 'Yogram account verification';
     const html = `<p>Hello ${userVerifyEmailDto.username},</p>
         <p>Welcome to our community! You created account but it still need to be verified.</p>
-        <p>please click on the activation link <a href=${path}/api/v1/signup/email-verify/${token}>verify link</a></p>`;
+        <p>please click on the activation link <a href=${path}/api/v1/signup/email-verify/${token}/${payload.email}>verify link</a></p>`;
     try {
       const result = await this.mailerService.sendMail({
         ...userVerifyEmailDto,

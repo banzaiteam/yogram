@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { DataSource, QueryFailedError } from 'typeorm';
@@ -19,10 +18,16 @@ import { OauthProviders } from '../../../apps/libs/Users/constants/oauth-provide
 import { GoogleSignupDto } from '../../../apps/libs/Users/dto/user/google-signup.dto';
 import { CreateUserByProviderDto } from '../../../apps/libs/Users/dto/user/create-user-by-provider.dto';
 import { genUserName } from './utils/gen-username.util';
-import { Response } from 'express';
 import { UsersQueryService } from './users-query.service';
 import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
+import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
+import { ChunksFileUploader } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import fs, { readdir } from 'fs/promises';
+import { HttpFilesPath } from '../../../apps/libs/Files/constants/path.enum';
+import { ConfigService } from '@nestjs/config';
+import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -34,22 +39,36 @@ export class UsersCommandService {
       CreateUserDto,
       UpdateUserDto
     >,
+    private readonly chunksFileUploader: ChunksFileUploader,
     private readonly profileCommandService: ProfileCommandService,
     private readonly providerCommandService: ProviderCommandService,
     private readonly usersQueryService: UsersQueryService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<ResponseUserDto> {
+  async createUser(
+    createUserDto: CreateUserDto,
+    bucketName: string,
+    file?: Express.Multer.File[],
+  ): Promise<ResponseUserDto> {
+    if (!Array.isArray(file)) {
+      const files = file;
+      file = [];
+      file.push(files);
+    }
     const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       const user = await this.userCommandRepository.create(
         createUserDto,
         queryRunner.manager,
       );
+
       const createProfileDto: CreateProfileDto = {
         user,
         username: createUserDto.username,
+        aboutMe: createUserDto.aboutMe,
       };
       await this.profileCommandService.create(
         createProfileDto,
@@ -67,20 +86,54 @@ export class UsersCommandService {
         );
       });
 
+      if (file.length && file[0] !== null) {
+        const uploadFile: UploadFile[] = [
+          {
+            fileType: FileTypes.Avatars,
+            filesUploadBaseDir:
+              '/home/node/dist/files/src/features/files/uploads/avatar',
+            fieldname: file[0].fieldname,
+            mimetype: file[0].mimetype,
+            size: file[0].size,
+            path: file[0].path,
+            fileId: createUserDto.id,
+            originalname: file[0].filename,
+            destination: file[0].destination,
+            bucketName,
+          },
+        ];
+        console.log('🚀 ~ UsersCommandService ~ uploadFile:', uploadFile);
+
+        const uploadServiceUrl = [
+          this.configService.get('FILES_SERVICE_URL'),
+          HttpFilesPath.Upload,
+        ].join('/');
+
+        this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+          createUserDto.id,
+          uploadFile,
+          [createUserDto.id].join('/'),
+          uploadServiceUrl,
+        );
+      }
+
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
+      console.log('🚀 ~ UsersCommandService ~ createUser ~ error:', error);
+      await queryRunner.rollbackTransaction();
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
           throw new ConflictException(
-            'user with this email/username already exists',
+            `UsersCommandService error: user with this ${error['detail'].substring(error['detail'].indexOf('(') + 1, error['detail'].indexOf(')'))} already exists`,
           );
         }
         if ((error['code'] = '23503')) {
-          throw new BadRequestException();
+          throw new BadRequestException(
+            'UsersCommandService error: 23503, primary key does not exist on user creation',
+          );
         }
       }
-      await queryRunner.rollbackTransaction();
       throw new InternalServerErrorException(error);
     } finally {
       await queryRunner.release();
@@ -91,9 +144,8 @@ export class UsersCommandService {
     googleSignupDto: GoogleSignupDto,
   ): Promise<GoogleResponse> {
     // form user does not exists so create provider entity and merge to the form user
+    const queryRunner = this.dataSource.createQueryRunner();
     if (!googleSignupDto.user) {
-      const queryRunner = this.dataSource.createQueryRunner();
-      await queryRunner.startTransaction();
       try {
         let username = googleSignupDto.username;
         const userWithTheSameUserName =
@@ -112,10 +164,10 @@ export class UsersCommandService {
               );
           username = await genUserName(
             usernameFromUsernameOrEmail,
-            queryRunner,
             this.usersQueryService,
           );
         }
+        await queryRunner.startTransaction();
         // create user
         const createUserDto: CreateUserByProviderDto = {
           email: googleSignupDto.email,
@@ -130,6 +182,7 @@ export class UsersCommandService {
         const createProfileDto: CreateProfileDto = {
           user,
           username: createUserDto.username,
+          aboutMe: createUserDto.aboutMe,
         };
         await this.profileCommandService.create(
           createProfileDto,
@@ -165,8 +218,9 @@ export class UsersCommandService {
     }
     // form user exists so merge it to the provider entity
     else {
+      // todo realize with transaction there, maybe not needed
       // update provider's username, email, providerId
-      const queryRunner = this.dataSource.createQueryRunner();
+      // const queryRunner = this.dataSource.createQueryRunner();
       const providerUpdateDto: UpdateProviderDto = {
         username: googleSignupDto.user.username,
         email: googleSignupDto.user.email,
@@ -183,6 +237,38 @@ export class UsersCommandService {
       });
       return { user };
     }
+  }
+
+  sendFilesToFilesServiceAndDeleteTempFilesAfter(
+    userId: string,
+    files: UploadFile[],
+    filesServiceUploadFolderWithoutBasePath: string,
+    uploadServiceUrl: string,
+  ) {
+    new Promise((res, rej) => {
+      res(
+        this.chunksFileUploader.proccessChunksUpload(
+          FilesRoutingKeys.FilesUploadedAvatars,
+          files,
+          filesServiceUploadFolderWithoutBasePath,
+          uploadServiceUrl,
+        ),
+      );
+      rej(
+        new InternalServerErrorException(
+          'PostCommandService: photos was not uploaded',
+        ),
+      );
+    })
+      .then(async () => {
+        await fs.rm(files[0].destination, { recursive: true });
+      })
+      .catch(async (err) => {
+        console.log('error in user-command-service.........', err);
+        // todo? delete post event
+        // it delete db post and related files in aws
+        await fs.rm(files[0].destination, { recursive: true });
+      });
   }
 
   async updateUser(

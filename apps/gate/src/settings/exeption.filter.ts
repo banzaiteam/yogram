@@ -3,11 +3,9 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-// https://docs.nestjs.com/exception-filters
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
   catch(exception: HttpException, host: ArgumentsHost) {
@@ -15,7 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
-    const error = exception.getResponse()['error'];
+    const error = exception.getResponse();
 
     if (host.getType<string>() === 'graphql') {
       const status = exception.getStatus();
@@ -31,9 +29,13 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
       );
     }
 
+    // we get error['response'] only when catch error from stream response(example: posts/create)
     response.status(status).json({
-      message: exception.message,
-      error,
+      message: !error['response']
+        ? exception.message
+        : JSON.parse(error['response'].stream).message,
+      // need custom error message handle because of  posts streaming response
+      error: !error['response'] ? error['error'] : exception.message,
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,

@@ -1,8 +1,8 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -47,6 +47,17 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Get('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 0,
+    });
+  }
+
+  @Public()
   @UseGuards(LoginGuard)
   @LoginSwagger()
   @Post('login')
@@ -56,17 +67,20 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const userAgent = req.headers['user-agent'];
-    const [accessToken, refresh_token] = await this.authService.proccessLogin(
+    const [accessToken, refreshToken] = await this.authService.proccessLogin(
       user.id,
       userAgent,
       req.ip,
     );
-    console.log('🚀 ~ AuthController ~ refresh_token:', refresh_token);
-    res.cookie('refresh_token', refresh_token, {
+    const date = new Date();
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       secure: true,
-      maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
+      maxAge: this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      // expires: new Date(
+      //   date.getTime() + this.configService.get('REFRESH_TOKEN_EXPIRES'),
+      // ),
     });
     return { accessToken };
   }
@@ -97,17 +111,18 @@ export class AuthController {
   }
 
   // pass refresh token which is the current session device
-  @LogoutSwagger()
-  @SkipAuthDecorator()
-  @UseGuards(RefreshGuard)
-  @Post('logout')
-  async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
-    const currentDeviceToken = req.headers.authorization.split(' ')[1].trim();
-    return await this.authService.deviceLogout(
-      currentDeviceToken,
-      logoutAllDto.tokens,
-    );
-  }
+  // to logout all, front need to pass refresh in cookies, then we get userId, then rewrite redis users:token:dsfjsdfjlsdf to users:userId(sAdd) and save all sessions
+  // @LogoutSwagger()
+  // @SkipAuthDecorator()
+  // @UseGuards(RefreshGuard)
+  // @Post('logout')
+  // async logout(@Req() req: Request, @Body() logoutAllDto?: LogoutAllDto) {
+  //   const currentDeviceToken = req.cookies?.refreshToken;
+  //   return await this.authService.deviceLogout(
+  //     currentDeviceToken,
+  //     logoutAllDto.tokens,
+  //   );
+  // }
 
   // send forgotPassword email to user email
   @Public()
@@ -121,25 +136,30 @@ export class AuthController {
   // forgot password email redirect it to this endpoint to check token and redirect user to the page where he can enter new password
   @Public()
   @ApiExcludeEndpoint()
-  @Get('restore-page/:token')
-  async restorePage(@Param('token') token: string, @Res() res: Response) {
+  @Get('restore-page/:token/:email')
+  async restorePage(
+    @Param('token') token: string,
+    @Param('email') email: string,
+    @Res() res: Response,
+  ) {
     try {
-      const email = await this.authService.restorePage(token);
+      const emailFromToken = await this.authService.restorePage(token);
       res.redirect(
         303,
-        [this.configService.get('RESTORE_PASSWORD_PAGE'), email.email].join(
+        [this.configService.get('RESTORE_PASSWORD_PAGE'), emailFromToken].join(
           '/',
         ),
       ); // restore-password page
     } catch (err) {
       if (err instanceof TokenExpiredError) {
+        console.log('🚀 ~ AuthController ~ err:', err);
         // if invalid/expired token we redirect to the sendForgotPassword email page
         res.redirect(
           303,
-          this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
-        );
-        throw new BadRequestException(
-          'Restore password link is expired, redirect to resend restore password page',
+          [
+            this.configService.get('SEND_RESTORE_PASSWORD_EMAIL_PAGE'),
+            email,
+          ].join('/'),
         );
       }
     }
@@ -162,7 +182,13 @@ export class AuthController {
   @GoogleSwagger()
   @Get('google')
   async googleOauth(@Res() res: Response) {
-    res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
+    try {
+      res.redirect(303, this.configService.get('GOOGLE_OAUTH_URI'));
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'AuthController: cant open oauth link',
+      );
+    }
   }
 
   @Public()
@@ -172,25 +198,19 @@ export class AuthController {
     @Query('code') code: string,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ): Promise<LoggedUserDto> {
-    const [access_token, refresh_token, user] = await this.authService.google(
+  ): Promise<{ accessToken: string; user: LoggedUserDto }> {
+    const { accessToken, refreshToken, user } = await this.authService.google(
       code,
       req.headers['user-agent'],
       req.ip,
     );
-    res.cookie('access_token', access_token, {
-      httpOnly: false,
-      sameSite: 'strict',
-      secure: true,
-      maxAge: parseInt(this.configService.get('ACCESS_TOKEN_EXPIRES')),
-    });
-    res.cookie('refresh_token', refresh_token, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
       secure: true,
       maxAge: parseInt(this.configService.get('REFRESH_TOKEN_EXPIRES')),
     });
-    return plainToInstance(LoggedUserDto, user);
+    return { accessToken, user: plainToInstance(LoggedUserDto, user) };
   }
 
   @AuthMeSwagger()

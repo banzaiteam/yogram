@@ -137,8 +137,23 @@ spec:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
                   key: REDIS_PORT
-            - name: NODE_ENV
+            - name: USERS_SERVICE_URL
               valueFrom:
                 secretKeyRef:
                   name: gate-yogram-production-config-secret
-                  key: NODE_ENV
+                  key: USERS_SERVICE_URL
+            - name: POSTS_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: POSTS_SERVICE_URL
+            - name: FILES_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: FILES_SERVICE_URL
+            - name: FILES_PROD_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gate-yogram-production-config-secret
+                  key: FILES_PROD_SERVICE_URL
