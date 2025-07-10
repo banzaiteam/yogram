@@ -158,7 +158,8 @@ export class PostsController {
           // generate uuid for posts because of multer call destination method on each uploaded file
           headers: { ...req.headers, postid, userid: user.id },
           responseType: 'stream',
-          maxBodyLength: 150000000,
+          maxBodyLength: 1500000000,
+          maxContentLength: 1500000000,
         },
       );
 
