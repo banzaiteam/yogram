@@ -87,8 +87,9 @@ export class PostCommandService {
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
           // todo? make env variable
-          filesUploadBaseDir:
-            '/home/node/dist/files/src/features/files/uploads/posts',
+          filesUploadBaseDir: this.configService.get(
+            'FILES_SERVICE_POSTS_UPLOAD_PATH',
+          ),
           fieldname: file.fieldname,
           mimetype: file.mimetype,
           size: file.size,

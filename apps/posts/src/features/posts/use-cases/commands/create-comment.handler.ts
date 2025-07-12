@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
+import { CreateCommentDto } from '../../../../../../../apps/libs/Posts/dto/input/create-comment.dto';
 import { CommentCommandService } from '../../comment-command.service';
 
 export class CreateCommentCommand {

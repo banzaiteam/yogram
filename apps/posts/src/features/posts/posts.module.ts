@@ -47,6 +47,14 @@ import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 import { PostSagas } from '../sagas/post.saga';
 import { CommentCommandRepository } from './infrastracture/repository/command/comment-command.repository';
 import { ICommentCommandRepository } from './interfaces/comment-command-repository.interface';
+import { ICommentQueryRepository } from './interfaces/comment-query-repository.interface';
+import { CommentQueryRepository } from './infrastracture/repository/query/comment-query.repository';
+import { Comment } from './infrastracture/entity/comment.entity';
+import {
+  CreateCommentCommand,
+  CreateCommentHandler,
+} from './use-cases/commands/create-comment.handler';
+import { CommentCommandService } from './comment-command.service';
 
 @Module({
   imports: [
@@ -58,7 +66,7 @@ import { ICommentCommandRepository } from './interfaces/comment-command-reposito
       { posts: [FilesBindingKeysEnum.Files_Uploaded_Posts] },
     ]),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([Post, File, PostsDeleteOubox]),
+    TypeOrmModule.forFeature([Post, File, PostsDeleteOubox, Comment]),
     // GraphQLModule.forRoot<ApolloFederationDriverConfig>({
     //   driver: ApolloFederationDriver,
     //   autoSchemaFile: {
@@ -84,8 +92,13 @@ import { ICommentCommandRepository } from './interfaces/comment-command-reposito
     PostsQueryRepository,
     GetPostsQuery,
     GetPostsQueryHandler,
+    CommentCommandRepository,
+    CreateCommentCommand,
+    CreateCommentHandler,
+    CommentCommandService,
     { provide: IPostCommandRepository, useClass: PostCommandRepository },
     { provide: ICommentCommandRepository, useClass: CommentCommandRepository },
+    { provide: ICommentQueryRepository, useClass: CommentQueryRepository },
     { provide: IFileCommandRepository, useClass: FileCommandRepository },
   ],
 })

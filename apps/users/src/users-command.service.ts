@@ -90,8 +90,9 @@ export class UsersCommandService {
         const uploadFile: UploadFile[] = [
           {
             fileType: FileTypes.Avatars,
-            filesUploadBaseDir:
-              '/home/node/dist/files/src/features/files/uploads/avatar',
+            filesUploadBaseDir: this.configService.get(
+              'FILES_SERVICE_AVATAR_UPLOAD_PATH',
+            ),
             fieldname: file[0].fieldname,
             mimetype: file[0].mimetype,
             size: file[0].size,

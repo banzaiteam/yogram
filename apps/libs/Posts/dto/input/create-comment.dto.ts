@@ -1,4 +1,5 @@
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -6,11 +7,14 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ResponsePostDto } from '../output/response-post.dto';
+import { ResponseCommentDto } from '../output/response-comment.dto';
+import { Post } from 'apps/posts/src/features/posts/infrastracture/entity/post.entity';
 
 export class CreateCommentDto {
   @IsUUID()
   postId: string;
-  @ApiHideProperty()
+  // @ApiHideProperty()
   @IsUUID()
   userId: string;
   @IsString()
@@ -22,4 +26,12 @@ export class CreateCommentDto {
   @IsUUID()
   @IsOptional()
   parentId?: string;
+  // @ApiHideProperty()
+  // @Type(() => Post)
+  post: Post;
+  // @ApiHideProperty()
+  // @Type(() => Comment)
+  // parentComment?: Comment;
+
+  likes = 0;
 }

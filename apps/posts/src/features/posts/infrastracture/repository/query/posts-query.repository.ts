@@ -10,7 +10,7 @@ import {
   IFiltering,
 } from 'apps/libs/common/pagination/decorators/filtering.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 export class PostsQueryRepository
@@ -52,5 +52,17 @@ export class PostsQueryRepository
       limit: pagination.limit,
     };
     return paginatedResponse;
+  }
+
+  async findPostbyId(
+    postId: string,
+    entityManager?: EntityManager,
+  ): Promise<Post> {
+    console.log('🚀 ~ postId:', postId);
+    if (entityManager) {
+      return await entityManager.findOneBy(Post, { id: postId });
+    }
+
+    return await this.postRepository.findOneByOrFail({ id: postId });
   }
 }

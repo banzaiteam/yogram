@@ -4,8 +4,8 @@ import { Post } from './post.entity';
 
 @Entity('comments')
 export class Comment extends BaseEntity {
-  @Column({ type: 'uuid' })
-  postId: string;
+  //   @Column({ type: 'uuid' })
+  //   postId: string;
 
   @Column({ type: 'uuid' })
   userId: string;
@@ -16,22 +16,25 @@ export class Comment extends BaseEntity {
   @Column({ type: 'integer', default: 0 })
   likes: number;
 
+  @Column({ type: 'uuid', nullable: true })
+  parentId?: string;
+
   @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinColumn({ name: 'post_id', referencedColumnName: 'id' })
   post: Post;
 
-  @ManyToOne(() => Comment, (comment) => comment.childComments, {
-    eager: true,
+  @ManyToOne(() => Comment, (comment) => comment.childrens, {
+    // eager: true,
     cascade: true,
     nullable: true,
   })
-  @JoinColumn({ name: 'parent_id' })
-  parentComment: Comment;
+  @JoinColumn({ name: 'parentId', referencedColumnName: 'id' })
+  parent: Comment;
 
-  @OneToMany(() => Comment, (comment) => comment.parentComment, {
+  @OneToMany(() => Comment, (comment) => comment.parent, {
     onDelete: 'CASCADE',
   })
-  childComments: Comment[];
+  childrens: Comment[];
 
   constructor(entity: Partial<Comment>) {
     super();

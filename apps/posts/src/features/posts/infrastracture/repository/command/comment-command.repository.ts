@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { ICommentCommandRepository } from '../../../interfaces/comment-command-repository.interface';
+
+import { CreateCommentDto } from '../../../../../../../../apps/libs/Posts/dto/input/create-comment.dto';
+import { FindCommentCriteria } from '../../../../../../../../apps/libs/Posts/dto/input/find-comment-criteria.dto';
+import { UpdateCommentDto } from '../../../../../../../../apps/libs/Posts/dto/input/update-comment.dto';
 import { Comment } from '../../entity/comment.entity';
-import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
-import { FindCommentCriteria } from 'apps/libs/Posts/dto/input/find-comment-criteria.dto';
-import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
 
 @Injectable()
 export class CommentCommandRepository
@@ -28,7 +29,9 @@ export class CommentCommandRepository
   ): Promise<Comment> {
     // you should use this queryRunner.manager(entityManager) on save operations because without it typeorm transactions does not work
     const comment = new Comment(commentDto);
+    console.log('🚀 ~ comment:', comment);
     if (entityManager) {
+      console.log('🚀 ~ entityManager: create comment repo');
       return await entityManager.save(comment);
     }
 

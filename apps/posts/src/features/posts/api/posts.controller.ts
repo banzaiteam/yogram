@@ -52,6 +52,7 @@ import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
 import { DeletePostEvent } from '../use-cases/events/delete-post.event';
 import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
 import { CreateCommentCommand } from '../use-cases/commands/create-comment.handler';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class PostsController {
@@ -61,6 +62,7 @@ export class PostsController {
     private commandBus: CommandBus,
     private readonly eventBus: EventBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {
     this.postEmmiter = new EventEmmiter();
   }
@@ -126,7 +128,9 @@ export class PostsController {
             null,
             await getUploadPath(
               FileTypes.Posts,
-              '/home/node/dist/posts/src/features/posts/uploads/posts',
+              process.env.NODE_ENV === 'DEVELOPMENT'
+                ? 'apps/posts/src/features/posts/uploads/posts'
+                : '/home/node/dist/posts/src/features/posts/uploads/posts',
               req,
             ),
           );
@@ -214,7 +218,12 @@ export class PostsController {
     );
   }
 
-  async createComment(createCommentDto: CreateCommentDto) {
+  @Post('posts/comment/add')
+  async createComment(@Body() createCommentDto: CreateCommentDto) {
+    console.log(
+      '🚀 ~ PostsController ~ createComment ~ createCommentDto:',
+      createCommentDto,
+    );
     return await this.commandBus.execute(
       new CreateCommentCommand(createCommentDto),
     );
