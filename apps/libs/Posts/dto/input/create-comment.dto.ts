@@ -1,5 +1,3 @@
-import { ApiHideProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -7,16 +5,15 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { ResponsePostDto } from '../output/response-post.dto';
-import { ResponseCommentDto } from '../output/response-comment.dto';
 import { Post } from 'apps/posts/src/features/posts/infrastracture/entity/post.entity';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {
   @IsUUID()
   postId: string;
-  // @ApiHideProperty()
-  @IsUUID()
-  userId: string;
+  @ApiHideProperty()
+  @IsOptional()
+  userId?: string;
   @IsString()
   @MinLength(2, { message: 'comment should be not less than 2 characters' })
   @MaxLength(300, {
@@ -26,12 +23,8 @@ export class CreateCommentDto {
   @IsUUID()
   @IsOptional()
   parentId?: string;
-  // @ApiHideProperty()
-  // @Type(() => Post)
+  @ApiHideProperty()
   post: Post;
-  // @ApiHideProperty()
-  // @Type(() => Comment)
-  // parentComment?: Comment;
-
+  @ApiHideProperty()
   likes = 0;
 }

@@ -50,6 +50,8 @@ import { CreateCommentDto } from '../../../../apps/libs/Posts/dto/input/create-c
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 import { ResponseCommentDto } from 'apps/libs/Posts/dto/output/response-comment.dto';
 import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
+import { AddCommentSwagger } from './decorators/swagger/add-comment-swagger.decorator';
+import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -225,10 +227,13 @@ export class PostsController {
     return await this.postsService.update(id, updatePostDto);
   }
 
+  @AddCommentSwagger()
   @Post('comments')
   async createComment(
+    @User('id') id: string,
     @Body() createCommentDto: CreateCommentDto,
-  ): Promise<ResponseCommentDto> {
+  ): Promise<void> {
+    createCommentDto.userId = id;
     return await this.gateService.requestHttpServicePost(
       HttpServices.Posts,
       HttpPostsPath.AddComment,
@@ -237,6 +242,7 @@ export class PostsController {
     );
   }
 
+  @UpdateCommentSwagger()
   @Patch('comments/:id')
   async updateComment(
     @Body()
