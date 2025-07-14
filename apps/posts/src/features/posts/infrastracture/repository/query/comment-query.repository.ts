@@ -39,9 +39,9 @@ export class CommentQueryRepository
       take: pagination.limit,
       order: sort,
       where: filter,
-      // relations: {
-      //   childComments: true,
-      // },
+      relations: {
+        childrens: true,
+      },
     });
     const paginatedResponse: CommentPaginatedResponseDto = {
       items: data[0],
@@ -56,19 +56,16 @@ export class CommentQueryRepository
     commentId: string,
     entityManager?: EntityManager,
   ): Promise<Comment> {
-    console.log('🚀 ~ commentId:', commentId);
     if (entityManager) {
-      return await entityManager.findOneBy(Comment, { id: commentId });
+      return await entityManager.findOne(Comment, {
+        where: { id: commentId },
+        relations: { childrens: true },
+      });
     }
-    const allcomments = await this.commentRepository.find({
-      where: { id: '357cb41f-9560-4bb1-b823-24c2a04b0367' },
-      // relations: { childComments: true },
-    });
-    console.log('🚀 ~ allcomments:', allcomments);
-    const comm = await this.commentRepository.find({
+
+    return await this.commentRepository.findOne({
       where: { id: commentId },
+      relations: { childrens: true },
     });
-    console.log('🚀 ~ comm:', comm);
-    return comm[0];
   }
 }

@@ -18,41 +18,47 @@ import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { genFileName, getUploadPath } from 'apps/gate/src/posts/helper';
-import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
+import {
+  genFileName,
+  getUploadPath,
+} from '../../../../../../apps/gate/src/posts/helper';
+import { CreatePostDto } from '../../../../../../apps/libs/Posts/dto/input/create-post.dto';
 import { CreatePostCommand } from '../use-cases/commands/create-post.handler';
-import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
-import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { UpdatePostCriteria } from '../../../../../../apps/libs/Posts/dto/input/update-post-criteria.dto';
+import { UpdatePostDto } from '../../../../../../apps/libs/Posts/dto/input/update-post.dto';
 import { UpdatePostCommand } from '../use-cases/commands/update-post.handler';
-import { EventSubscribe } from 'apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
-import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
-import { IEvent } from 'apps/libs/common/message-brokers/interfaces/event.interface';
+import { EventSubscribe } from '../../../../../../apps/libs/common/message-brokers/rabbit/decorators/event-subscriber.decorator';
+import { FilesRoutingKeys } from '../../../../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { IEvent } from '../../../../../../apps/libs/common/message-brokers/interfaces/event.interface';
 import { FileStatus } from '../constants/file.constant';
 import {
   IPagination,
   PaginationParams,
-} from 'apps/libs/common/pagination/decorators/pagination.decorator';
+} from '../../../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from 'apps/libs/common/pagination/decorators/sorting.decorator';
+} from '../../../../../../apps/libs/common/pagination/decorators/sorting.decorator';
 import {
   FilteringParams,
   IFiltering,
-} from 'apps/libs/common/pagination/decorators/filtering.decorator';
+} from '../../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { GetPostsQuery } from '../use-cases/queries/get-posts.query';
-import { SharpPipe } from 'apps/libs/common/pipes/sharp.pipe';
+import { SharpPipe } from '../../../../../../apps/libs/common/pipes/sharp.pipe';
 import { Post as PostResponse } from '../infrastracture/entity/post.entity';
-import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
+import { PostPaginatedResponseDto } from '../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { FileTypes } from '../../../../../../apps/libs/Files/constants/file-type.enum';
 import { DeletePostCommand } from '../use-cases/commands/delete-post.handler';
 import EventEmmiter from 'events';
-import { SsePostsEvents } from 'apps/posts/src/constants/sse-events.enum';
-import { CancelUploadDto } from 'apps/libs/Posts/dto/input/cancel-upload.dto';
+import { SsePostsEvents } from '../../../../../../apps/posts/src/constants/sse-events.enum';
+import { CancelUploadDto } from '../../../../../../apps/libs/Posts/dto/input/cancel-upload.dto';
 import { DeletePostEvent } from '../use-cases/events/delete-post.event';
-import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
+import { CreateCommentDto } from '../../../../../../apps/libs/Posts/dto/input/create-comment.dto';
 import { CreateCommentCommand } from '../use-cases/commands/create-comment.handler';
 import { ConfigService } from '@nestjs/config';
+import { ResponseCommentDto } from '../../../../../../apps/libs/Posts/dto/output/response-comment.dto';
+import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
+import { UpdateCommentCommand } from '../use-cases/commands/update-comment.handler';
 
 @Controller()
 export class PostsController {
@@ -128,7 +134,8 @@ export class PostsController {
             null,
             await getUploadPath(
               FileTypes.Posts,
-              process.env.NODE_ENV === 'DEVELOPMENT'
+              process.env.NODE_ENV === 'DEVELOPMENT' ||
+                process.env.NODE_ENV === 'TESTING'
                 ? 'apps/posts/src/features/posts/uploads/posts'
                 : '/home/node/dist/posts/src/features/posts/uploads/posts',
               req,
@@ -219,13 +226,19 @@ export class PostsController {
   }
 
   @Post('posts/comment/add')
-  async createComment(@Body() createCommentDto: CreateCommentDto) {
-    console.log(
-      '🚀 ~ PostsController ~ createComment ~ createCommentDto:',
-      createCommentDto,
-    );
+  async createComment(
+    @Body() createCommentDto: CreateCommentDto,
+  ): Promise<ResponseCommentDto> {
     return await this.commandBus.execute(
       new CreateCommentCommand(createCommentDto),
+    );
+  }
+
+  @Patch('posts/comment/update/:id')
+  async updateComment(@Body() payload: any): Promise<void> {
+    const { id, updateCommentDto } = payload;
+    return await this.commandBus.execute(
+      new UpdateCommentCommand(id, updateCommentDto),
     );
   }
 }

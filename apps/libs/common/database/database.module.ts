@@ -6,7 +6,6 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 @Module({})
 export class DatabaseModule {
   static register(): DynamicModule {
-    console.log(__dirname);
     return {
       module: DatabaseModule,
       imports: [

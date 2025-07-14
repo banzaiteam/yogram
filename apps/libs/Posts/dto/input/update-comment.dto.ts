@@ -1,6 +1,12 @@
-import { PartialType, PickType } from '@nestjs/swagger';
-import { CreateCommentDto } from './create-comment.dto';
+import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class UpdateCommentDto extends PartialType(
-  PickType(CreateCommentDto, ['text']),
-) {}
+export class UpdateCommentDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  likes?: number;
+  @IsString()
+  @IsOptional()
+  text?: string;
+}

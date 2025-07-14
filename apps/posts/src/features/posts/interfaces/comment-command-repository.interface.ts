@@ -12,10 +12,10 @@ export abstract class ICommentCommandRepository<
   ): Promise<Response>;
 
   abstract update(
-    criteria: Criteria,
+    id: string,
     updateDto: Update,
     entityManager?: EntityManager,
-  ): Promise<any>;
+  ): Promise<number>;
 
   abstract delete(
     postId: string,

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostCommandService } from '../../post-command.service';
 import { ConfigService } from '@nestjs/config';
-import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
+import { HttpFilesPath } from '../../../../../../../apps/libs/Files/constants/path.enum';
 
 export class DeletePostCommand {
   constructor(

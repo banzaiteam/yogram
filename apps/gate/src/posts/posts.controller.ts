@@ -46,8 +46,10 @@ import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.deco
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
-import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
-import { HttpServices } from 'apps/gate/common/constants/http-services.enum';
+import { CreateCommentDto } from '../../../../apps/libs/Posts/dto/input/create-comment.dto';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { ResponseCommentDto } from 'apps/libs/Posts/dto/output/response-comment.dto';
+import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -224,11 +226,28 @@ export class PostsController {
   }
 
   @Post('comments')
-  async createComment(@Body() createCommentDto: CreateCommentDto) {
+  async createComment(
+    @Body() createCommentDto: CreateCommentDto,
+  ): Promise<ResponseCommentDto> {
     return await this.gateService.requestHttpServicePost(
       HttpServices.Posts,
       HttpPostsPath.AddComment,
       createCommentDto,
+      {},
+    );
+  }
+
+  @Patch('comments/:id')
+  async updateComment(
+    @Body()
+    updateCommentDto: UpdateCommentDto,
+    @Param('id') id: string,
+  ): Promise<void> {
+    const upd = { id, updateCommentDto };
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Posts,
+      [HttpPostsPath.UpdateComment, id].join('/'),
+      upd,
       {},
     );
   }

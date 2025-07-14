@@ -1,8 +1,15 @@
-import { OmitType } from '@nestjs/swagger';
-import { Comment } from '../../../../../apps/posts/src/features/posts/infrastracture/entity/comment.entity';
+import { Exclude, Expose } from 'class-transformer';
 
-export class ResponseCommentDto extends OmitType(Comment, [
-  'deletedAt',
-  'post',
-  'parent',
-]) {}
+@Exclude()
+export class ResponseCommentDto {
+  @Expose()
+  id: string;
+  @Expose()
+  userId: string;
+  @Expose()
+  text: string;
+  @Expose()
+  likes: number;
+  @Expose()
+  parentId?: string;
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { ICommentCommandRepository } from '../../../interfaces/comment-command-repository.interface';
@@ -29,9 +29,7 @@ export class CommentCommandRepository
   ): Promise<Comment> {
     // you should use this queryRunner.manager(entityManager) on save operations because without it typeorm transactions does not work
     const comment = new Comment(commentDto);
-    console.log('🚀 ~ comment:', comment);
     if (entityManager) {
-      console.log('🚀 ~ entityManager: create comment repo');
       return await entityManager.save(comment);
     }
 
@@ -39,45 +37,20 @@ export class CommentCommandRepository
   }
 
   async update(
-    criteria: FindCommentCriteria,
+    id: string,
     updateDto: UpdateCommentDto,
     entityManager?: EntityManager,
-  ): Promise<Comment> {
-    return;
-    // const post = await this.postRepo
-    //   .createQueryBuilder('posts')
-    //   .innerJoinAndSelect('posts.files', 'files')
-    //   .where('posts.id = :id', { id: criteria?.id })
-    //   .orWhere('files.id = :fileid', { fileid: criteria?.fileid })
-    //   .getOne();
-    // if (!post) throw new NotFoundException('post not found');
-    // let files = [];
-    // if (
-    //   Object.keys(updateDto).includes('url') ||
-    //   Object.keys(updateDto).includes('status')
-    // ) {
-    //   files = await Promise.all(
-    //     post.files.map(async (file) => {
-    //       if (file.id === criteria.fileid) {
-    //         file.url = updateDto?.url;
-    //         file.status = updateDto?.status;
-    //       }
-    //       return file;
-    //     }),
-    //   );
-    // }
-    // console.log('🚀 ~ comment:', post);
-    // const merged = await Promise.resolve(
-    //   this.postRepo.merge(post, {
-    //     ...updateDto,
-    //     ...files,
-    //   }),
-    // );
-    // if transaction then save with entityManager
-    // if (entityManager) {
-    //   return await entityManager.save(merged);
-    // }
-    // return await this.postRepo.save(merged);
+  ): Promise<number> {
+    const comment = await this.commentRepo.findOneBy({ id });
+    if (!comment)
+      throw new NotFoundException(
+        'CommentCommandRepository error: comment was not found',
+      );
+    const updated = await this.commentRepo.update(id, updateDto);
+    if (entityManager) {
+      return (await entityManager.update(Comment, id, updateDto)).affected;
+    }
+    return updated.affected;
   }
 
   async delete(
