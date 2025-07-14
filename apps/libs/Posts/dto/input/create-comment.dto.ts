@@ -5,7 +5,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Post } from 'apps/posts/src/features/posts/infrastracture/entity/post.entity';
+import { Post } from '../../../../../apps/posts/src/features/posts/infrastracture/entity/post.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateCommentDto {

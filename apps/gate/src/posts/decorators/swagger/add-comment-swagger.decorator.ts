@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CreateCommentDto } from 'apps/libs/Posts/dto/input/create-comment.dto';
+import { CreateCommentDto } from '../../../../../../apps/libs/Posts/dto/input/create-comment.dto';
 
 export const AddCommentSwagger = () =>
   applyDecorators(

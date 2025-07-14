@@ -48,8 +48,7 @@ import { Public } from '../../../../apps/gate/common/decorators/public.decorator
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { CreateCommentDto } from '../../../../apps/libs/Posts/dto/input/create-comment.dto';
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
-import { ResponseCommentDto } from 'apps/libs/Posts/dto/output/response-comment.dto';
-import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
+import { UpdateCommentDto } from '../../../../apps/libs/Posts/dto/input/update-comment.dto';
 import { AddCommentSwagger } from './decorators/swagger/add-comment-swagger.decorator';
 import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagger.decorator';
 

@@ -6,7 +6,7 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
-import { UpdateCommentDto } from 'apps/libs/Posts/dto/input/update-comment.dto';
+import { UpdateCommentDto } from '../../../../../../apps/libs/Posts/dto/input/update-comment.dto';
 
 export const UpdateCommentSwagger = () =>
   applyDecorators(
