@@ -8,4 +8,5 @@ export class ResponsePostDto {
   createdAt: Date;
   updatedAt: Date;
   files: ResponseFileDto[];
+  comments: any;
 }

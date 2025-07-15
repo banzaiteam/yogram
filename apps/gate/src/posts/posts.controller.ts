@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -41,26 +40,27 @@ import { CreateSwagger } from './decorators/swagger/create-swagger.decorator';
 import { DeleteSwagger } from './decorators/swagger/delete-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
 import { PublishSwagger } from './decorators/swagger/publish-swagger.decorator';
-import EventEmitter from 'events';
 import { CancelUploadDto } from '../../../../apps/libs/Posts/dto/input/cancel-upload.dto';
 import { SseCancelTokenSwagger } from './decorators/swagger/sse-cancel-token-swagger.decorator';
 import { CancelPostSwagger } from './decorators/swagger/cancel-post-swagger.decorator';
 import { SseFileSwagger } from './decorators/swagger/sse-file-swagger.decorator';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { LoggedUserDto } from '../../../../apps/libs/Users/dto/user/logged-user.dto';
+import { CreateCommentDto } from '../../../../apps/libs/Posts/dto/input/create-comment.dto';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { UpdateCommentDto } from '../../../../apps/libs/Posts/dto/input/update-comment.dto';
+import { AddCommentSwagger } from './decorators/swagger/add-comment-swagger.decorator';
+import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
-  private readonly postEmitter: EventEmitter;
   constructor(
     private readonly postsService: PostsService,
     private readonly configService: ConfigService,
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
-  ) {
-    this.postEmitter = new EventEmitter();
-  }
+  ) {}
 
   @Public()
   @SseFileSwagger()
@@ -224,5 +224,36 @@ export class PostsController {
       isPublished: true,
     };
     return await this.postsService.update(id, updatePostDto);
+  }
+
+  @AddCommentSwagger()
+  @Post('comments')
+  async createComment(
+    @User('id') id: string,
+    @Body() createCommentDto: CreateCommentDto,
+  ): Promise<void> {
+    createCommentDto.userId = id;
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Posts,
+      HttpPostsPath.AddComment,
+      createCommentDto,
+      {},
+    );
+  }
+
+  @UpdateCommentSwagger()
+  @Patch('comments/:id')
+  async updateComment(
+    @Body()
+    updateCommentDto: UpdateCommentDto,
+    @Param('id') id: string,
+  ): Promise<void> {
+    const upd = { id, updateCommentDto };
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Posts,
+      [HttpPostsPath.UpdateComment, id].join('/'),
+      upd,
+      {},
+    );
   }
 }

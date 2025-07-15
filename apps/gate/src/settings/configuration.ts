@@ -13,10 +13,6 @@ export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
   const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES'];
-  console.log(
-    'process.env.NODE_ENV in getonfigturation = ',
-    process.env.NODE_ENV,
-  );
 
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {

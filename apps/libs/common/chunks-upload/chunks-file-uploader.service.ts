@@ -7,10 +7,14 @@ import { firstValueFrom } from 'rxjs';
 import { UploadFile } from './interfaces/upload-file.interface';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChunksFileUploader {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
   /**
    * Take array of files uploaded by multer, divide each file by chunks and then send them to uploadChunk method which send chunk by chunk to proccessComposeFile which must be called at consumer service.
    * @param {string} routingKey - routing key for rabbitMq which link queue with exchange.
@@ -99,6 +103,12 @@ export class ChunksFileUploader {
     ].join('/');
     console.log('🚀 ~ ChunksFileUploader ~ pathToFile:', pathToFile);
     const chunkedFileDto: ChunkedFileDto = {
+      environment:
+        process.env.NODE_ENV === 'DEVELOPMENT'
+          ? 'dev'
+          : process.env.NODE_ENV === 'TESTING'
+            ? 'test'
+            : 'prod',
       bucketName: file.bucketName,
       routingKey,
       fileType: file.fileType,
@@ -131,7 +141,11 @@ export class ChunksFileUploader {
       '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunkedFileDto:',
       chunkedFileDto,
     );
-    const CHUNKS_DIR = '/home/node/dist/files/src/features/files/chunks';
+    const CHUNKS_DIR = this.configService.get('FILES_SERVICE_CHUNKS_DIR');
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ CHUNKS_DIR:',
+      CHUNKS_DIR,
+    );
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
     console.log(

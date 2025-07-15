@@ -1,17 +1,17 @@
-import { IPagination } from 'apps/libs/common/pagination/decorators/pagination.decorator';
+import { IPagination } from '../../../../../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import { IPostQueryRepository } from '../../../interfaces/posts-query-repository.interface';
 import { Post } from '../../entity/post.entity';
 import {
   getSortingOrder,
   ISorting,
-} from 'apps/libs/common/pagination/decorators/sorting.decorator';
+} from '../../../../../../../../apps/libs/common/pagination/decorators/sorting.decorator';
 import {
   getFilteringObject,
   IFiltering,
-} from 'apps/libs/common/pagination/decorators/filtering.decorator';
+} from '../../../../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { EntityManager, Repository } from 'typeorm';
+import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 
 export class PostsQueryRepository
   implements IPostQueryRepository<PostPaginatedResponseDto>
@@ -43,6 +43,7 @@ export class PostsQueryRepository
       where: filter,
       relations: {
         files: true,
+        comments: true,
       },
     });
     const paginatedResponse: PostPaginatedResponseDto = {
@@ -52,5 +53,22 @@ export class PostsQueryRepository
       limit: pagination.limit,
     };
     return paginatedResponse;
+  }
+
+  async findPostbyId(
+    postId: string,
+    entityManager?: EntityManager,
+  ): Promise<Post> {
+    if (entityManager) {
+      return await entityManager.findOne(Post, {
+        where: { id: postId },
+        relations: { files: true, comments: true },
+      });
+    }
+
+    return await this.postRepository.findOne({
+      where: { id: postId },
+      relations: { files: true, comments: true },
+    });
   }
 }

@@ -16,11 +16,14 @@ import { AppController } from './app.controller';
 import { GateService } from 'apps/libs/gateService';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
+  console.log('posts env...');
   const defaultEnvFilePath = [
     'apps/posts/src/.env.development',
     'apps/posts/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
+    console.log('posts test env...');
+
     return ['apps/posts/src/.env.test', ...defaultEnvFilePath];
   }
   return defaultEnvFilePath;

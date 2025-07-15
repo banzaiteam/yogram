@@ -58,7 +58,7 @@ export class AwsService implements IUploader {
         ContentLength: file.size,
         Bucket: bucketName,
         ContentType: file.mimetype,
-        Key: [file.fileType, file.pathToFile].join('/'),
+        Key: [file.environment, file.fileType, file.pathToFile].join('/'),
       },
     });
 

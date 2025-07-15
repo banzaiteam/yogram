@@ -3,14 +3,14 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreatePostDto } from 'apps/libs/Posts/dto/input/create-post.dto';
+import { CreatePostDto } from '../../../../../apps/libs/Posts/dto/input/create-post.dto';
 import { IPostCommandRepository } from './interfaces/post-command-repository.interface';
 import { Post } from './infrastracture/entity/post.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FileCommandService } from './file-command.service';
 import { CreateFileDto } from '../../dto/create-file.dto';
-import { ChunksFileUploader } from 'apps/libs/common/chunks-upload/chunks-file-uploader.service';
-import { HttpFilesPath } from 'apps/libs/Files/constants/path.enum';
+import { ChunksFileUploader } from '../../../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { HttpFilesPath } from '../../../../../apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
 import fs from 'node:fs/promises';
 import { EventBus } from '@nestjs/cqrs';
@@ -19,11 +19,11 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { v4 } from 'uuid';
 import { FileStatus } from './constants/file.constant';
-import { UpdatePostCriteria } from 'apps/libs/Posts/dto/input/update-post-criteria.dto';
-import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
-import { UploadFile } from 'apps/libs/common/chunks-upload/interfaces/upload-file.interface';
-import { FileTypes } from 'apps/libs/Files/constants/file-type.enum';
-import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { UpdatePostCriteria } from '../../../../../apps/libs/Posts/dto/input/update-post-criteria.dto';
+import { UpdatePostDto } from '../../../../../apps/libs/Posts/dto/input/update-post.dto';
+import { UploadFile } from '../../../../../apps/libs/common/chunks-upload/interfaces/upload-file.interface';
+import { FileTypes } from '../../../../../apps/libs/Files/constants/file-type.enum';
+import { FilesRoutingKeys } from '../../../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostsDeleteOubox } from './outbox/posts-delete-outbox.entity';
 import { BaseDeleteOutBox } from 'apps/libs/common/outbox/base-delete-outbox.entity';
@@ -87,8 +87,9 @@ export class PostCommandService {
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
           // todo? make env variable
-          filesUploadBaseDir:
-            '/home/node/dist/files/src/features/files/uploads/posts',
+          filesUploadBaseDir: this.configService.get(
+            'FILES_SERVICE_POSTS_UPLOAD_PATH',
+          ),
           fieldname: file.fieldname,
           mimetype: file.mimetype,
           size: file.size,
