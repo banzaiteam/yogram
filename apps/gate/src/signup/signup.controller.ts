@@ -110,7 +110,7 @@ export class SignupController {
   @Get('email-verify/:token/:email')
   async emailVerify(
     @Param('token') token: string,
-    @Param() email: string,
+    @Param('email') email: string,
     @Res() res: Response,
   ) {
     try {
