@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../../../../libs/Users/dto/user/create-user.dto';
 import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dto';
 import { Profile } from '../../entity/Profile.entity';
@@ -8,6 +12,7 @@ import { ResponseProfileDto } from '../../../../../../apps/libs/Users/dto/user/r
 import { UpdateProfileDto } from '../../../../../../apps/libs/Users/dto/profile/update-profile.dto';
 import { plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Subscriber } from '../../entity/Subscriber.entity';
 
 @Injectable()
 export class ProfileCommandRepository
@@ -17,7 +22,10 @@ export class ProfileCommandRepository
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(Subscriber)
+    private readonly subscriberRepository: Repository<Subscriber>,
   ) {}
+
   // We pass the entity manager into getRepository to ensure that we
   // we run the query in the same context as the transaction.
   async create(
@@ -64,6 +72,26 @@ export class ProfileCommandRepository
   }
   delete(userId: string): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  async findOne(id: string): Promise<Profile> {
+    const profile = await this.profileRepository.findOneBy({ id });
+    if (!profile)
+      throw new BadRequestException(
+        'ProfileCommandRepository error: profile does not exist',
+      );
+    return profile;
+  }
+
+  async subscribe(
+    subscriber: string,
+    subscribeTo: Profile,
+    entityManager?: EntityManager,
+  ): Promise<Subscriber> {
+    const subscription = this.subscriberRepository.create();
+    subscription.id = subscriber;
+    subscription.subscribedTo = [subscribeTo];
+    return await this.subscriberRepository.save(subscription);
   }
 }
 

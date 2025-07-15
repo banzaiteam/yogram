@@ -48,7 +48,11 @@ import { ProviderCommandService } from './provider-command.service';
 import { ProfileCommandService } from './profile-command.service';
 import { ChunksFileUploaderModule } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.module';
 import { RabbitConsumerModule } from '../../../apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
-import { FilesBindingKeysEnum } from '../../../apps/files/src/features/files/message-brokers/rabbit/users-queue-bindings.constant';
+import { Subscriber } from './infrastructure/entity/Subscriber.entity';
+import {
+  SubscribeCommand,
+  SubscribeHandler,
+} from './features/subscribe/command/subscribe.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -75,7 +79,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     RabbitProducerModule.register(['users']),
     RabbitConsumerModule.register([{ files: ['files.uploaded.avatars'] }]),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([User, Profile, Provider]),
+    TypeOrmModule.forFeature([User, Profile, Provider, Subscriber]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
@@ -115,6 +119,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     FindUserByProviderIdHandler,
     ProviderQueryService,
     ProviderQueryRepositoryProvider,
+    SubscribeCommand,
+    SubscribeHandler,
     ProviderCommandService,
     ProfileCommandService,
   ],

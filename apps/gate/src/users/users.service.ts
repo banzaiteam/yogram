@@ -100,7 +100,10 @@ export class UsersService {
   }
 
   async subscribe(id: string, subscribeTo: string) {
-    const subscribeDto: SubscribeDto = { subscriber: id, subscribeTo };
+    const subscribeDto: SubscribeDto = {
+      subscriber: id,
+      subscribeTo,
+    };
     return await this.gateService.requestHttpServicePost(
       HttpServices.Users,
       HttpUsersPath.Subscribe,
