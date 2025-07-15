@@ -48,6 +48,7 @@ import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-pass
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
+import { SubscribeDto } from 'apps/libs/Users/dto/profile/subscribe.dto';
 @Controller()
 export class UsersController {
   private readonly usersEmmiter: EventEmmiter;
@@ -190,10 +191,8 @@ export class UsersController {
     rtKey: string,
     { payload }: IEvent,
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ payload:', payload);
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
-    console.log('🚀 ~ UsersController ~ folderPath:', folderPath);
     const criteria = {
       id: folderPath,
     };
@@ -214,5 +213,10 @@ export class UsersController {
     return await this.commandBus.execute(
       new CreateUserGoogleCommand(googleSignupDto),
     );
+  }
+
+  @Post('users/subscribe')
+  async subscribe(@Body() subscribeDto: SubscribeDto) {
+    return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
   }
 }

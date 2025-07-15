@@ -33,6 +33,7 @@ import { Public } from '../../../../apps/gate/common/decorators/public.decorator
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
+import { User } from '../auth/decorators/user.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -114,5 +115,10 @@ export class UsersController {
       sorting,
       filtering,
     );
+  }
+
+  @Post('subscribe')
+  async subscribe(@User('id') id: string, subscribeTo: string) {
+    return await this.usersService.subscribe(id, subscribeTo);
   }
 }

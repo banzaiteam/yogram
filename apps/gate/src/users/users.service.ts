@@ -14,6 +14,7 @@ import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/f
 import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
+import { SubscribeDto } from 'apps/libs/Users/dto/profile/subscribe.dto';
 
 @Injectable()
 export class UsersService {
@@ -96,5 +97,15 @@ export class UsersService {
     return Object.entries(objectWithoutUndefined)
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
+  }
+
+  async subscribe(id: string, subscribeTo: string) {
+    const subscribeDto: SubscribeDto = { subscriber: id, subscribeTo };
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Users,
+      HttpUsersPath.Subscribe,
+      subscribeDto,
+      {},
+    );
   }
 }
