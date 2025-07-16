@@ -48,18 +48,25 @@ export class ProfileCommandService {
   }
 
   async subscribe(subscriber: string, subscribeTo: string): Promise<any> {
-    const subscriberProfile = await this.userQueryRepository.findUserByCriteria(
-      { id: subscriber },
-    );
-    if (!subscriberProfile)
+    const user = await this.userQueryRepository.findUserByCriteria({
+      id: subscriber,
+    });
+
+    if (!user)
       throw new NotFoundException(
         'ProfileCommandService error: user was not found',
       );
     const profileTOSubscribeOn =
       await this.profileCommandRepository.findOne(subscribeTo);
+    const subscribers = await this.getAllProfileSubscribedOn(user.profile.id);
     return await this.profileCommandRepository.subscribe(
-      subscriberProfile.profile.id,
+      user.profile.id,
       profileTOSubscribeOn,
     );
+  }
+
+  async getAllProfileSubscribedOn(id: string) {
+    const subscribers =
+      await this.profileCommandRepository.getAllProfileSubscribedOn(id);
   }
 }

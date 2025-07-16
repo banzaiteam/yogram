@@ -83,14 +83,24 @@ export class ProfileCommandRepository
     return profile;
   }
 
+  async getAllProfileSubscribedOn(id: string) {
+    return await this.subscriberRepository.find({
+      where: { id },
+      relations: { profiles: true },
+    });
+  }
+
   async subscribe(
     subscriber: string,
     subscribeTo: Profile,
     entityManager?: EntityManager,
   ): Promise<Subscriber> {
+    console.log('🚀 ~ subscribeTo:', subscribeTo);
     const subscription = this.subscriberRepository.create();
     subscription.id = subscriber;
-    subscription.subscribedTo = [subscribeTo];
+    let arr = [];
+    arr.push(subscribeTo);
+    subscription.profiles = arr;
     return await this.subscriberRepository.save(subscription);
   }
 }

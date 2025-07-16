@@ -17,7 +17,7 @@ export class Profile extends BaseEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
-  @ManyToMany(() => Subscriber, (subscribers) => subscribers.subscribedTo)
+  @ManyToMany(() => Subscriber, (subscribers) => subscribers.profiles)
   subscribers: Subscriber[];
 
   constructor(entity: Partial<Profile>) {

@@ -1,4 +1,4 @@
-import { Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
 import { Profile } from './Profile.entity';
 
 @Entity()
@@ -12,7 +12,10 @@ export class Subscriber {
   @JoinTable({
     name: 'subscribes',
     joinColumn: { name: 'subscriber_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'subscribed_id', referencedColumnName: 'id' },
+    inverseJoinColumn: {
+      name: 'subscribed_id',
+      referencedColumnName: 'id',
+    },
   })
-  subscribedTo: Profile[];
+  profiles: Profile[];
 }
