@@ -47,8 +47,8 @@ import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/eve
 import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
-import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
-import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
+import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
+import { SubscribeDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
 @Controller()
 export class UsersController {

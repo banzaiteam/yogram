@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
-import { SubscriberCommandService } from 'apps/users/src/subscriber-command.service';
+import { SubscribeDto } from '../../../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { SubscriberCommandService } from '../../../../../../apps/users/src/subscriber-command.service';
 
 export class SubscribeCommand {
   constructor(public readonly subscribeDto: SubscribeDto) {}
