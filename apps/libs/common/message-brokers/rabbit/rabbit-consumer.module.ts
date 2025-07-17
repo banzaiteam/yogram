@@ -108,9 +108,6 @@ export class RabbitConsumerModule implements OnModuleInit {
           });
           await channel.assertExchange('exchange1', 'topic');
           bindingKeys.forEach((key) => {
-            console.log(
-              `RabbitModule bindingKeys to queue: ${queueName}, key: ${key}`,
-            );
             channel.bindQueue(queueName, 'exchange1', key);
           });
           channel.consume(queueName, async (message) => {

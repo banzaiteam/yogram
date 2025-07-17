@@ -77,15 +77,11 @@ export class ProfileCommandRepository
     throw new Error('Method not implemented.');
   }
 
-  async findOne(id: string): Promise<ResponseProfile1Dto> {
+  async findOne(id: string): Promise<ResponseProfile1Dto | null> {
     const profile = await this.profileRepository.findOne({
       where: { id },
       relations: { user: true },
     });
-    if (!profile)
-      throw new BadRequestException(
-        'ProfileCommandRepository error: profile does not exist',
-      );
     return plainToInstance(ResponseProfile1Dto, profile);
   }
 
