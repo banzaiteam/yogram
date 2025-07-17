@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ResponseSubscribedOnDto } from 'apps/libs/Users/dto/profile/response-subscribed-on.dto';
+import { ResponseSubscribedOnDto } from '../../../../../../apps/libs/Users/dto/profile/response-subscribed-on.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { Subscriber } from '../../entity/Subscriber.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ISubscriberQueryRepository } from 'apps/users/src/interfaces/query/subscriber-query.interface';
+import { ISubscriberQueryRepository } from '../../../../../../apps/users/src/interfaces/query/subscriber-query.interface';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
