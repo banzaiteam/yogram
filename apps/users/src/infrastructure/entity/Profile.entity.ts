@@ -1,7 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { User } from './User.entity';
 import { BaseEntity } from '../../../../../apps/libs/common/entity/base.entity';
-import { Subscriber } from './Subscriber.entity';
 
 @Entity('profiles')
 export class Profile extends BaseEntity {
@@ -16,9 +15,6 @@ export class Profile extends BaseEntity {
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
-
-  @ManyToMany(() => Subscriber, (subscribers) => subscribers.profiles)
-  subscribers: Subscriber[];
 
   constructor(entity: Partial<Profile>) {
     super();

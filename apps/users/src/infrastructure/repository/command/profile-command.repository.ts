@@ -8,7 +8,10 @@ import { UpdateUserDto } from '../../../../../libs/Users/dto/user/update-user.dt
 import { Profile } from '../../entity/Profile.entity';
 import { Brackets, EntityManager, Repository } from 'typeorm';
 import { IProfileCommandRepository } from 'apps/users/src/interfaces/command/profile-command.interface';
-import { ResponseProfileDto } from '../../../../../../apps/libs/Users/dto/user/response-profile.dto';
+import {
+  ResponseProfile1Dto,
+  ResponseProfileDto,
+} from '../../../../../../apps/libs/Users/dto/user/response-profile.dto';
 import { UpdateProfileDto } from '../../../../../../apps/libs/Users/dto/profile/update-profile.dto';
 import { plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -74,35 +77,38 @@ export class ProfileCommandRepository
     throw new Error('Method not implemented.');
   }
 
-  async findOne(id: string): Promise<Profile> {
-    const profile = await this.profileRepository.findOneBy({ id });
+  async findOne(id: string): Promise<ResponseProfile1Dto> {
+    const profile = await this.profileRepository.findOne({
+      where: { id },
+      relations: { user: true },
+    });
     if (!profile)
       throw new BadRequestException(
         'ProfileCommandRepository error: profile does not exist',
       );
-    return profile;
+    return plainToInstance(ResponseProfile1Dto, profile);
   }
 
-  async getAllProfileSubscribedOn(id: string) {
-    return await this.subscriberRepository.find({
-      where: { id },
-      relations: { profiles: true },
-    });
-  }
+  // async getAllProfileSubscribedOn(id: string) {
+  //   return await this.subscriberRepository.find({
+  //     where: { id },
+  //     relations: { profiles: true },
+  //   });
+  // }
 
-  async subscribe(
-    subscriber: string,
-    subscribeTo: Profile,
-    entityManager?: EntityManager,
-  ): Promise<Subscriber> {
-    console.log('🚀 ~ subscribeTo:', subscribeTo);
-    const subscription = this.subscriberRepository.create();
-    subscription.id = subscriber;
-    let arr = [];
-    arr.push(subscribeTo);
-    subscription.profiles = arr;
-    return await this.subscriberRepository.save(subscription);
-  }
+  // async subscribe(
+  //   subscriber: string,
+  //   subscribeTo: Profile,
+  //   entityManager?: EntityManager,
+  // ): Promise<Subscriber> {
+  //   console.log('🚀 ~ subscribeTo:', subscribeTo);
+  //   const subscription = this.subscriberRepository.create();
+  //   subscription.id = subscriber;
+  //   let arr = [];
+  //   arr.push(subscribeTo);
+  //   subscription.profiles = arr;
+  //   return await this.subscriberRepository.save(subscription);
+  // }
 }
 
 export type ProfileUpdateCriteria = {

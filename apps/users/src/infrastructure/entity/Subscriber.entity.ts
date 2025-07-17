@@ -1,21 +1,26 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
-import { Profile } from './Profile.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Subscriber {
-  @PrimaryColumn('uuid')
-  id: string;
+  @PrimaryColumn({ type: 'uuid' })
+  subscriberId: string;
 
-  @ManyToMany(() => Profile, (profile) => profile.subscribers, {
-    cascade: true,
-  })
-  @JoinTable({
-    name: 'subscribes',
-    joinColumn: { name: 'subscriber_id', referencedColumnName: 'id' },
-    inverseJoinColumn: {
-      name: 'subscribed_id',
-      referencedColumnName: 'id',
-    },
-  })
-  profiles: Profile[];
+  @Column({ type: 'varchar', nullable: true })
+  subscriberUrl: string;
+
+  @Column({ type: 'varchar' })
+  subscriberUsername: string;
+
+  @PrimaryColumn({ type: 'uuid' })
+  subscribedId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  subscribedUrl: string;
+
+  @Column({ type: 'varchar' })
+  subscribedUsername: string;
+
+  constructor(entity: Partial<Subscriber>) {
+    Object.assign(this, entity);
+  }
 }

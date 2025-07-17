@@ -116,12 +116,12 @@ export class UsersController {
       filtering,
     );
   }
-  // todo write tests, subscribe unit/e2e
+
   @Post('subscribe')
   async subscribe(
     @User('id') id: string,
     @Body('subscribeTo') subscribeTo: string,
-  ) {
+  ): Promise<void> {
     return await this.usersService.subscribe(id, subscribeTo);
   }
 }

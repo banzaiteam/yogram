@@ -35,7 +35,6 @@ export class PostsQueryRepository
     if (filtering) {
       filter = getFilteringObject(filtering);
     }
-
     const data = await this.postRepository.findAndCount({
       skip: pagination.offset,
       take: pagination.limit,
@@ -46,6 +45,7 @@ export class PostsQueryRepository
         comments: true,
       },
     });
+    console.log('🚀 ~ data:', data);
     const paginatedResponse: PostPaginatedResponseDto = {
       items: data[0],
       totalItems: data[1],

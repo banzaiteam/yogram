@@ -19,9 +19,7 @@ export class UsersQueryService {
   }
 
   async findUserByCriteria(criteria: UserCriteria): Promise<ResponseUserDto> {
-    const user = await this.userQueryRepository.findUserByCriteria(criteria);
-    console.log('🚀 ~ UsersQueryService ~ findUserByCriteria ~ user:', user);
-    return user;
+    return await this.userQueryRepository.findUserByCriteria(criteria);
   }
 
   async findUserByProviderId(providerId: string): Promise<ResponseUserDto> {

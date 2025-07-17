@@ -48,7 +48,7 @@ import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-pass
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
-import { SubscribeDto } from 'apps/libs/Users/dto/profile/subscribe.dto';
+import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
 @Controller()
 export class UsersController {
@@ -217,7 +217,7 @@ export class UsersController {
   }
 
   @Post('users/subscribe')
-  async subscribe(@Body() subscribeDto: any) {
+  async subscribe(@Body() subscribeDto: SubscribeDto): Promise<void> {
     return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
   }
 }

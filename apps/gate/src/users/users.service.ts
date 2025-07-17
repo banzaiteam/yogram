@@ -14,7 +14,7 @@ import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/f
 import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
-import { SubscribeDto } from 'apps/libs/Users/dto/profile/subscribe.dto';
+import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
 
 @Injectable()
 export class UsersService {
@@ -99,7 +99,7 @@ export class UsersService {
       .join('&');
   }
 
-  async subscribe(id: string, subscribeTo: string) {
+  async subscribe(id: string, subscribeTo: string): Promise<void> {
     const subscribeDto: SubscribeDto = {
       subscriber: id,
       subscribeTo,
