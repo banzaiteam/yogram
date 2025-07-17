@@ -1,17 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProfileCommandService } from './profile-command.service';
-import { IUsersQueryRepository } from './interfaces/query/user-query.interface';
-import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 import { NotFoundException } from '@nestjs/common';
-import { User } from './infrastructure/entity/User.entity';
-import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
-import { CreateProfileDto } from 'apps/libs/Users/dto/profile/create-profile.dto';
-import { UpdateProfileDto } from 'apps/libs/Users/dto/profile/update-profile.dto';
-import {
-  ResponseProfile1Dto,
-  ResponseProfileDto,
-} from 'apps/libs/Users/dto/user/response-profile.dto';
-import { SubscriberCommandRepository } from './infrastructure/repository/command/subscriber-command.repository';
+import { ResponseProfile1Dto } from 'apps/libs/Users/dto/user/response-profile.dto';
 import { ISubscriberCommandRepository } from './interfaces/command/subscriber-command.interface';
 import { SubscriberCommandService } from './subscriber-command.service';
 import { Profile } from './infrastructure/entity/Profile.entity';
@@ -20,7 +9,6 @@ import { ProfileCommandRepository } from './infrastructure/repository/command/pr
 import { UsersQueryService } from './users-query.service';
 import { SubscriberQueryService } from './subscriber-query.service';
 import { Subscriber } from './infrastructure/entity/Subscriber.entity';
-import { rejects } from 'assert';
 
 const subscriberUser = {
   id: 'be225a5f-e127-49d8-ad00-d49830af654d',
