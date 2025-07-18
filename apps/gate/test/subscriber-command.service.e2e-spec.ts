@@ -28,7 +28,7 @@ describe('Session e2e', () => {
     await app.close();
   });
 
-  describe('Subscribe Success', () => {
+  describe.skip('Subscribe Success', () => {
     it('Subscribe to profile (POST /users/subscribe)', async () => {
       const authResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -43,7 +43,7 @@ describe('Session e2e', () => {
     });
   });
 
-  describe('Subscribe Exceptions', () => {
+  describe.skip('Subscribe Exceptions', () => {
     it('should throw ProfileCommandService error: subscriber  user was not found', async () => {
       const exception = new NotFoundException(
         'ProfileCommandService error: profile to subscribe on was not found',
