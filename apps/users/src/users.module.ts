@@ -62,6 +62,10 @@ import {
   UnsubscribeCommand,
   UnsubscribeHandler,
 } from './features/subscribe/command/unsubscribe.handler';
+import {
+  SubscriptionsHandler,
+  SubscriptionsQuery,
+} from './features/subscribe/query/subscriptions.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -139,6 +143,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     ProfileCommandRepository,
     UnsubscribeCommand,
     UnsubscribeHandler,
+    SubscriptionsHandler,
+    SubscriptionsQuery,
   ],
 })
 export class UsersModule {}

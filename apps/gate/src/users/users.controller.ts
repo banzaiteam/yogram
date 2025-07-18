@@ -35,6 +35,7 @@ import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/
 import { JwtService } from '@nestjs/jwt';
 import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
 import { User } from '../auth/decorators/user.decorator';
+import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -124,6 +125,13 @@ export class UsersController {
     @Body('subscribeTo') subscribeTo: string,
   ): Promise<void> {
     return await this.usersService.subscribe(id, subscribeTo);
+  }
+
+  @Get('subscriptions')
+  async getAllSubscriptions(
+    @User('id') id: string,
+  ): Promise<ResponseSubscriptionsDto> {
+    return await this.usersService.getAllSubscriptions(id);
   }
 
   @Delete('unsubscribe')

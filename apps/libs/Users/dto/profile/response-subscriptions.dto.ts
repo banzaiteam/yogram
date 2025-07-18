@@ -11,7 +11,7 @@ class Subscribe {
 }
 
 @Exclude()
-export class ResponseSubscribedOnDto {
+export class ResponseSubscriptionsDto {
   @Expose()
   subscriber: Subscribe;
   @Expose()

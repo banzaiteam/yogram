@@ -8,4 +8,5 @@ export enum HttpUsersPath {
   UpdateUserByCriteria = 'users/update',
   Subscribe = 'users/subscribe',
   Unsubscribe = 'users/unsubscribe',
+  GetAllSubscribedOn = 'users/subscriptions',
 }

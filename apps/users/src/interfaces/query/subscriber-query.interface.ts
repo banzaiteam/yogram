@@ -1,14 +1,14 @@
 import { EntityManager } from 'typeorm';
-import { ResponseSubscribedOnDto } from '../../../../../apps/libs/Users/dto/profile/response-subscribed-on.dto';
+import { ResponseSubscriptionsDto } from '../../../../libs/Users/dto/profile/response-subscriptions.dto';
 
 export abstract class ISubscriberQueryRepository {
   abstract getAllSubscriptions(
     id: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseSubscribedOnDto>;
+  ): Promise<ResponseSubscriptionsDto>;
 
   abstract getAllSubscribers(
     id: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseSubscribedOnDto>;
+  ): Promise<ResponseSubscriptionsDto>;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ResponseSubscribedOnDto } from '../../../../../../apps/libs/Users/dto/profile/response-subscribed-on.dto';
+import { ResponseSubscriptionsDto } from '../../../../../libs/Users/dto/profile/response-subscriptions.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { Subscriber } from '../../entity/Subscriber.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,7 +15,7 @@ export class SubscriberQueryRepository implements ISubscriberQueryRepository {
   async getAllSubscriptions(
     subscriberId: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseSubscribedOnDto> {
+  ): Promise<ResponseSubscriptionsDto> {
     let subscribedOn;
     if (entityManager) {
       subscribedOn = await entityManager.find(Subscriber, {
@@ -48,13 +48,13 @@ export class SubscriberQueryRepository implements ISubscriberQueryRepository {
       };
       parsedSubscription.subscribed.push(subscribed);
     });
-    return plainToInstance(ResponseSubscribedOnDto, parsedSubscription);
+    return plainToInstance(ResponseSubscriptionsDto, parsedSubscription);
   }
 
   getAllSubscribers(
     id: string,
     entityManager?: EntityManager,
-  ): Promise<ResponseSubscribedOnDto> {
+  ): Promise<ResponseSubscriptionsDto> {
     throw new Error('Method not implemented.');
   }
 }

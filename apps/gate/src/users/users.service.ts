@@ -14,8 +14,8 @@ import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/f
 import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
-import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
-import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 
 @Injectable()
 export class UsersService {
@@ -120,6 +120,15 @@ export class UsersService {
     return await this.gateService.requestHttpServiceDelete(
       HttpServices.Users,
       deletePath,
+      {},
+    );
+  }
+
+  async getAllSubscriptions(id: string): Promise<ResponseSubscriptionsDto> {
+    const path = [HttpUsersPath.GetAllSubscribedOn, id].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      path,
       {},
     );
   }

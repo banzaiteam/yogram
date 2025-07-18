@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { ISubscriberCommandRepository } from './interfaces/command/subscriber-command.interface';
 import { UsersQueryService } from './users-query.service';
@@ -34,6 +38,12 @@ export class SubscriberCommandService {
       throw new NotFoundException(
         'ProfileCommandService error: profile to subscribe on was not found',
       );
+
+    if (userSubscriber.profile.id === profileToSubscribeOn.id) {
+      throw new ConflictException(
+        'SubscriberCommandService error: user cant subscribe on himself',
+      );
+    }
 
     if (entityManager) {
       return await this.subscriberCommandRepository.subscribe(

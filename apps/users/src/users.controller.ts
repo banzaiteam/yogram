@@ -51,8 +51,11 @@ import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
 import { SubscribeDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
-import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeDto } from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
+import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
+
 @Controller()
 export class UsersController {
   private readonly usersEmmiter: EventEmmiter;
@@ -222,6 +225,13 @@ export class UsersController {
   @Post('users/subscribe')
   async subscribe(@Body() subscribeDto: SubscribeDto): Promise<void> {
     return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
+  }
+
+  @Get('users/subscriptions/:id')
+  async getAllSubscriptions(
+    @Param('id') id: string,
+  ): Promise<ResponseSubscriptionsDto> {
+    return await this.queryBus.execute(new SubscriptionsQuery(id));
   }
 
   @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')
