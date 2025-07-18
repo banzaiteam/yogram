@@ -1,20 +1,17 @@
-import {
-  HttpStatus,
-  INestApplication,
-  NotFoundException,
-} from '@nestjs/common';
+import { INestApplication, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { UsersModule } from '../../../apps/users/src/users.module';
-import { SubscriberCommandService } from '../../../apps/users/src/subscriber-command.service';
+import { HttpUsersPath } from '../../../apps/libs/Users/constants/path.enum';
 
+let subscriber = 'be225a5f-e127-49d8-ad00-d49830af654d';
 let subscribeTo = '24d033ff-ac03-4b46-b1b2-09282f57c813';
+let unsubscribeFrom = '24d033ff-ac03-4b46-b1b2-09282f57c813';
 const mockSubscriberCommandService = {
   subscribe: jest.fn(),
 };
 
-describe('Session e2e', () => {
+describe('Subscriber e2e', () => {
   let app: INestApplication;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,6 +40,21 @@ describe('Session e2e', () => {
     });
   });
 
+  describe.skip('Subscribe delete', () => {
+    it('Delete (DELETE /users/unsubscribe)', async () => {
+      const authResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'retouch226@gmail.com', password: '24488Ok!' });
+      let accessToken = authResponse.body.accessToken;
+
+      await request(app.getHttpServer())
+        .delete('/users/unsubscribe')
+        .send({ unsubscribeFrom })
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+    });
+  });
+
   describe.skip('Subscribe Exceptions', () => {
     it('should throw ProfileCommandService error: subscriber  user was not found', async () => {
       const exception = new NotFoundException(
@@ -57,7 +69,7 @@ describe('Session e2e', () => {
 
       const response = await request(app.getHttpServer())
         .post('/users/subscribe')
-        .send({ subscribeTo })
+        .send({ unsubscribeFrom })
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(404);
       expect(response.body.message).toEqual(exception.message);

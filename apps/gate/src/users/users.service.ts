@@ -15,6 +15,7 @@ import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
+import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
 
 @Injectable()
 export class UsersService {
@@ -108,6 +109,17 @@ export class UsersService {
       HttpServices.Users,
       HttpUsersPath.Subscribe,
       subscribeDto,
+      {},
+    );
+  }
+
+  async unsubscribe(id: string, unsubscribeFrom: string): Promise<void> {
+    const deletePath = [HttpUsersPath.Unsubscribe, id, unsubscribeFrom].join(
+      '/',
+    );
+    return await this.gateService.requestHttpServiceDelete(
+      HttpServices.Users,
+      deletePath,
       {},
     );
   }

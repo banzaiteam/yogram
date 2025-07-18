@@ -136,38 +136,44 @@ describe('Subscriber Command Service', () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(subscribed).toEqual(undefined);
     });
+
+    describe.skip('throws', () => {
+      it('should throw ProfileCommandService error: user was not found', async () => {
+        const ecxeption = new NotFoundException(
+          'ProfileCommandService error: user was not found',
+        );
+        const mockMethod = jest.spyOn(service, 'subscribe');
+        jest
+          .spyOn(usersQueryService, 'findUserByCriteria')
+          .mockRejectedValueOnce(ecxeption);
+
+        try {
+          await service.subscribe(subscriberUser.id, profileTOSubscribeOn.id);
+        } catch (error) {
+          expect(mockMethod).toHaveBeenCalledTimes(1);
+          expect(error).toEqual(ecxeption);
+        }
+      });
+
+      it('should throw ProfileCommandService error: subscriber  user was not foundd', async () => {
+        const ecxeption = new NotFoundException(
+          'ProfileCommandService error: subscriber  user was not found',
+        );
+        const mockMethod = jest.spyOn(service, 'subscribe');
+        jest
+          .spyOn(profileRepository, 'findOne')
+          .mockRejectedValueOnce(ecxeption);
+        try {
+          await service.subscribe(subscriberUser.id, profileTOSubscribeOn.id);
+        } catch (error) {
+          expect(mockMethod).toHaveBeenCalledTimes(1);
+          expect(error).toEqual(ecxeption);
+        }
+      });
+    });
   });
 
-  describe.skip('throws', () => {
-    it('should throw ProfileCommandService error: user was not found', async () => {
-      const ecxeption = new NotFoundException(
-        'ProfileCommandService error: user was not found',
-      );
-      const mockMethod = jest.spyOn(service, 'subscribe');
-      jest
-        .spyOn(usersQueryService, 'findUserByCriteria')
-        .mockRejectedValueOnce(ecxeption);
-
-      try {
-        await service.subscribe(subscriberUser.id, profileTOSubscribeOn.id);
-      } catch (error) {
-        expect(mockMethod).toHaveBeenCalledTimes(1);
-        expect(error).toEqual(ecxeption);
-      }
-    });
-
-    it('should throw ProfileCommandService error: subscriber  user was not foundd', async () => {
-      const ecxeption = new NotFoundException(
-        'ProfileCommandService error: subscriber  user was not found',
-      );
-      const mockMethod = jest.spyOn(service, 'subscribe');
-      jest.spyOn(profileRepository, 'findOne').mockRejectedValueOnce(ecxeption);
-      try {
-        await service.subscribe(subscriberUser.id, profileTOSubscribeOn.id);
-      } catch (error) {
-        expect(mockMethod).toHaveBeenCalledTimes(1);
-        expect(error).toEqual(ecxeption);
-      }
-    });
+  describe.skip('Delete', () => {
+    it('should delete subscribtion', async () => {});
   });
 });

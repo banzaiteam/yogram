@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ISubscriberCommandRepository } from 'apps/users/src/interfaces/command/subscriber-command.interface';
 import { EntityManager, Repository } from 'typeorm';
 import { Subscriber } from '../../entity/Subscriber.entity';
@@ -13,12 +13,27 @@ export class SubscriberCommandRepository
     private readonly subscriberRepository: Repository<Subscriber>,
   ) {}
 
-  unsubscribe(
-    profileId: string,
-    subscribeId: String,
+  async unsubscribe(
+    subscriberUserId: string,
+    unsubscribeProfileId: string,
     entityManager?: EntityManager,
   ): Promise<void> {
-    throw new Error('Method not implemented.');
+    const deleted = await this.subscriberRepository.delete({
+      subscriberId: subscriberUserId,
+      subscribedId: unsubscribeProfileId,
+    });
+    if (deleted.affected < 1) {
+      throw new InternalServerErrorException('subscribtion was not deleted');
+    }
+    if (entityManager) {
+      const deleted = await entityManager.delete(Subscriber, {
+        subscriberId: subscriberUserId,
+        subscribedId: unsubscribeProfileId,
+      });
+      if (deleted.affected < 1) {
+        throw new InternalServerErrorException('subscribtion was not deleted');
+      }
+    }
   }
 
   async subscribe(
@@ -29,7 +44,7 @@ export class SubscriberCommandRepository
     subscribedUrl: string,
     subscribedUserName: string,
     entityManager?: EntityManager,
-  ) {
+  ): Promise<Subscriber> {
     const subscription = this.subscriberRepository.create({
       subscriberId: subscriberProfileId,
       subscriberUrl,

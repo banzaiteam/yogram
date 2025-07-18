@@ -57,10 +57,35 @@ export class SubscriberCommandService {
   }
 
   async unsubscribe(
-    profileId: string,
-    subscribeId: String,
+    subscriberUserId: string,
+    unsubscribeProfileId: string,
     entityManager?: EntityManager,
   ): Promise<void> {
-    throw new Error('Method not implemented.');
+    const userSubscriber = await this.usersQueryService.findUserByCriteria({
+      id: subscriberUserId,
+    });
+
+    if (!userSubscriber)
+      throw new NotFoundException(
+        'ProfileCommandService error: subscriber  user was not found',
+      );
+
+    const profileToUnsubscribe =
+      await this.profileCommandRepository.findOne(unsubscribeProfileId);
+    if (!profileToUnsubscribe)
+      throw new NotFoundException(
+        'ProfileCommandService error: profile to subscribe on was not found',
+      );
+
+    if (entityManager) {
+      return await this.subscriberCommandRepository.unsubscribe(
+        userSubscriber.profile.id,
+        unsubscribeProfileId,
+      );
+    }
+    return await this.subscriberCommandRepository.unsubscribe(
+      userSubscriber.profile.id,
+      unsubscribeProfileId,
+    );
   }
 }

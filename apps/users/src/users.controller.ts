@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   MaxFileSizeValidator,
   Param,
@@ -50,6 +51,8 @@ import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
 import { SubscribeDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
+import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
 @Controller()
 export class UsersController {
   private readonly usersEmmiter: EventEmmiter;
@@ -219,5 +222,12 @@ export class UsersController {
   @Post('users/subscribe')
   async subscribe(@Body() subscribeDto: SubscribeDto): Promise<void> {
     return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
+  }
+
+  @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')
+  async unsubscribe(@Param() unsubscribeDto: UnsubscribeDto): Promise<void> {
+    return await this.commandBus.execute(
+      new UnsubscribeCommand(unsubscribeDto),
+    );
   }
 }

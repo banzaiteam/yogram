@@ -58,6 +58,10 @@ import { SubscriberCommandService } from './subscriber-command.service';
 import { ProfileCommandRepository } from './infrastructure/repository/command/profile-command.repository';
 import { SubscriberQueryRepositoryProvider } from './providers/query/subscriber-query-repository.provider';
 import { SubscriberQueryService } from './subscriber-query.service';
+import {
+  UnsubscribeCommand,
+  UnsubscribeHandler,
+} from './features/subscribe/command/unsubscribe.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -133,6 +137,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscriberQueryRepositoryProvider,
     SubscriberQueryService,
     ProfileCommandRepository,
+    UnsubscribeCommand,
+    UnsubscribeHandler,
   ],
 })
 export class UsersModule {}

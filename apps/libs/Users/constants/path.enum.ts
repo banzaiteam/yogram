@@ -7,4 +7,5 @@ export enum HttpUsersPath {
   EmailVerify = 'users/email-verify',
   UpdateUserByCriteria = 'users/update',
   Subscribe = 'users/subscribe',
+  Unsubscribe = 'users/unsubscribe',
 }

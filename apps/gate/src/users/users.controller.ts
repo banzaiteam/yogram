@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -123,5 +124,13 @@ export class UsersController {
     @Body('subscribeTo') subscribeTo: string,
   ): Promise<void> {
     return await this.usersService.subscribe(id, subscribeTo);
+  }
+
+  @Delete('unsubscribe')
+  async unsubscribe(
+    @User('id') id: string,
+    @Body('unsubscribeFrom') unsubscribeFrom: string,
+  ): Promise<void> {
+    return await this.usersService.unsubscribe(id, unsubscribeFrom);
   }
 }
