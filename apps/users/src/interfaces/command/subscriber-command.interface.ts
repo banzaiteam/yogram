@@ -5,7 +5,7 @@ export abstract class ISubscriberCommandRepository {
     profileId: string,
     subscribeId: string,
     entityManager?: EntityManager,
-  ): Promise<void>;
+  ): Promise<number>;
 
   abstract subscribe(
     subscriberProfileId: string,

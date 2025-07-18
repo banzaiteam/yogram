@@ -15,5 +15,5 @@ export class ResponseSubscriptionsDto {
   @Expose()
   subscriber: Subscribe;
   @Expose()
-  subscribed: Subscribe[];
+  subscriptions: Subscribe[];
 }

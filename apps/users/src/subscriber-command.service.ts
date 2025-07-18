@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
@@ -41,7 +42,7 @@ export class SubscriberCommandService {
 
     if (userSubscriber.profile.id === profileToSubscribeOn.id) {
       throw new ConflictException(
-        'SubscriberCommandService error: user cant subscribe on himself',
+        'SubscriberCommandService error: user cant subscribe to himself',
       );
     }
 
@@ -88,14 +89,27 @@ export class SubscriberCommandService {
       );
 
     if (entityManager) {
-      return await this.subscriberCommandRepository.unsubscribe(
+      const deleted = await this.subscriberCommandRepository.unsubscribe(
         userSubscriber.profile.id,
         unsubscribeProfileId,
       );
+      if (deleted < 1) {
+        throw new InternalServerErrorException(
+          'SubscriberCommandService error: subscribtion does not exist',
+        );
+      }
+      return;
     }
-    return await this.subscriberCommandRepository.unsubscribe(
+
+    const deleted = await this.subscriberCommandRepository.unsubscribe(
       userSubscriber.profile.id,
       unsubscribeProfileId,
     );
+    if (deleted < 1) {
+      throw new InternalServerErrorException(
+        'SubscriberCommandService error: subscribtion does not exist',
+      );
+    }
+    return;
   }
 }

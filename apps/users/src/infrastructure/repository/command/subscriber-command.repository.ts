@@ -17,23 +17,19 @@ export class SubscriberCommandRepository
     subscriberUserId: string,
     unsubscribeProfileId: string,
     entityManager?: EntityManager,
-  ): Promise<void> {
-    const deleted = await this.subscriberRepository.delete({
-      subscriberId: subscriberUserId,
-      subscribedId: unsubscribeProfileId,
-    });
-    if (deleted.affected < 1) {
-      throw new InternalServerErrorException('subscribtion was not deleted');
-    }
+  ): Promise<number> {
     if (entityManager) {
       const deleted = await entityManager.delete(Subscriber, {
         subscriberId: subscriberUserId,
         subscribedId: unsubscribeProfileId,
       });
-      if (deleted.affected < 1) {
-        throw new InternalServerErrorException('subscribtion was not deleted');
-      }
+      return deleted.affected;
     }
+    const deleted = await this.subscriberRepository.delete({
+      subscriberId: subscriberUserId,
+      subscribedId: unsubscribeProfileId,
+    });
+    return deleted.affected;
   }
 
   async subscribe(

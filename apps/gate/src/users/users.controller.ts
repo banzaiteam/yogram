@@ -36,6 +36,10 @@ import { JwtService } from '@nestjs/jwt';
 import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
 import { User } from '../auth/decorators/user.decorator';
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { SubscribeSwagger } from './decorators/swagger/subscribe-swagger.decorator';
+import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.decorator';
+import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -80,7 +84,7 @@ export class UsersController {
 
   @Public()
   @ProfilePageSwagger()
-  @Get(':id/profile/posts')
+  @Get(':id/profile')
   async profilePage(
     @Param('id') id: string,
     @Req() req: Request,
@@ -119,6 +123,7 @@ export class UsersController {
     );
   }
 
+  @SubscribeSwagger()
   @Post('subscribe')
   async subscribe(
     @User('id') id: string,
@@ -127,18 +132,23 @@ export class UsersController {
     return await this.usersService.subscribe(id, subscribeTo);
   }
 
+  @UnsubscribeSwagger()
+  @Delete('unsubscribe')
+  async unsubscribe(
+    @User('id') id: string,
+    @Body() unsubscribeFrom: UnsubscribeDto,
+  ): Promise<void> {
+    return await this.usersService.unsubscribe(
+      id,
+      unsubscribeFrom.unsubscribeFrom,
+    );
+  }
+
+  @GetAllSubscriptionsSwagger()
   @Get('subscriptions')
   async getAllSubscriptions(
     @User('id') id: string,
   ): Promise<ResponseSubscriptionsDto> {
     return await this.usersService.getAllSubscriptions(id);
-  }
-
-  @Delete('unsubscribe')
-  async unsubscribe(
-    @User('id') id: string,
-    @Body('unsubscribeFrom') unsubscribeFrom: string,
-  ): Promise<void> {
-    return await this.usersService.unsubscribe(id, unsubscribeFrom);
   }
 }

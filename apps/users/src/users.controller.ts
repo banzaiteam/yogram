@@ -49,9 +49,15 @@ import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-pass
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
-import { SubscribeDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import {
+  SubscribeDto,
+  SubscriberDto,
+} from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
-import { UnsubscribeDto } from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import {
+  UnsubscribeDto,
+  UnsubscriberDto,
+} from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
 import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
@@ -223,7 +229,7 @@ export class UsersController {
   }
 
   @Post('users/subscribe')
-  async subscribe(@Body() subscribeDto: SubscribeDto): Promise<void> {
+  async subscribe(@Body() subscribeDto: SubscriberDto): Promise<void> {
     return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
   }
 
@@ -235,7 +241,7 @@ export class UsersController {
   }
 
   @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')
-  async unsubscribe(@Param() unsubscribeDto: UnsubscribeDto): Promise<void> {
+  async unsubscribe(@Param() unsubscribeDto: UnsubscriberDto): Promise<void> {
     return await this.commandBus.execute(
       new UnsubscribeCommand(unsubscribeDto),
     );

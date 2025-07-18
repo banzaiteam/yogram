@@ -12,17 +12,18 @@ export class SubscriberQueryRepository implements ISubscriberQueryRepository {
     @InjectRepository(Subscriber)
     private readonly subscriberQueryRepository: Repository<Subscriber>,
   ) {}
+
   async getAllSubscriptions(
     subscriberId: string,
     entityManager?: EntityManager,
   ): Promise<ResponseSubscriptionsDto> {
-    let subscribedOn;
+    let subscriptions;
     if (entityManager) {
-      subscribedOn = await entityManager.find(Subscriber, {
+      subscriptions = await entityManager.find(Subscriber, {
         where: { subscriberId: subscriberId },
       });
     } else {
-      subscribedOn = await this.subscriberQueryRepository.find({
+      subscriptions = await this.subscriberQueryRepository.find({
         where: { subscriberId: subscriberId },
       });
     }
@@ -33,9 +34,9 @@ export class SubscriberQueryRepository implements ISubscriberQueryRepository {
         url: '',
         username: '',
       },
-      subscribed: [],
+      subscriptions: [],
     };
-    subscribedOn.map((item) => {
+    subscriptions.map((item) => {
       parsedSubscription.subscriber = {
         id: item.subscriberId,
         url: item.subscriberUrl,
@@ -46,7 +47,7 @@ export class SubscriberQueryRepository implements ISubscriberQueryRepository {
         url: item.subscribedUrl,
         username: item.subscribedUsername,
       };
-      parsedSubscription.subscribed.push(subscribed);
+      parsedSubscription.subscriptions.push(subscribed);
     });
     return plainToInstance(ResponseSubscriptionsDto, parsedSubscription);
   }
