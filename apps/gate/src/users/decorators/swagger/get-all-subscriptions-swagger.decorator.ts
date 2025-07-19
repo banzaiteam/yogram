@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseSubscriptionsDto } from 'apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { ResponseSubscriptionsDto } from '../../../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 
 export function GetAllSubscriptionsSwagger() {
   return applyDecorators(

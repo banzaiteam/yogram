@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
-import { SubscribeDto } from 'apps/libs/Users/dto/subscriber/subscribe.dto';
+import { SubscribeDto } from '../../../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 
 export const SubscribeSwagger = () =>
   applyDecorators(

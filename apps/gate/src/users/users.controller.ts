@@ -37,7 +37,7 @@ import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.de
 import { User } from '../auth/decorators/user.decorator';
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { SubscribeSwagger } from './decorators/swagger/subscribe-swagger.decorator';
-import { UnsubscribeDto } from 'apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.decorator';
 import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
 

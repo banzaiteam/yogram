@@ -40,6 +40,23 @@ describe('Subscriber e2e', () => {
     });
   });
 
+  describe.skip('Get All Subscriptions', () => {
+    it('GET (GET /users/unsubscribe)', async () => {
+      const authResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'retouch226@gmail.com', password: '24488Ok!' });
+      let accessToken = authResponse.body.accessToken;
+
+      const response = await request(app.getHttpServer())
+        .get('/users/subscriptions')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      console.log('🚀 ~ it ~ response:', response.body);
+      expect(response).not.toBe(undefined);
+    });
+  });
+
   describe.skip('Subscribe delete', () => {
     it('Delete (DELETE /users/unsubscribe)', async () => {
       const authResponse = await request(app.getHttpServer())
@@ -69,7 +86,7 @@ describe('Subscriber e2e', () => {
 
       const response = await request(app.getHttpServer())
         .post('/users/subscribe')
-        .send({ unsubscribeFrom })
+        .send({ subscribeTo })
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(404);
       expect(response.body.message).toEqual(exception.message);

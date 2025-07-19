@@ -75,7 +75,6 @@ export class SubscriberCommandService {
     const userSubscriber = await this.usersQueryService.findUserByCriteria({
       id: subscriberUserId,
     });
-
     if (!userSubscriber)
       throw new NotFoundException(
         'ProfileCommandService error: subscriber  user was not found',
