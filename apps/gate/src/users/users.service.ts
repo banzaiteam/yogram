@@ -14,6 +14,8 @@ import { IFiltering } from '../../../../apps/libs/common/pagination/decorators/f
 import { PostsService } from '../posts/posts.service';
 import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
+import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 
 @Injectable()
 export class UsersService {
@@ -96,5 +98,38 @@ export class UsersService {
     return Object.entries(objectWithoutUndefined)
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
+  }
+
+  async subscribe(id: string, subscribeTo: string): Promise<void> {
+    const subscribeDto: SubscribeDto = {
+      subscriber: id,
+      subscribeTo,
+    };
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Users,
+      HttpUsersPath.Subscribe,
+      subscribeDto,
+      {},
+    );
+  }
+
+  async unsubscribe(id: string, unsubscribeFrom: string): Promise<void> {
+    const deletePath = [HttpUsersPath.Unsubscribe, id, unsubscribeFrom].join(
+      '/',
+    );
+    return await this.gateService.requestHttpServiceDelete(
+      HttpServices.Users,
+      deletePath,
+      {},
+    );
+  }
+
+  async getAllSubscriptions(id: string): Promise<ResponseSubscriptionsDto> {
+    const path = [HttpUsersPath.GetAllSubscribedOn, id].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      path,
+      {},
+    );
   }
 }

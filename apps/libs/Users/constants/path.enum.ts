@@ -6,4 +6,7 @@ export enum HttpUsersPath {
   FindProviderByProviderId = 'users/provider',
   EmailVerify = 'users/email-verify',
   UpdateUserByCriteria = 'users/update',
+  Subscribe = 'users/subscribe',
+  Unsubscribe = 'users/unsubscribe',
+  GetAllSubscribedOn = 'users/subscriptions',
 }

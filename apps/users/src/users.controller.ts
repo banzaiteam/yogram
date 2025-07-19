@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   MaxFileSizeValidator,
   Param,
@@ -47,7 +48,20 @@ import { IEvent } from '../../../apps/libs/common/message-brokers/interfaces/eve
 import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-password.pipe';
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
-import { UserAvatarDto } from 'apps/libs/Users/dto/user/user-avatar.dto';
+import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
+import {
+  SubscribeDto,
+  SubscriberDto,
+} from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
+import {
+  UnsubscribeDto,
+  UnsubscriberDto,
+} from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
+import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
+
 @Controller()
 export class UsersController {
   private readonly usersEmmiter: EventEmmiter;
@@ -190,10 +204,8 @@ export class UsersController {
     rtKey: string,
     { payload }: IEvent,
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ payload:', payload);
     let folderPath: string = <string>payload['folderPath'];
     folderPath = folderPath.substring(folderPath.lastIndexOf('/') + 1);
-    console.log('🚀 ~ UsersController ~ folderPath:', folderPath);
     const criteria = {
       id: folderPath,
     };
@@ -213,6 +225,25 @@ export class UsersController {
   ): Promise<GoogleResponse> {
     return await this.commandBus.execute(
       new CreateUserGoogleCommand(googleSignupDto),
+    );
+  }
+
+  @Post('users/subscribe')
+  async subscribe(@Body() subscribeDto: SubscriberDto): Promise<void> {
+    return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
+  }
+
+  @Get('users/subscriptions/:id')
+  async getAllSubscriptions(
+    @Param('id') id: string,
+  ): Promise<ResponseSubscriptionsDto> {
+    return await this.queryBus.execute(new SubscriptionsQuery(id));
+  }
+
+  @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')
+  async unsubscribe(@Param() unsubscribeDto: UnsubscriberDto): Promise<void> {
+    return await this.commandBus.execute(
+      new UnsubscribeCommand(unsubscribeDto),
     );
   }
 }

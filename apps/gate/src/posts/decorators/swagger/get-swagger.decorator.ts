@@ -53,6 +53,6 @@ export const GetSwagger = () =>
       description:
         'api/v1/posts/page=2&limit=9&sort=createdAt:desc&filter=userId:eq:2',
       summary:
-        'find and sort posts by filter parameter(isPublished | userId) and sort parameter(createdAt | isPublished). Return paginated array',
+        'find and sort posts by filter parameter(id | isPublished | userId) and sort parameter(createdAt). Return paginated array',
     }),
   );

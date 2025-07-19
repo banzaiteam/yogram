@@ -84,9 +84,13 @@ export class PostCommandService {
           postid: createPostDto.postId,
           post,
         };
+        console.log(
+          'FILES_SERVICE_POSTS_UPLOAD_PATH',
+          this.configService.get('FILES_SERVICE_POSTS_UPLOAD_PATH'),
+        );
+
         const uploadFile: UploadFile = {
           fileType: FileTypes.Posts,
-          // todo? make env variable
           filesUploadBaseDir: this.configService.get(
             'FILES_SERVICE_POSTS_UPLOAD_PATH',
           ),

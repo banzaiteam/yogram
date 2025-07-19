@@ -38,6 +38,8 @@ export class ChunksFileUploader {
       const chunkSize = 1024 * 1024;
       const totalChunks = Math.ceil(file.size / chunkSize);
       let startByte = 0;
+      console.log('file ====', file);
+
       const openFile = await fs.open(file.path, 'r');
       const readable = openFile.createReadStream();
       const chunks = [];

@@ -62,6 +62,16 @@ spec:
                 secretKeyRef:
                   name: posts-yogram-production-config-secret
                   key: BUCKET
+            - name: FILES_SERVICE_POSTS_UPLOAD_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: posts-yogram-production-config-secret
+                  key: FILES_SERVICE_POSTS_UPLOAD_PATH
+            - name: FILES_SERVICE_CHUNKS_DIR
+              valueFrom:
+                secretKeyRef:
+                  name: posts-yogram-production-config-secret
+                  key: FILES_SERVICE_CHUNKS_DIR
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:

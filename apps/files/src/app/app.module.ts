@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import {
   EnvironmentMode,
   EnvironmentsTypes,
-} from 'apps/gate/src/settings/configuration';
+} from '../../../../apps/gate/src/settings/configuration';
 
 import { ConfigModule } from '@nestjs/config';
 import { getConfiguration } from '../settings/configuration';

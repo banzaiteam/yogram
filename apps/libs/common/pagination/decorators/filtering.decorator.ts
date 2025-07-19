@@ -55,12 +55,14 @@ export const filteringFactory = (data, ctx: ExecutionContext): IFiltering => {
   // extract the parameters and validate if the rule and the filterProperty are valid
   const [filterProperty, rule, value] = filter.split(':');
 
-  if (!data.includes(filterProperty))
+  if (!data.includes(filterProperty)) {
     throw new BadRequestException(
       `Invalid filter filterProperty: ${filterProperty}`,
     );
-  if (!Object.values(FilterRule).includes(rule as FilterRule))
+  }
+  if (!Object.values(FilterRule).includes(rule as FilterRule)) {
     throw new BadRequestException(`Invalid filter rule: ${rule}`);
+  }
 
   return { filterProperty, rule, value };
 };
