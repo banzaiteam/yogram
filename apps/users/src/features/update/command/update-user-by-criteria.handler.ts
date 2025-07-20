@@ -12,6 +12,7 @@ export class UpdateUserByCriteriaHandler
   async execute({
     criteria,
     updateUserDto,
+    file,
   }: UpdateUserByCriteriaCommand): Promise<ResponseUserDto> {
     const updatedUser = await this.usersCommandService.updateUser(
       criteria,

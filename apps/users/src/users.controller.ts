@@ -135,7 +135,7 @@ export class UsersController {
             await getUploadPath(
               FileTypes.Avatars,
               process.env.NODE_ENV === 'DEVELOPMENT'
-                ? 'apps/users/src/uploads'
+                ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,
             ),
@@ -166,7 +166,7 @@ export class UsersController {
         validators: [
           new MaxFileSizeValidator({
             maxSize: 20000000,
-            message: ' file is biiger than 20mb',
+            message: ' file is biger than 20mb',
           }),
         ],
         fileIsRequired: false,
@@ -175,7 +175,6 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ file:', file);
     createUserDto.id = <string>req.headers.id;
     await this.commandBus.execute(new CreateUserCommand(createUserDto, file));
   }
@@ -186,16 +185,61 @@ export class UsersController {
     await this.commandBus.execute(new EmailVerifyCommand(parsedEmail));
   }
 
-  // find user by id, username or email and update
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: async (req, file, cb) => {
+          cb(
+            null,
+            await getUploadPath(
+              FileTypes.Avatars,
+              process.env.NODE_ENV === 'DEVELOPMENT'
+                ? 'apps/users/src/uploads/avatars'
+                : '/home/node/dist/users/src/uploads/avatars',
+              req,
+            ),
+          );
+        },
+
+        filename: (req, file, cb) => {
+          cb(null, genFileName(file.originalname));
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
   @Patch('users/update')
   async update(
     @Body()
     payload: UpdateUserCriteria & UpdateUserDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 20000000,
+            message: ' file is biger than 20mb',
+          }),
+        ],
+        fileIsRequired: false,
+      }),
+      SharpPipe,
+    )
+    file?: Express.Multer.File[],
   ): Promise<void> {
-    const criteria = payload['criteria'];
-    const updateUserDto = payload['updateUserDto'];
+    const criteria = JSON.parse(payload['criteria']);
+    console.log('🚀 ~ UsersController ~ criteria:', criteria);
+    const updateUserDto = JSON.parse(payload['updateUserDto']);
+    console.log('🚀 ~ UsersController ~ updateUserDto:', updateUserDto);
     return await this.commandBus.execute(
-      new UpdateUserByCriteriaCommand(criteria, updateUserDto),
+      new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
     );
   }
 

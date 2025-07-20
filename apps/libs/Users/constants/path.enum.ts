@@ -1,5 +1,6 @@
 export enum HttpUsersPath {
   Create = 'users/create',
+  Update = 'users/update',
   CreateWithGoogle = 'users/google',
   FindUserByCriteria = 'users',
   FindUserByProviderId = 'users/findone',

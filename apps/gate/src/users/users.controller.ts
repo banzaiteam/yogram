@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -40,6 +41,9 @@ import { SubscribeSwagger } from './decorators/swagger/subscribe-swagger.decorat
 import { UnsubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.decorator';
 import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
+import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
 
 @ApiTags('Users')
 @Controller('users')
@@ -47,6 +51,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
   //
   @ApiExcludeEndpoint()
@@ -62,13 +67,45 @@ export class UsersController {
 
   @UpdateSwagger()
   @Patch()
-  async update(
-    @Body()
-    UpdateUserWithCriteriaDto: UpdateUserWithCriteriaDto,
-  ): Promise<void> {
-    const criteria = UpdateUserWithCriteriaDto['criteria'];
-    const updateUserDto = UpdateUserWithCriteriaDto['updateUserDto'];
-    return await this.usersService.update(criteria, updateUserDto);
+  async update(@Req() req: Request, @Res() res: Response): Promise<void> {
+    try {
+      // todo! error 413, bodyparser limit 150 mb does not help when use gateService
+      const microserviceResponse = await axios.patch(
+        [
+          this.configService.get('USERS_SERVICE_URL'),
+          HttpUsersPath.Update,
+        ].join('/'),
+        req,
+        {
+          headers: { ...req.headers },
+          responseType: 'stream',
+        },
+      );
+
+      res.setHeader('content-type', 'application/json');
+      microserviceResponse.data.pipe(res);
+      res.status(200);
+      return null;
+    } catch (err) {
+      // responseType: 'stream' error handle
+      await new Promise((res) => {
+        let streamString = '';
+        err.response.data.setEncoding('utf8');
+        err.response.data
+          .on('data', (utf8Chunk) => {
+            streamString += utf8Chunk;
+          })
+          .on('end', async () => {
+            err.response.stream = streamString;
+          });
+        setTimeout(() => {
+          res(err);
+        }, 300);
+      }).then((data) => {
+        console.log('🚀 ~ UsersController ~ awaitnewPromise ~ data:', data);
+        throw new HttpException(data, data['status']);
+      });
+    }
   }
 
   @FindUserByCriteriaSwagger()
