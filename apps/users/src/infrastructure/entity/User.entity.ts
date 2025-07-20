@@ -13,6 +13,16 @@ export class User extends BaseEntity {
   verified: boolean = false;
   @Column({ type: 'varchar', nullable: true, default: null })
   url: string;
+  @Column({ type: 'varchar', nullable: true, default: null })
+  firstName: string;
+  @Column({ type: 'varchar', nullable: true, default: null })
+  lastName: string;
+  @Column({ type: 'varchar', nullable: true })
+  country: string;
+  @Column({ type: 'varchar', nullable: true })
+  city: string;
+  @Column({ type: 'date', nullable: true })
+  birthdate: Date;
 
   @OneToOne(() => Profile, (profile) => profile.user, {
     eager: true,
