@@ -12,6 +12,7 @@ import { HttpUsersPath } from '../../../../../apps/libs/Users/constants/path.enu
 import { IOauth } from './interfaces/oauth.interface';
 import { LoggedUserDto } from '../../../../../apps/libs/Users/dto/user/logged-user.dto';
 import { HttpServices } from '../../../../../apps/gate/common/constants/http-services.enum';
+import { OmitType } from '@nestjs/swagger';
 
 @Injectable()
 export class GoogleOauth implements IOauth {
@@ -79,7 +80,6 @@ export class GoogleOauth implements IOauth {
         console.log('auth: user exists', user);
         googleSignupDto = {
           providerId: userCredentials.providerId,
-          username: userCredentials.username,
           email: userCredentials.email,
           user: { id: user.id, email: user.email, username: user.username },
         };

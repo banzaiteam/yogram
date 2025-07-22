@@ -28,6 +28,8 @@ import { HttpFilesPath } from '../../../apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
 import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -51,6 +53,7 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File[],
   ): Promise<ResponseUserDto> {
+    console.log('🚀 ~ UsersCommandService ~ createUserDto:', createUserDto);
     if (!Array.isArray(file)) {
       const files = file;
       file = [];
@@ -171,6 +174,8 @@ export class UsersCommandService {
         await queryRunner.startTransaction();
         // create user
         const createUserDto: CreateUserByProviderDto = {
+          firstName: null,
+          lastName: null,
           email: googleSignupDto.email,
           username,
           verified: true,
@@ -275,14 +280,57 @@ export class UsersCommandService {
   async updateUser(
     criteria: UpdateUserCriteria,
     updateUserDto: UpdateUserDto,
+    bucketName: string,
+    file?: Express.Multer.File,
   ): Promise<ResponseUserDto> {
     const queryRunner = this.dataSource.createQueryRunner();
-    const updatedUser = await this.userCommandRepository.update(
-      criteria,
-      updateUserDto,
-      queryRunner.manager,
-    );
-    return plainToInstance(ResponseUserDto, updatedUser);
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      if (file) {
+        const uploadFile: UploadFile[] = [
+          {
+            fileType: FileTypes.Avatars,
+            filesUploadBaseDir: this.configService.get(
+              'FILES_SERVICE_AVATAR_UPLOAD_PATH',
+            ),
+            fieldname: file.fieldname,
+            mimetype: file.mimetype,
+            size: file.size,
+            path: file.path,
+            fileId: v4(),
+            originalname: file.filename,
+            destination: file.destination,
+            bucketName,
+          },
+        ];
+
+        const uploadServiceUrl = [
+          this.configService.get('FILES_SERVICE_URL'),
+          HttpFilesPath.Upload,
+        ].join('/');
+
+        this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+          criteria.id,
+          uploadFile,
+          [criteria.id].join('/'),
+          uploadServiceUrl,
+        );
+      }
+      const updatedUser = await this.userCommandRepository.update(
+        criteria,
+        updateUserDto,
+        queryRunner.manager,
+      );
+      await queryRunner.commitTransaction();
+      return plainToInstance(ResponseUserDto, updatedUser);
+    } catch (err) {
+      console.log('🚀 ~ UsersCommandService ~ err:', err);
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(err);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async emailVerify(email: string): Promise<void> {

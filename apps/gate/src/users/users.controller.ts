@@ -44,6 +44,7 @@ import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscri
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
+import FormData from 'form-data';
 
 @ApiTags('Users')
 @Controller('users')
@@ -67,9 +68,15 @@ export class UsersController {
 
   @UpdateSwagger()
   @Patch()
-  async update(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async update(
+    @User('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    console.log('🚀 ~ UsersController ~ id:', id);
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
+
       const microserviceResponse = await axios.patch(
         [
           this.configService.get('USERS_SERVICE_URL'),
@@ -77,7 +84,7 @@ export class UsersController {
         ].join('/'),
         req,
         {
-          headers: { ...req.headers },
+          headers: { ...req.headers, id },
           responseType: 'stream',
         },
       );
@@ -102,7 +109,7 @@ export class UsersController {
           res(err);
         }, 300);
       }).then((data) => {
-        console.log('🚀 ~ UsersController ~ awaitnewPromise ~ data:', data);
+        console.log('🚀 ~ UsersController ~ error update user ~ data:', data);
         throw new HttpException(data, data['status']);
       });
     }

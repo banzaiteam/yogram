@@ -218,6 +218,7 @@ export class UsersController {
   )
   @Patch('users/update')
   async update(
+    @Req() req: Request,
     @Body()
     payload: UpdateUserCriteria & UpdateUserDto,
     @UploadedFile(
@@ -234,10 +235,9 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    const criteria = JSON.parse(payload['criteria']);
-    console.log('🚀 ~ UsersController ~ criteria:', criteria);
+    console.log('🚀 ~ UsersController ~ file:', file);
+    const criteria = { id: req.headers.id.toString() };
     const updateUserDto = JSON.parse(payload['updateUserDto']);
-    console.log('🚀 ~ UsersController ~ updateUserDto:', updateUserDto);
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
     );
