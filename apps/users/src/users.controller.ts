@@ -49,18 +49,14 @@ import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-pass
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
-import {
-  SubscribeDto,
-  SubscriberDto,
-} from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { SubscriberDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
-import {
-  UnsubscribeDto,
-  UnsubscriberDto,
-} from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscriberDto } from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
 import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
+import { GetAvatarsQuery } from './features/avatars/query/get-avatars.handler';
+import { GetFilesUrlDto } from '../../../apps/libs/Files/dto/get-files.dto';
 
 @Controller()
 export class UsersController {
@@ -183,6 +179,11 @@ export class UsersController {
   async emailVerify(@Body() email: string): Promise<void> {
     const parsedEmail = Object.keys(email)[0];
     await this.commandBus.execute(new EmailVerifyCommand(parsedEmail));
+  }
+
+  @Get('users/avatars/:id')
+  async getAvatarsUrls(@Param('id') id: string): Promise<GetFilesUrlDto> {
+    return await this.queryBus.execute(new GetAvatarsQuery(id));
   }
 
   @UseInterceptors(

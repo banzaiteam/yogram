@@ -43,8 +43,8 @@ import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.dec
 import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
-import FormData from 'form-data';
+import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
+import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -165,6 +165,11 @@ export class UsersController {
       sorting,
       filtering,
     );
+  }
+
+  @Get('avatars')
+  async getAvatarsUrls(@User('id') id: string): Promise<GetFilesUrlDto> {
+    return await this.usersService.getAvatarsUrls(id);
   }
 
   @SubscribeSwagger()

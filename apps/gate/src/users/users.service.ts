@@ -16,6 +16,7 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,6 +30,15 @@ export class UsersService {
   ): Promise<ResponseUserDto | null> {
     const queryString = this.makeQueryStringFromObject(findUserByCriteriaDto);
     const path = `${HttpUsersPath.FindUserByCriteria}?${queryString}`;
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      path,
+      {},
+    );
+  }
+
+  async getAvatarsUrls(id: string): Promise<GetFilesUrlDto> {
+    const path = [HttpUsersPath.GetAvatars, id].join('/');
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Users,
       path,

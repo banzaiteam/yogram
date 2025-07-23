@@ -66,6 +66,10 @@ import {
   SubscriptionsHandler,
   SubscriptionsQuery,
 } from './features/subscribe/query/subscriptions.handler';
+import {
+  GetAvatarsHandler,
+  GetAvatarsQuery,
+} from './features/avatars/query/get-avatars.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -145,6 +149,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UnsubscribeHandler,
     SubscriptionsHandler,
     SubscriptionsQuery,
+    GetAvatarsHandler,
+    GetAvatarsQuery,
   ],
 })
 export class UsersModule {}

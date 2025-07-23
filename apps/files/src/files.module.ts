@@ -15,6 +15,11 @@ import {
   DeleteFilesCommand,
   DeleteFilesCommandHandler,
 } from './features/files/use-case/commands/delete-files.handler';
+import {
+  GetFilesUrlHandler,
+  GetFilesUrlQuery,
+} from './features/files/use-case/query/get-files-url.handler';
+import { FilesQueryService } from './files-query.service';
 
 @Module({
   imports: [
@@ -32,6 +37,9 @@ import {
     GateService,
     UploadFilesCommand,
     UploadFilesCommandHandler,
+    GetFilesUrlHandler,
+    GetFilesUrlQuery,
+    FilesQueryService,
   ],
 })
 export class FilesModule {}

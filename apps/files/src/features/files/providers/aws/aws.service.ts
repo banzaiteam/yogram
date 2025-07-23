@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -18,8 +17,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
-import { ChunkedFileDto } from 'apps/libs/common/chunks-upload/dto/chunked-file.dto';
+import { ChunkedFileDto } from '../../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
 
 @Injectable()
 export class AwsService implements IUploader {
@@ -120,7 +118,7 @@ export class AwsService implements IUploader {
     return false;
   }
 
-  async listObjects(bucketName: string, path: string) {
+  async listObjects(bucketName: string, path: string): Promise<any> {
     const input = {
       Bucket: bucketName,
       Prefix: path,

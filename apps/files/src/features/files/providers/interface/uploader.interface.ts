@@ -19,4 +19,5 @@ export abstract class IUploader {
     accountId: string,
   ): Promise<boolean>;
   abstract deleteFolder(bucketName: string, path: string): Promise<boolean>;
+  abstract listObjects(bucketName: string, path: string): Promise<any>;
 }
