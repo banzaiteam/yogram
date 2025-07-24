@@ -17,6 +17,8 @@ import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/
 import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
+import { IdDto } from 'apps/libs/common/dto/id.dto';
+import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
 
 @Injectable()
 export class UsersService {
@@ -139,6 +141,16 @@ export class UsersService {
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Users,
       path,
+      {},
+    );
+  }
+
+  async switchAvataratar(id: string, url: string): Promise<void> {
+    const switchAvatarDto: SwitchAvatarDto = { id, url };
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Users,
+      HttpUsersPath.SwitchAvatar,
+      switchAvatarDto,
       {},
     );
   }

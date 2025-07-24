@@ -57,6 +57,8 @@ import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/r
 import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
 import { GetAvatarsQuery } from './features/avatars/query/get-avatars.handler';
 import { GetFilesUrlDto } from '../../../apps/libs/Files/dto/get-files.dto';
+import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
+import { SwitchAvatarCommand } from './features/avatars/query/command/switch-avatar.handler';
 
 @Controller()
 export class UsersController {
@@ -184,6 +186,13 @@ export class UsersController {
   @Get('users/avatars/:id')
   async getAvatarsUrls(@Param('id') id: string): Promise<GetFilesUrlDto> {
     return await this.queryBus.execute(new GetAvatarsQuery(id));
+  }
+
+  @Patch('users/switch-avatar')
+  async switchAvatar(@Body() switchAvatarDto: SwitchAvatarDto): Promise<void> {
+    return await this.commandBus.execute(
+      new SwitchAvatarCommand(switchAvatarDto),
+    );
   }
 
   @UseInterceptors(

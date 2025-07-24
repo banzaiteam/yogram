@@ -30,6 +30,8 @@ import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { uuid } from 'uuidv4';
 import { v4 } from 'uuid';
+import { SwitchAvatarCommand } from './features/avatars/query/command/switch-avatar.handler';
+import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -331,6 +333,12 @@ export class UsersCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async switchAvatar(switchAvatarDto: SwitchAvatarDto): Promise<void> {
+    const criteria = { id: switchAvatarDto.id };
+    const updateAvatarDto = { url: switchAvatarDto.url };
+    await this.userCommandRepository.update(criteria, updateAvatarDto);
   }
 
   async emailVerify(email: string): Promise<void> {

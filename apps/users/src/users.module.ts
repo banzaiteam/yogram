@@ -70,6 +70,10 @@ import {
   GetAvatarsHandler,
   GetAvatarsQuery,
 } from './features/avatars/query/get-avatars.handler';
+import {
+  SwitchAvatarCommand,
+  SwitchAvatarHandler,
+} from './features/avatars/query/command/switch-avatar.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -151,6 +155,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscriptionsQuery,
     GetAvatarsHandler,
     GetAvatarsQuery,
+    SwitchAvatarCommand,
+    SwitchAvatarHandler,
   ],
 })
 export class UsersModule {}

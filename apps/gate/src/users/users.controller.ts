@@ -45,6 +45,7 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
 import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
+import { IdDto } from 'apps/libs/common/dto/id.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -170,6 +171,14 @@ export class UsersController {
   @Get('avatars')
   async getAvatarsUrls(@User('id') id: string): Promise<GetFilesUrlDto> {
     return await this.usersService.getAvatarsUrls(id);
+  }
+
+  @Patch('switch-avatar')
+  async switchAvatar(
+    @User('id') id: string,
+    @Body('url') url: string,
+  ): Promise<void> {
+    return await this.usersService.switchAvataratar(id, url);
   }
 
   @SubscribeSwagger()
