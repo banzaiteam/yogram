@@ -5,7 +5,8 @@ export class GoogleSignupDto {
   @IsString()
   providerId: string;
   @IsString()
-  username: string;
+  @IsOptional()
+  username?: string;
   @IsEmail()
   email: string;
   @IsOptional()

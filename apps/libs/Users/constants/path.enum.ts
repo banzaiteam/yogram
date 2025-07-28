@@ -1,5 +1,6 @@
 export enum HttpUsersPath {
   Create = 'users/create',
+  Update = 'users/update',
   CreateWithGoogle = 'users/google',
   FindUserByCriteria = 'users',
   FindUserByProviderId = 'users/findone',
@@ -9,4 +10,7 @@ export enum HttpUsersPath {
   Subscribe = 'users/subscribe',
   Unsubscribe = 'users/unsubscribe',
   GetAllSubscribedOn = 'users/subscriptions',
+  GetAvatars = 'users/avatars',
+  SwitchAvatar = 'users/avatar/switch',
+  DeleteAvatar = 'users/:id/avatar/delete',
 }

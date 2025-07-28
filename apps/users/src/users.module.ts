@@ -66,6 +66,18 @@ import {
   SubscriptionsHandler,
   SubscriptionsQuery,
 } from './features/subscribe/query/subscriptions.handler';
+import {
+  GetAvatarsHandler,
+  GetAvatarsQuery,
+} from './features/avatars/query/get-avatars.handler';
+import {
+  SwitchAvatarCommand,
+  SwitchAvatarHandler,
+} from './features/avatars/command/switch-avatar.handler';
+import {
+  DeleteAvatarCommand,
+  DeleteAvatarHandler,
+} from './features/avatars/command/delete-avatar.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -145,6 +157,13 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UnsubscribeHandler,
     SubscriptionsHandler,
     SubscriptionsQuery,
+    GetAvatarsHandler,
+    GetAvatarsQuery,
+    SwitchAvatarCommand,
+    SwitchAvatarHandler,
+    DeleteAvatarCommand,
+    DeleteAvatarHandler,
+    UsersCommandService,
   ],
 })
 export class UsersModule {}

@@ -16,6 +16,8 @@ import { plainToInstance } from 'class-transformer';
 import { ResponseProfilePageDto } from '../../../../apps/libs/Users/dto/profile/response-profile-page.dto';
 import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
+import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
+import { SwitchAvatarDto } from '../../../../apps/libs/Users/dto/user/switch-avatar.dto';
 
 @Injectable()
 export class UsersService {
@@ -36,11 +38,39 @@ export class UsersService {
     );
   }
 
+  async getAvatarsUrls(id: string): Promise<GetFilesUrlDto[]> {
+    const path = [HttpUsersPath.GetAvatars, id].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      path,
+      {},
+    );
+  }
+
+  async deleteAvatar(id: string, url: string): Promise<void> {
+    let path = [HttpUsersPath.DeleteAvatar, `?url=${url}`].join('/');
+    path = path.replace(':id', id);
+    return await this.gateService.requestHttpServiceDelete(
+      HttpServices.Users,
+      path,
+      {},
+    );
+  }
+
+  async switchAvatar(id: string, url: string): Promise<void> {
+    const switchAvatarDto: SwitchAvatarDto = { id, url };
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Users,
+      HttpUsersPath.SwitchAvatar,
+      switchAvatarDto,
+      {},
+    );
+  }
+
   async findUserByProviderId(
     providerId: string,
   ): Promise<ResponseUserDto | null> {
     const path = `${HttpUsersPath.FindUserByProviderId}/${providerId}`;
-    console.log('🚀 ~ UsersService ~ path:', path);
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Users,
       path,
@@ -60,8 +90,6 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<void> {
-    console.log('HttpServices.Users', HttpServices.Users);
-
     await this.gateService.requestHttpServicePost(
       HttpServices.Users,
       HttpUsersPath.Create,

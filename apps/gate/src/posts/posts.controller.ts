@@ -142,10 +142,6 @@ export class PostsController {
     @Res() res: Response,
   ) {
     try {
-      // if (!user.verified)
-      //   throw new BadRequestException(
-      //     'PostsController error: cant create post, user`s account not verified',
-      //   );
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const postid = v4();
       const microserviceResponse = await axios.post(

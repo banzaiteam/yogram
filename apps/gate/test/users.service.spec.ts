@@ -8,9 +8,13 @@ import { IProfileCommandRepository } from '../../../apps/users/src/interfaces/co
 import { ProfileCommandService } from '../../../apps/users/src/profile-command.service';
 import { ProviderCommandService } from '../../../apps/users/src/provider-command.service';
 import { UsersQueryService } from '../../../apps/users/src/users-query.service';
+import { ChunksFileUploader } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { ConfigService } from '@nestjs/config';
 
 const createUserDto: CreateUserDto = {
   username: 'username1',
+  firstName: 'dfgdgdf',
+  lastName: 'dsfdgdgdfgd',
   email: 'retouch@gmail.com',
   password: '123456Ok!',
 };
@@ -42,6 +46,14 @@ describe('Users Service', () => {
         {
           provide: IProfileCommandRepository,
           useValue: { create: jest.fn() },
+        },
+        {
+          provide: ChunksFileUploader,
+          useValue: jest.fn(),
+        },
+        {
+          provide: ConfigService,
+          useValue: jest.fn(),
         },
         {
           provide: ProfileCommandService,

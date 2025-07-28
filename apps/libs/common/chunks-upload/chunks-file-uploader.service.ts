@@ -3,7 +3,6 @@ import { ChunkedFileDto } from './dto/chunked-file.dto';
 import fs from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { UploadFile } from './interfaces/upload-file.interface';
 import { FilesRoutingKeys } from 'apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import axios from 'axios';
@@ -29,7 +28,6 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    console.log('🚀 ~ ChunksFileUploader ~ routingKey:', routingKey);
     // devide files on chunks
     const filesCount = files.length;
     let currentFile = 0;
@@ -38,7 +36,6 @@ export class ChunksFileUploader {
       const chunkSize = 1024 * 1024;
       const totalChunks = Math.ceil(file.size / chunkSize);
       let startByte = 0;
-      console.log('file ====', file);
 
       const openFile = await fs.open(file.path, 'r');
       const readable = openFile.createReadStream();
@@ -93,17 +90,11 @@ export class ChunksFileUploader {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ): Promise<void> {
-    console.log('🚀 ~ ChunksFileUploader ~ file:', file);
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ uploadServiceUrl:',
-      uploadServiceUrl,
-    );
     // upload chunk to files microservice
     const pathToFile = [
       filesServiceUploadFolderWithoutBasePath,
       file.originalname,
     ].join('/');
-    console.log('🚀 ~ ChunksFileUploader ~ pathToFile:', pathToFile);
     const chunkedFileDto: ChunkedFileDto = {
       environment:
         process.env.NODE_ENV === 'DEVELOPMENT'
@@ -126,7 +117,6 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
-    console.log('🚀 ~ ChunksFileUploader ~ chunkedFileDto:', chunkedFileDto);
 
     // await firstValueFrom(
     await axios.post(uploadServiceUrl, chunkedFileDto);
@@ -139,25 +129,9 @@ export class ChunksFileUploader {
    * @returns {Promise<void>}
    */
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunkedFileDto:',
-      chunkedFileDto,
-    );
     const CHUNKS_DIR = this.configService.get('FILES_SERVICE_CHUNKS_DIR');
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ CHUNKS_DIR:',
-      CHUNKS_DIR,
-    );
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunksPath:',
-      chunksPath,
-    );
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ uploadsPath:',
-      uploadsPath,
-    );
 
     await this.createFolderIfNotExists(chunksPath);
     await this.createFolderIfNotExists(
@@ -173,17 +147,6 @@ export class ChunksFileUploader {
       const blob = new Blob([bufferChunk]);
       // stream from buffer
       const stream = blob.stream();
-      console.log(
-        'upload file path ====',
-        [
-          chunksPath,
-          [
-            chunkedFileDto.originalname,
-            chunkedFileDto.metadata.currentChunk,
-          ].join('.'),
-        ].join('/'),
-      );
-
       const writableChunk = await fs.open(
         [
           chunksPath,
@@ -200,7 +163,6 @@ export class ChunksFileUploader {
       await pipeline(stream, writable);
 
       writable.on('finish', async () => {
-        console.log('writable chunk');
         await writableChunk.close();
         writable.end();
       });

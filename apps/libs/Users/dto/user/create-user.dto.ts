@@ -1,4 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -60,6 +61,36 @@ export class CreateUserDto {
     message: 'aboutMe should be minimum 20 and max 200 characters long',
   })
   aboutMe?: string;
+
+  @MinLength(3, {
+    message: 'firstName should be minimum 3 and max 20 characters long',
+  })
+  @MaxLength(20, {
+    message: 'firstName should be minimum 3 and max 20 characters long',
+  })
+  @IsString()
+  firstName: string;
+
+  @MinLength(3, {
+    message: 'lastName should be minimum 3 and max 20 characters long',
+  })
+  @MaxLength(20, {
+    message: 'lastName should be minimum 3 and max 20 characters long',
+  })
+  @IsString()
+  lastName: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  birthdate?: Date;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
 
   @ApiProperty({
     type: 'string',

@@ -49,18 +49,18 @@ import { HashPasswordPipe } from '../../../apps/libs/common/encryption/hash-pass
 import EventEmmiter from 'node:events';
 import { SseUsersEvents } from './constants/sse-events.enum';
 import { UserAvatarDto } from '../../../apps/libs/Users/dto/user/user-avatar.dto';
-import {
-  SubscribeDto,
-  SubscriberDto,
-} from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
+import { SubscriberDto } from '../../../apps/libs/Users/dto/subscriber/subscribe.dto';
 import { SubscribeCommand } from './features/subscribe/command/subscribe.handler';
-import {
-  UnsubscribeDto,
-  UnsubscriberDto,
-} from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscriberDto } from '../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeCommand } from './features/subscribe/command/unsubscribe.handler';
 import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
+import { GetAvatarsQuery } from './features/avatars/query/get-avatars.handler';
+import { GetFilesUrlDto } from '../../../apps/libs/Files/dto/get-files.dto';
+import { SwitchAvatarDto } from '../../../apps/libs/Users/dto/user/switch-avatar.dto';
+import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
+import { DeleteAvatarDto } from '../../../apps/libs/Users/dto/user/delete-avatar.dto';
+import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
 
 @Controller()
 export class UsersController {
@@ -135,7 +135,7 @@ export class UsersController {
             await getUploadPath(
               FileTypes.Avatars,
               process.env.NODE_ENV === 'DEVELOPMENT'
-                ? 'apps/users/src/uploads'
+                ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,
             ),
@@ -166,7 +166,7 @@ export class UsersController {
         validators: [
           new MaxFileSizeValidator({
             maxSize: 20000000,
-            message: ' file is biiger than 20mb',
+            message: ' file is biger than 20mb',
           }),
         ],
         fileIsRequired: false,
@@ -175,7 +175,6 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ file:', file);
     createUserDto.id = <string>req.headers.id;
     await this.commandBus.execute(new CreateUserCommand(createUserDto, file));
   }
@@ -186,16 +185,83 @@ export class UsersController {
     await this.commandBus.execute(new EmailVerifyCommand(parsedEmail));
   }
 
-  // find user by id, username or email and update
+  @Get('users/avatars/:id')
+  async getAvatarsUrls(@Param('id') id: string): Promise<GetFilesUrlDto[]> {
+    return await this.queryBus.execute(new GetAvatarsQuery(id));
+  }
+
+  @Patch('users/avatar/switch')
+  async switchAvatar(@Body() switchAvatarDto: SwitchAvatarDto): Promise<void> {
+    return await this.commandBus.execute(
+      new SwitchAvatarCommand(switchAvatarDto),
+    );
+  }
+
+  @Delete('users/:id/avatar/delete')
+  async deleteAvatar(
+    @Param('id') id: string,
+    @Query('url') url: string,
+  ): Promise<void> {
+    const deleteAvatarDto: DeleteAvatarDto = { id, url };
+    return await this.commandBus.execute(
+      new DeleteAvatarCommand(deleteAvatarDto),
+    );
+  }
+
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: async (req, file, cb) => {
+          cb(
+            null,
+            await getUploadPath(
+              FileTypes.Avatars,
+              process.env.NODE_ENV === 'DEVELOPMENT'
+                ? 'apps/users/src/uploads/avatars'
+                : '/home/node/dist/users/src/uploads/avatars',
+              req,
+            ),
+          );
+        },
+
+        filename: (req, file, cb) => {
+          cb(null, genFileName(file.originalname));
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG)$/)) {
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
+    }),
+  )
   @Patch('users/update')
   async update(
+    @Req() req: Request,
     @Body()
     payload: UpdateUserCriteria & UpdateUserDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 20000000,
+            message: 'file is biger than 20mb',
+          }),
+        ],
+        fileIsRequired: false,
+      }),
+      SharpPipe,
+    )
+    file?: Express.Multer.File[],
   ): Promise<void> {
-    const criteria = payload['criteria'];
-    const updateUserDto = payload['updateUserDto'];
+    const criteria = { id: req.headers.id.toString() };
+    const updateUserDto = JSON.parse(payload['updateUserDto']);
     return await this.commandBus.execute(
-      new UpdateUserByCriteriaCommand(criteria, updateUserDto),
+      new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
     );
   }
 

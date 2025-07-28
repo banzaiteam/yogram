@@ -27,6 +27,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       const user = await this.usersCommandService.updateUser(
         criteria,
         createUserDto,
+        this.configService.get('BUCKET'),
+        file[0],
       );
       userVerifyEmailDto = {
         to: user.email,

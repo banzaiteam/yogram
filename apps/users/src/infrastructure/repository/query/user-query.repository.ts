@@ -28,6 +28,7 @@ export class UserQueryRepository
   // find only by userId or email, or username or provider
   async findUserByCriteria(
     criteria: UserCriteria,
+    entityManager?: EntityManager,
   ): Promise<ResponseUserDto | null> {
     const user = await this.usersRepository
       .createQueryBuilder('users')

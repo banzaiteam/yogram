@@ -37,6 +37,16 @@ spec:
                 secretKeyRef:
                   name: files-yogram-production-config-secret
                   key: RMQ_URL
+            - name: BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: files-yogram-production-config-secret
+                  key: BUCKET
+            - name: UPLOAD_SERVICE_URL_PREFIX
+              valueFrom:
+                secretKeyRef:
+                  name: files-yogram-production-config-secret
+                  key: UPLOAD_SERVICE_URL_PREFIX
             - name: AWS_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

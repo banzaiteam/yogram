@@ -1,6 +1,5 @@
 import {
   ArgumentMetadata,
-  BadRequestException,
   InternalServerErrorException,
   PipeTransform,
 } from '@nestjs/common';
@@ -10,10 +9,6 @@ import { pipeline } from 'node:stream/promises';
 
 export class SharpPipe implements PipeTransform {
   async transform(files: Express.Multer.File[], metadata: ArgumentMetadata) {
-    console.log('🚀 ~ SharpPipe ~ transform ~ files:', files);
-    // if (!files) {
-    //   throw new BadRequestException('file required');
-    // }
     if (!files) return null;
     if (!Array.isArray(files)) {
       const file = files;

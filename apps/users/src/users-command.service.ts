@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { DataSource, QueryFailedError } from 'typeorm';
@@ -28,6 +30,12 @@ import { HttpFilesPath } from '../../../apps/libs/Files/constants/path.enum';
 import { ConfigService } from '@nestjs/config';
 import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
+import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
+import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
+import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
+import { DeleteAvatarDto } from 'apps/libs/Users/dto/user/delete-avatar.dto';
+import axios from 'axios';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -51,6 +59,7 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File[],
   ): Promise<ResponseUserDto> {
+    console.log('🚀 ~ UsersCommandService ~ createUserDto:', createUserDto);
     if (!Array.isArray(file)) {
       const files = file;
       file = [];
@@ -117,12 +126,12 @@ export class UsersCommandService {
           uploadServiceUrl,
         );
       }
-
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
       console.log('🚀 ~ UsersCommandService ~ createUser ~ error:', error);
       await queryRunner.rollbackTransaction();
+      // todo delete uploaded avatar if error (this.deleteAvatar)
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
           throw new ConflictException(
@@ -171,6 +180,8 @@ export class UsersCommandService {
         await queryRunner.startTransaction();
         // create user
         const createUserDto: CreateUserByProviderDto = {
+          firstName: null,
+          lastName: null,
           email: googleSignupDto.email,
           username,
           verified: true,
@@ -275,14 +286,91 @@ export class UsersCommandService {
   async updateUser(
     criteria: UpdateUserCriteria,
     updateUserDto: UpdateUserDto,
+    bucketName: string,
+    file?: Express.Multer.File,
   ): Promise<ResponseUserDto> {
     const queryRunner = this.dataSource.createQueryRunner();
-    const updatedUser = await this.userCommandRepository.update(
-      criteria,
-      updateUserDto,
-      queryRunner.manager,
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      if (file) {
+        const uploadFile: UploadFile[] = [
+          {
+            fileType: FileTypes.Avatars,
+            filesUploadBaseDir: this.configService.get(
+              'FILES_SERVICE_AVATAR_UPLOAD_PATH',
+            ),
+            fieldname: file.fieldname,
+            mimetype: file.mimetype,
+            size: file.size,
+            path: file.path,
+            fileId: v4(),
+            originalname: file.filename,
+            destination: file.destination,
+            bucketName,
+          },
+        ];
+
+        const uploadServiceUrl = [
+          this.configService.get('FILES_SERVICE_URL'),
+          HttpFilesPath.Upload,
+        ].join('/');
+
+        this.sendFilesToFilesServiceAndDeleteTempFilesAfter(
+          criteria.id,
+          uploadFile,
+          [criteria.id].join('/'),
+          uploadServiceUrl,
+        );
+      }
+      const updatedUser = await this.userCommandRepository.update(
+        criteria,
+        updateUserDto,
+        queryRunner.manager,
+      );
+      await queryRunner.commitTransaction();
+      return plainToInstance(ResponseUserDto, updatedUser);
+    } catch (err) {
+      console.log('🚀 ~ UsersCommandService ~ err:', err);
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(err);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async switchAvatar(switchAvatarDto: SwitchAvatarDto): Promise<void> {
+    const criteria = { id: switchAvatarDto.id };
+    const updateAvatarDto = { url: switchAvatarDto.url };
+    await this.userCommandRepository.update(criteria, updateAvatarDto);
+  }
+
+  async deleteAvatar(deleteAvatarDto: DeleteAvatarDto): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const user = await this.usersQueryService.findUserByCriteria({
+      id: deleteAvatarDto.id,
+    });
+    const deleteUrl = deleteAvatarDto.url.substring(
+      deleteAvatarDto.url.indexOf('.com') + 5,
     );
-    return plainToInstance(ResponseUserDto, updatedUser);
+    try {
+      if (user.url && user.url === deleteAvatarDto.url) {
+        await this.userCommandRepository.update({ id: user.id }, { url: null });
+      }
+      const url = `${this.configService.get('FILES_SERVICE_URL')}/${HttpFilesPath.Delete}?bucket=${this.configService.get('BUCKET')}&folder=${deleteUrl}`;
+      await axios.delete(url);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        error.response.data,
+        error.response.data.statusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async emailVerify(email: string): Promise<void> {

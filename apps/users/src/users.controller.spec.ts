@@ -5,6 +5,12 @@ import { DataSource } from 'typeorm';
 import { IUserCommandRepository } from './interfaces/command/user-command.interface';
 import { IProfileCommandRepository } from './interfaces/command/profile-command.interface';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ChunksFileUploader } from '../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
+import { ProfileCommandService } from './profile-command.service';
+import { ProviderCommandService } from './provider-command.service';
+import { UsersQueryService } from './users-query.service';
+import { ConfigService } from '@nestjs/config';
+import { ProviderQueryService } from './provider-query.service';
 
 describe('UsersController', () => {
   let usersController: UsersController;
@@ -19,6 +25,36 @@ describe('UsersController', () => {
         { provide: IProfileCommandRepository, useValue: jest.fn() },
         { provide: CommandBus, useValue: jest.fn() },
         { provide: QueryBus, useValue: jest.fn() },
+        {
+          provide: ChunksFileUploader,
+          useValue: jest.fn(),
+        },
+        {
+          provide: ProfileCommandService,
+          useValue: jest.fn(),
+        },
+        {
+          provide: ProviderCommandService,
+          useValue: jest.fn(),
+        },
+        {
+          provide: UsersQueryService,
+          useValue: jest.fn(),
+        },
+        {
+          provide: ProviderQueryService,
+          useValue: jest.fn(),
+        },
+        {
+          provide: QueryBus,
+          useValue: jest.fn().mockResolvedValueOnce({
+            execute: jest.fn(),
+          }),
+        },
+        {
+          provide: ConfigService,
+          useValue: jest.fn(),
+        },
       ],
     }).compile();
 

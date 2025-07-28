@@ -1,15 +1,19 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ChunksFileUploader } from '../../../../../../apps/libs/common/chunks-upload/chunks-file-uploader.service';
 import { ChunkedFileDto } from '../../../../../../apps/libs/common/chunks-upload/dto/chunked-file.dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UploadFilesCommand } from '../use-case/commands/upload-files.handler';
 import { DeleteFilesCommand } from '../use-case/commands/delete-files.handler';
+
+import { GetFilesUrlDto } from '../../../../../../apps/libs/Files/dto/get-files.dto';
+import { GetFilesUrlQuery } from '../use-case/query/get-files-url.handler';
 
 @Controller()
 export class FilesController {
   constructor(
     private readonly chunksFileUploader: ChunksFileUploader,
     private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post('files/upload')
@@ -24,6 +28,11 @@ export class FilesController {
         rej(new Error('Files Controller: files was not uploaded'));
       });
     }
+  }
+
+  @Get('files')
+  async getFiles(@Query('path') path: string): Promise<GetFilesUrlDto[]> {
+    return await this.queryBus.execute(new GetFilesUrlQuery(path));
   }
 
   @Delete('files/delete')

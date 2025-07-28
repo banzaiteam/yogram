@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -20,7 +21,6 @@ import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find
 import { plainToInstance } from 'class-transformer';
 import { FindUserByCriteriaSwagger } from './decorators/swagger/find-one-by-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
-import { UpdateUserWithCriteriaDto } from '../../../../apps/libs/Users/dto/user/update-user-with-criteria.dto';
 import {
   IPagination,
   PaginationParams,
@@ -40,6 +40,13 @@ import { SubscribeSwagger } from './decorators/swagger/subscribe-swagger.decorat
 import { UnsubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.decorator';
 import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
+import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
+import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
+import { GetAvatarsSwagger } from './decorators/swagger/get-avatars-swagger.decorator';
+import { SwitchAvatarSwagger } from './decorators/swagger/switch-avatar-swagger.decorator';
+import { DeleteAvatarSwagger } from './decorators/swagger/delete-avatar-swagger.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -47,6 +54,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
   //
   @ApiExcludeEndpoint()
@@ -63,12 +71,50 @@ export class UsersController {
   @UpdateSwagger()
   @Patch()
   async update(
-    @Body()
-    UpdateUserWithCriteriaDto: UpdateUserWithCriteriaDto,
+    @User('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
   ): Promise<void> {
-    const criteria = UpdateUserWithCriteriaDto['criteria'];
-    const updateUserDto = UpdateUserWithCriteriaDto['updateUserDto'];
-    return await this.usersService.update(criteria, updateUserDto);
+    console.log('🚀 ~ UsersController ~ id:', id);
+    try {
+      // todo! error 413, bodyparser limit 150 mb does not help when use gateService
+
+      const microserviceResponse = await axios.patch(
+        [
+          this.configService.get('USERS_SERVICE_URL'),
+          HttpUsersPath.Update,
+        ].join('/'),
+        req,
+        {
+          headers: { ...req.headers, id },
+          responseType: 'stream',
+        },
+      );
+
+      res.setHeader('content-type', 'application/json');
+      microserviceResponse.data.pipe(res);
+      res.status(200);
+      return null;
+    } catch (err) {
+      // responseType: 'stream' error handle
+      await new Promise((res) => {
+        let streamString = '';
+        err.response.data.setEncoding('utf8');
+        err.response.data
+          .on('data', (utf8Chunk) => {
+            streamString += utf8Chunk;
+          })
+          .on('end', async () => {
+            err.response.stream = streamString;
+          });
+        setTimeout(() => {
+          res(err);
+        }, 300);
+      }).then((data) => {
+        console.log('🚀 ~ UsersController ~ error update user ~ data:', data);
+        throw new HttpException(data, data['status']);
+      });
+    }
   }
 
   @FindUserByCriteriaSwagger()
@@ -86,22 +132,28 @@ export class UsersController {
   @ProfilePageSwagger()
   @Get(':id/profile')
   async profilePage(
+    @User('id') loggedUserId: string,
     @Param('id') id: string,
     @Req() req: Request,
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
   ): Promise<ResponseProfilePageDto> {
+    console.log(
+      '🚀 ~ UsersController ~ profilePage ~ loggedUserId:',
+      loggedUserId,
+    );
     const filtering: IFiltering = {
       filterProperty: 'userId',
       rule: 'eq',
       value: id,
     };
     let allowScroll: boolean = false;
+    let payload;
     const token = req.headers?.authorization;
     if (token) {
       const accessToken = token.split(' ')[1];
       try {
-        let payload = await this.jwtService.verifyAsync(accessToken.trim());
+        payload = await this.jwtService.verifyAsync(accessToken.trim());
         if (payload.id && payload.id === id) {
           allowScroll = true;
         }
@@ -115,12 +167,41 @@ export class UsersController {
       pagination.page = 1;
     }
 
-    return await this.usersService.profilePage(
+    let userInfo = await this.usersService.profilePage(
       id,
       pagination,
       sorting,
       filtering,
     );
+    if (payload) {
+      return userInfo;
+    } else {
+      userInfo.posts.items = userInfo.posts.items.filter(
+        (post) => post.isPublished,
+      );
+      return userInfo;
+    }
+  }
+
+  @GetAvatarsSwagger()
+  @Get('avatars')
+  async getAvatarsUrls(@User('id') id: string): Promise<GetFilesUrlDto[]> {
+    return await this.usersService.getAvatarsUrls(id);
+  }
+
+  @SwitchAvatarSwagger()
+  @Patch('avatar/switch')
+  async switchAvatar(
+    @User('id') id: string,
+    @Body('url') url: string,
+  ): Promise<void> {
+    return await this.usersService.switchAvatar(id, url);
+  }
+
+  @DeleteAvatarSwagger()
+  @Delete('avatar/delete')
+  async deleteAvatar(@User('id') id: string, @Query('url') url: string) {
+    return await this.usersService.deleteAvatar(id, url);
   }
 
   @SubscribeSwagger()

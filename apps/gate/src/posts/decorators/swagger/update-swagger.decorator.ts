@@ -15,4 +15,8 @@ export const UpdateSwagger = () =>
       status: 404,
       description: 'post not found',
     }),
+    ApiResponse({
+      status: 400,
+      description: 'post description should not be more than 500 symbols',
+    }),
   );
