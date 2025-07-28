@@ -132,22 +132,28 @@ export class UsersController {
   @ProfilePageSwagger()
   @Get(':id/profile')
   async profilePage(
+    @User('id') loggedUserId: string,
     @Param('id') id: string,
     @Req() req: Request,
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
   ): Promise<ResponseProfilePageDto> {
+    console.log(
+      '🚀 ~ UsersController ~ profilePage ~ loggedUserId:',
+      loggedUserId,
+    );
     const filtering: IFiltering = {
       filterProperty: 'userId',
       rule: 'eq',
       value: id,
     };
     let allowScroll: boolean = false;
+    let payload;
     const token = req.headers?.authorization;
     if (token) {
       const accessToken = token.split(' ')[1];
       try {
-        let payload = await this.jwtService.verifyAsync(accessToken.trim());
+        payload = await this.jwtService.verifyAsync(accessToken.trim());
         if (payload.id && payload.id === id) {
           allowScroll = true;
         }
@@ -161,12 +167,20 @@ export class UsersController {
       pagination.page = 1;
     }
 
-    return await this.usersService.profilePage(
+    let userInfo = await this.usersService.profilePage(
       id,
       pagination,
       sorting,
       filtering,
     );
+    if (payload) {
+      return userInfo;
+    } else {
+      userInfo.posts.items = userInfo.posts.items.filter(
+        (post) => post.isPublished,
+      );
+      return userInfo;
+    }
   }
 
   @GetAvatarsSwagger()
