@@ -9,7 +9,7 @@ export class GetAvatarsQuery {
 @QueryHandler(GetAvatarsQuery)
 export class GetAvatarsHandler implements IQueryHandler<GetAvatarsQuery> {
   constructor(private readonly usersQueryService: UsersQueryService) {}
-  async execute({ id }: GetAvatarsQuery): Promise<GetFilesUrlDto> {
+  async execute({ id }: GetAvatarsQuery): Promise<GetFilesUrlDto[]> {
     return await this.usersQueryService.getAvatars(id);
   }
 }

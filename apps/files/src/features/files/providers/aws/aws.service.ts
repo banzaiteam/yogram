@@ -32,7 +32,6 @@ export class AwsService implements IUploader {
   constructor(private readonly configService: ConfigService) {}
 
   async uploadFiles(file: ChunkedFileDto): Promise<UploadFilesResponse> {
-    console.log('🚀 ~ AwsService ~ uploadFiles ~ file:', file);
     const bucketName = file.bucketName;
     const isBucketExists = await this.isBucketExists(
       bucketName,
@@ -129,28 +128,50 @@ export class AwsService implements IUploader {
   }
 
   async deleteFolder(bucketName: string, path: string): Promise<boolean> {
-    const isFolderExists = await this.isFolderExists(bucketName, path);
-    // folder does not exist === deleted
-    {
-      if (!isFolderExists) return true;
-    }
-    const content = await this.listObjects(bucketName, path);
-
-    try {
-      for (let i = 0; i < content.length; i++) {
-        const element = content[i];
-        // if (i === 4) {
-        //   throw Error();
-        // }
-        // todo! if during deleting some files left post will not be deleted from db, need to launch smth like outbox
-        await this.s3Client.send(
-          new DeleteObjectCommand({ Bucket: bucketName, Key: element.Key }),
+    // is it has a file extension
+    const pattern = /\.[^\\/:*?"<>|\s.]{1,255}$/;
+    if (!pattern.test(path)) {
+      const isFolderExists = await this.isFolderExists(bucketName, path);
+      {
+        if (!isFolderExists) return true;
+      }
+      let content = await this.listObjects(bucketName, path);
+      console.log('🚀 ~ AwsService ~ deleteFolder ~ content:', content);
+      content = undefined;
+      try {
+        for (let i = 0; i < content.length; i++) {
+          const element = content[i];
+          // todo! if during deleting some files left post will not be deleted from db, need to launch smth like outbox
+          await this.s3Client.send(
+            new DeleteObjectCommand({ Bucket: bucketName, Key: element.Key }),
+          );
+        }
+        return true;
+      } catch (err) {
+        throw new InternalServerErrorException(
+          `AwsService deleteFolder error: bucket:${bucketName} `,
         );
       }
-      return true;
-    } catch (err) {
+    } else {
+      await this.deleteFile(bucketName, path);
+    }
+  }
+
+  async deleteFile(bucketName: string, path: string): Promise<void> {
+    const params = {
+      Bucket: bucketName,
+      Key: path,
+    };
+    let content = await this.listObjects(bucketName, path);
+    if (!content)
       throw new InternalServerErrorException(
-        `AwsService deleteFolder error: bucket:${bucketName} `,
+        'AwsService error: file was not found during delete',
+      );
+    const command = new DeleteObjectCommand(params);
+    const data = await this.s3Client.send(command);
+    if (data.$metadata.httpStatusCode !== 204) {
+      throw new InternalServerErrorException(
+        'AwsService error: file was not found during delete',
       );
     }
   }

@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../../apps/libs/Users/dto/user/create-user.dto';
 import { DataSource, QueryFailedError } from 'typeorm';
@@ -30,8 +32,10 @@ import { FileTypes } from '../../../apps/libs/Files/constants/file-type.enum';
 import { FilesRoutingKeys } from '../../../apps/files/src/features/files/message-brokers/rabbit/files-routing-keys.constant';
 import { uuid } from 'uuidv4';
 import { v4 } from 'uuid';
-import { SwitchAvatarCommand } from './features/avatars/query/command/switch-avatar.handler';
+import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
 import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
+import { DeleteAvatarDto } from 'apps/libs/Users/dto/user/delete-avatar.dto';
+import axios from 'axios';
 
 export type GoogleResponse = { user: ResponseUserDto; created?: boolean };
 
@@ -122,12 +126,12 @@ export class UsersCommandService {
           uploadServiceUrl,
         );
       }
-
       await queryRunner.commitTransaction();
       return plainToInstance(ResponseUserDto, user);
     } catch (error) {
       console.log('🚀 ~ UsersCommandService ~ createUser ~ error:', error);
       await queryRunner.rollbackTransaction();
+      // todo delete uploaded avatar if error (this.deleteAvatar)
       if (error instanceof QueryFailedError) {
         if ((error['code'] = '23505')) {
           throw new ConflictException(
@@ -339,6 +343,34 @@ export class UsersCommandService {
     const criteria = { id: switchAvatarDto.id };
     const updateAvatarDto = { url: switchAvatarDto.url };
     await this.userCommandRepository.update(criteria, updateAvatarDto);
+  }
+
+  async deleteAvatar(deleteAvatarDto: DeleteAvatarDto): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    const user = await this.usersQueryService.findUserByCriteria({
+      id: deleteAvatarDto.id,
+    });
+    const deleteUrl = deleteAvatarDto.url.substring(
+      deleteAvatarDto.url.indexOf('.com') + 5,
+    );
+    try {
+      if (user.url && user.url === deleteAvatarDto.url) {
+        await this.userCommandRepository.update({ id: user.id }, { url: null });
+      }
+      const url = `${this.configService.get('FILES_SERVICE_URL')}/${HttpFilesPath.Delete}?bucket=${this.configService.get('BUCKET')}&folder=${deleteUrl}`;
+      await axios.delete(url);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        error.response.data,
+        error.response.data.statusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async emailVerify(email: string): Promise<void> {

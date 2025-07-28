@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SwitchAvatarDto } from '../../../../../../../apps/libs/Users/dto/user/switch-avatar.dto';
-import { UsersCommandService } from '../../../../../../../apps/users/src/users-command.service';
+import { SwitchAvatarDto } from '../../../../../libs/Users/dto/user/switch-avatar.dto';
+import { UsersCommandService } from '../../../users-command.service';
 
 export class SwitchAvatarCommand {
   constructor(public readonly switchAvatarDto: SwitchAvatarDto) {}

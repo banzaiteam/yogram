@@ -58,7 +58,9 @@ import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.han
 import { GetAvatarsQuery } from './features/avatars/query/get-avatars.handler';
 import { GetFilesUrlDto } from '../../../apps/libs/Files/dto/get-files.dto';
 import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
-import { SwitchAvatarCommand } from './features/avatars/query/command/switch-avatar.handler';
+import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
+import { DeleteAvatarDto } from 'apps/libs/Users/dto/user/delete-avatar.dto';
+import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
 
 @Controller()
 export class UsersController {
@@ -184,14 +186,25 @@ export class UsersController {
   }
 
   @Get('users/avatars/:id')
-  async getAvatarsUrls(@Param('id') id: string): Promise<GetFilesUrlDto> {
+  async getAvatarsUrls(@Param('id') id: string): Promise<GetFilesUrlDto[]> {
     return await this.queryBus.execute(new GetAvatarsQuery(id));
   }
 
-  @Patch('users/switch-avatar')
+  @Patch('users/avatar/switch')
   async switchAvatar(@Body() switchAvatarDto: SwitchAvatarDto): Promise<void> {
     return await this.commandBus.execute(
       new SwitchAvatarCommand(switchAvatarDto),
+    );
+  }
+
+  @Delete('users/:id/avatar/delete')
+  async deleteAvatar(
+    @Param('id') id: string,
+    @Query('url') url: string,
+  ): Promise<void> {
+    const deleteAvatarDto: DeleteAvatarDto = { id, url };
+    return await this.commandBus.execute(
+      new DeleteAvatarCommand(deleteAvatarDto),
     );
   }
 
@@ -236,7 +249,7 @@ export class UsersController {
         validators: [
           new MaxFileSizeValidator({
             maxSize: 20000000,
-            message: ' file is biger than 20mb',
+            message: 'file is biger than 20mb',
           }),
         ],
         fileIsRequired: false,
@@ -245,7 +258,6 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ file:', file);
     const criteria = { id: req.headers.id.toString() };
     const updateUserDto = JSON.parse(payload['updateUserDto']);
     return await this.commandBus.execute(

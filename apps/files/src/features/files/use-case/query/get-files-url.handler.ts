@@ -13,7 +13,7 @@ export class GetFilesUrlHandler implements IQueryHandler<GetFilesUrlQuery> {
     private readonly configService: ConfigService,
     private readonly filesQueryService: FilesQueryService,
   ) {}
-  async execute({ path }: GetFilesUrlQuery): Promise<GetFilesUrlDto> {
+  async execute({ path }: GetFilesUrlQuery): Promise<GetFilesUrlDto[]> {
     return await this.filesQueryService.getFilesUrl(
       path,
       this.configService.get('BUCKET'),

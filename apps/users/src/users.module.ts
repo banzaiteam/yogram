@@ -73,7 +73,11 @@ import {
 import {
   SwitchAvatarCommand,
   SwitchAvatarHandler,
-} from './features/avatars/query/command/switch-avatar.handler';
+} from './features/avatars/command/switch-avatar.handler';
+import {
+  DeleteAvatarCommand,
+  DeleteAvatarHandler,
+} from './features/avatars/command/delete-avatar.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -157,6 +161,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     GetAvatarsQuery,
     SwitchAvatarCommand,
     SwitchAvatarHandler,
+    DeleteAvatarCommand,
+    DeleteAvatarHandler,
+    UsersCommandService,
   ],
 })
 export class UsersModule {}

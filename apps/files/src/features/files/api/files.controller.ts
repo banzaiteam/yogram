@@ -31,7 +31,7 @@ export class FilesController {
   }
 
   @Get('files')
-  async getFiles(@Query('path') path: string): Promise<GetFilesUrlDto> {
+  async getFiles(@Query('path') path: string): Promise<GetFilesUrlDto[]> {
     return await this.queryBus.execute(new GetFilesUrlQuery(path));
   }
 

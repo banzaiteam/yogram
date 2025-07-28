@@ -21,7 +21,6 @@ import { FindUserByCriteriaDto } from '../../../../apps/libs/Users/dto/user/find
 import { plainToInstance } from 'class-transformer';
 import { FindUserByCriteriaSwagger } from './decorators/swagger/find-one-by-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
-import { UpdateUserWithCriteriaDto } from '../../../../apps/libs/Users/dto/user/update-user-with-criteria.dto';
 import {
   IPagination,
   PaginationParams,
@@ -45,7 +44,9 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { HttpUsersPath } from '../../../../apps/libs/Users/constants/path.enum';
 import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
-import { IdDto } from 'apps/libs/common/dto/id.dto';
+import { GetAvatarsSwagger } from './decorators/swagger/get-avatars-swagger.decorator';
+import { SwitchAvatarSwagger } from './decorators/swagger/switch-avatar-swagger.decorator';
+import { DeleteAvatarSwagger } from './decorators/swagger/delete-avatar-swagger.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -168,17 +169,25 @@ export class UsersController {
     );
   }
 
+  @GetAvatarsSwagger()
   @Get('avatars')
-  async getAvatarsUrls(@User('id') id: string): Promise<GetFilesUrlDto> {
+  async getAvatarsUrls(@User('id') id: string): Promise<GetFilesUrlDto[]> {
     return await this.usersService.getAvatarsUrls(id);
   }
 
-  @Patch('switch-avatar')
+  @SwitchAvatarSwagger()
+  @Patch('avatar/switch')
   async switchAvatar(
     @User('id') id: string,
     @Body('url') url: string,
   ): Promise<void> {
-    return await this.usersService.switchAvataratar(id, url);
+    return await this.usersService.switchAvatar(id, url);
+  }
+
+  @DeleteAvatarSwagger()
+  @Delete('avatar/delete')
+  async deleteAvatar(@User('id') id: string, @Query('url') url: string) {
+    return await this.usersService.deleteAvatar(id, url);
   }
 
   @SubscribeSwagger()

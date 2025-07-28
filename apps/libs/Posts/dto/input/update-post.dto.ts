@@ -6,9 +6,9 @@ import {
   IsOptional,
   IsString,
   MaxLength,
-  MinLength,
 } from 'class-validator';
 import { FileStatus } from '../../../../../apps/posts/src/features/posts/constants/file.constant';
+import { BadRequestException } from '@nestjs/common';
 
 export class UpdatePostDto extends PartialType(
   OmitType(CreatePostDto, ['postId', 'userId']),
@@ -24,7 +24,12 @@ export class UpdatePostDto extends PartialType(
   status?: FileStatus;
   @IsOptional()
   @IsString()
-  @MaxLength(200)
-  @MinLength(20)
+  @MaxLength(500, {
+    message: () => {
+      throw new BadRequestException(
+        'post description should not be more than 500 symbols',
+      );
+    },
+  })
   description?: string;
 }
