@@ -57,9 +57,9 @@ import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/r
 import { SubscriptionsQuery } from './features/subscribe/query/subscriptions.handler';
 import { GetAvatarsQuery } from './features/avatars/query/get-avatars.handler';
 import { GetFilesUrlDto } from '../../../apps/libs/Files/dto/get-files.dto';
-import { SwitchAvatarDto } from 'apps/libs/Users/dto/user/switch-avatar.dto';
+import { SwitchAvatarDto } from '../../../apps/libs/Users/dto/user/switch-avatar.dto';
 import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
-import { DeleteAvatarDto } from 'apps/libs/Users/dto/user/delete-avatar.dto';
+import { DeleteAvatarDto } from '../../../apps/libs/Users/dto/user/delete-avatar.dto';
 import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
 
 @Controller()
