@@ -50,24 +50,20 @@ export class PostCommandRepository
       Object.keys(updateDto).includes('url') ||
       Object.keys(updateDto).includes('status')
     ) {
-      files = await Promise.all(
-        post.files.map(async (file) => {
-          if (file.id === criteria.fileid) {
-            file.url = updateDto?.url;
-            file.status = updateDto?.status;
-          }
-          return file;
-        }),
-      );
+      files = post.files.map(async (file) => {
+        if (file.id === criteria.fileid) {
+          file.url = updateDto?.url;
+          file.status = updateDto?.status;
+        }
+        return file;
+      });
     }
 
     console.log('🚀 ~ post:', post);
-    const merged = await Promise.resolve(
-      this.postRepo.merge(post, {
-        ...updateDto,
-        ...files,
-      }),
-    );
+    const merged = this.postRepo.merge(post, {
+      ...updateDto,
+      ...files,
+    });
 
     // if transaction then save with entityManager
     if (entityManager) {
