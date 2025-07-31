@@ -61,6 +61,7 @@ import { SwitchAvatarDto } from '../../../apps/libs/Users/dto/user/switch-avatar
 import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
 import { DeleteAvatarDto } from '../../../apps/libs/Users/dto/user/delete-avatar.dto';
 import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
+import { UsersQueryService } from './users-query.service';
 
 @Controller()
 export class UsersController {
@@ -70,6 +71,7 @@ export class UsersController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly providerQueryService: ProviderQueryService,
+    private readonly usersQueryService: UsersQueryService,
   ) {
     this.usersEmmiter = new EventEmmiter();
   }
@@ -108,6 +110,11 @@ export class UsersController {
     return await this.queryBus.execute(
       new FindUserByCriteriaQuery(findUserByCriteriaDto),
     );
+  }
+
+  @Get('users/amount')
+  async usersAmount(): Promise<number> {
+    return await this.usersQueryService.usersAmount();
   }
 
   @Get('users/findone/:providerid')

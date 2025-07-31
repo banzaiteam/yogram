@@ -13,4 +13,5 @@ export enum HttpUsersPath {
   GetAvatars = 'users/avatars',
   SwitchAvatar = 'users/avatar/switch',
   DeleteAvatar = 'users/:id/avatar/delete',
+  Amount = 'users/amount',
 }

@@ -12,4 +12,6 @@ export abstract class IUsersQueryRepository<U, R> {
   abstract findUserByUsername(username: string): Promise<R>;
 
   abstract findUserByProviderId(providerId: string): Promise<R>;
+
+  abstract usersAmount(): Promise<number>;
 }

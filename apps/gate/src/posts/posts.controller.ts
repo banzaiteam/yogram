@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -13,7 +14,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { Request, Response } from 'express';
-import { User } from '../auth/decorators/user.decorator';
 import { GateService } from '../../../../apps/libs/gateService';
 import { HttpService } from '@nestjs/axios';
 import axios from 'axios';
@@ -51,6 +51,8 @@ import { HttpServices } from '../../../../apps/gate/common/constants/http-servic
 import { UpdateCommentDto } from '../../../../apps/libs/Posts/dto/input/update-comment.dto';
 import { AddCommentSwagger } from './decorators/swagger/add-comment-swagger.decorator';
 import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagger.decorator';
+import { User } from '../auth/decorators/user.decorator';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -60,6 +62,7 @@ export class PostsController {
     private readonly configService: ConfigService,
     private readonly gateService: GateService,
     private readonly httpService: HttpService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Public()
@@ -132,6 +135,41 @@ export class PostsController {
   @Post('cancel')
   async cancelUpload(@Body() cancelUploadDto: CancelUploadDto) {
     return await this.postsService.cancelUpload(cancelUploadDto);
+  }
+
+  @Public()
+  @Get('main')
+  async main(@Req() req: Request) {
+    // todo get users count and 4 last posts
+    // todo sse on each user registration, then front compare checkpoint(100) and next (105), or the same with posts
+    const token = req.headers?.authorization;
+    const pagination: IPagination = { page: 1, limit: 4, offset: 0 };
+    const filter: IFiltering = {
+      filterProperty: 'isPublished',
+      rule: 'eq',
+      value: 'true',
+    };
+    const sorting: ISorting = { property: 'createdAt', direction: 'asc' };
+    if (token) {
+      const accessToken = token.split(' ')[1];
+      try {
+        const payload = await this.jwtService.verifyAsync(accessToken.trim());
+        if (payload.id) {
+          return await this.postsService.main(
+            pagination,
+            sorting,
+            filter,
+            payload.id,
+          );
+        }
+      } catch (error) {
+        throw new BadRequestException(
+          'PostsController error: invalid token on MainPage',
+        );
+      }
+    } else {
+      return await this.postsService.main(pagination, sorting, filter);
+    }
   }
 
   @CreateSwagger()

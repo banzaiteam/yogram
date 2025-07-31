@@ -26,6 +26,7 @@ export class PostsQueryRepository
     sorting?: ISorting,
     filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
+    console.log('🚀 ~ PostsQueryRepository ~ get ~ filtering:', filtering);
     let sort = {},
       filter = {};
 
@@ -34,6 +35,7 @@ export class PostsQueryRepository
     }
     if (filtering) {
       filter = getFilteringObject(filtering);
+      console.log('🚀 ~ PostsQueryRepository ~ get ~ filter:', filter);
     }
     const data = await this.postRepository.findAndCount({
       skip: pagination.offset,

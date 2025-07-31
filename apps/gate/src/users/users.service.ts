@@ -98,6 +98,16 @@ export class UsersService {
     );
   }
 
+  async usersAmount(): Promise<number> {
+    console.log('2');
+
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      HttpUsersPath.Amount,
+      {},
+    );
+  }
+
   async update(
     criteria: UpdateUserCriteria,
     updateUserDto: UpdateUserDto,

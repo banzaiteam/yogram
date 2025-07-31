@@ -54,6 +54,10 @@ export class UserQueryRepository
     return plainToInstance(ResponseUserDto, mappedUser);
   }
 
+  async usersAmount(): Promise<number> {
+    return await this.usersRepository.count();
+  }
+
   async findUserByUsername(username: string): Promise<ResponseUserDto | null> {
     const user = await this.usersRepository
       .createQueryBuilder('users')

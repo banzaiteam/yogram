@@ -24,6 +24,10 @@ export class UsersQueryService {
     return await this.userQueryRepository.userLoginQuery(email);
   }
 
+  async usersAmount(): Promise<number> {
+    return await this.userQueryRepository.usersAmount();
+  }
+
   async findUserByCriteria(
     criteria: UserCriteria,
     entityManager?: EntityManager,
