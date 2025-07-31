@@ -54,7 +54,17 @@ export class PostsService {
       return plainToInstance(ResponsePostsMainPage, responsePostsMainPage);
     }
     if (id) {
-      console.log('true');
+      const [subscriptions, subscribers] = await Promise.all([
+        this.usersService.getAllSubscriptions(id),
+        this.usersService.getAllSubscribers(id),
+      ]);
+      const responsePostsMainPage: ResponsePostsMainPage = {
+        posts: posts.items,
+        usersAmount,
+        subscriptions: subscriptions.amount,
+        subscribers: subscribers.amount,
+      };
+      return plainToInstance(ResponsePostsMainPage, responsePostsMainPage);
     }
   }
 

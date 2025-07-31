@@ -20,6 +20,10 @@
     "noFallthroughCasesInSwitch": false,
     "allowJs": true,
     "resolveJsonModule": true,
-    "paths": {}
+    "paths": {
+      "@/*": ["apps/*"],
+      "@libs/*": ["apps/libs/*"],
+      "@gate/*": ["apps/gate/*"]
+    }
   }
 }

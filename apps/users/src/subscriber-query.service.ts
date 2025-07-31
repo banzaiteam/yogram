@@ -4,6 +4,7 @@ import { EntityManager } from 'typeorm';
 import { ResponseSubscriptionsDto } from '../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 
 import { UsersQueryService } from './users-query.service';
+import { ResponseSubscribersDto } from 'apps/libs/Users/dto/profile/response-subscribers.dto';
 
 @Injectable()
 export class SubscriberQueryService {
@@ -30,6 +31,28 @@ export class SubscriberQueryService {
       );
     }
     return await this.subscriberQueryRepository.getAllSubscriptions(
+      user.profile.id,
+    );
+  }
+
+  async getAllSubscribers(
+    subscriberId: string,
+    entityManager?: EntityManager,
+  ): Promise<ResponseSubscribersDto> {
+    const user = await this.usersQueryService.findUserByCriteria({
+      id: subscriberId,
+    });
+    if (!user)
+      throw new NotFoundException(
+        'SubscriberQueryService error: user was not found',
+      );
+    if (entityManager) {
+      return await this.subscriberQueryRepository.getAllSubscribers(
+        user.profile.id,
+        entityManager,
+      );
+    }
+    return await this.subscriberQueryRepository.getAllSubscribers(
       user.profile.id,
     );
   }

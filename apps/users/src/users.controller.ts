@@ -62,6 +62,8 @@ import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.ha
 import { DeleteAvatarDto } from '../../../apps/libs/Users/dto/user/delete-avatar.dto';
 import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
 import { UsersQueryService } from './users-query.service';
+import { ResponseSubscribersDto } from 'apps/libs/Users/dto/profile/response-subscribers.dto';
+import { SubscribersQuery } from './features/subscribe/query/subscribers.handler';
 
 @Controller()
 export class UsersController {
@@ -311,6 +313,13 @@ export class UsersController {
     @Param('id') id: string,
   ): Promise<ResponseSubscriptionsDto> {
     return await this.queryBus.execute(new SubscriptionsQuery(id));
+  }
+
+  @Get('users/subscribers/:id')
+  async getAllSubscribers(
+    @Param('id') id: string,
+  ): Promise<ResponseSubscribersDto> {
+    return await this.queryBus.execute(new SubscribersQuery(id));
   }
 
   @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')

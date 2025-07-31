@@ -131,6 +131,10 @@ export class PostsController {
     }
   }
 
+  @Public()
+  @Get('ssr')
+  async ssr() {}
+
   @CancelPostSwagger()
   @Post('cancel')
   async cancelUpload(@Body() cancelUploadDto: CancelUploadDto) {

@@ -18,6 +18,7 @@ import { SubscribeDto } from '../../../../apps/libs/Users/dto/subscriber/subscri
 import { ResponseSubscriptionsDto } from '../../../../apps/libs/Users/dto/profile/response-subscriptions.dto';
 import { GetFilesUrlDto } from '../../../../apps/libs/Files/dto/get-files.dto';
 import { SwitchAvatarDto } from '../../../../apps/libs/Users/dto/user/switch-avatar.dto';
+import { ResponseSubscribersDto } from 'apps/libs/Users/dto/profile/response-subscribers.dto';
 
 @Injectable()
 export class UsersService {
@@ -99,8 +100,6 @@ export class UsersService {
   }
 
   async usersAmount(): Promise<number> {
-    console.log('2');
-
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Users,
       HttpUsersPath.Amount,
@@ -164,6 +163,15 @@ export class UsersService {
 
   async getAllSubscriptions(id: string): Promise<ResponseSubscriptionsDto> {
     const path = [HttpUsersPath.GetAllSubscribedOn, id].join('/');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Users,
+      path,
+      {},
+    );
+  }
+
+  async getAllSubscribers(id: string): Promise<ResponseSubscribersDto> {
+    const path = [HttpUsersPath.GetAllSubscribers, id].join('/');
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Users,
       path,
