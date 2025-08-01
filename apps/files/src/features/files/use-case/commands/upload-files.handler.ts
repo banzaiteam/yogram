@@ -20,8 +20,6 @@ export class UploadFilesCommandHandler
 
   async execute({ chunkedFileDto }: UploadFilesCommand): Promise<any> {
     try {
-      console.log('filesssss');
-
       const response = await this.filesCommandService.uploadFiles(
         chunkedFileDto,
         AwsBuckets.Files,
