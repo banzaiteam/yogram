@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SendUserVerifyEmailCommand } from './send-user-verify-email.command';
-import { MailService } from 'apps/mailer/src/mailer.service';
+import { MailService } from '../../../../../../apps/mailer/src/mailer.service';
 
 @CommandHandler(SendUserVerifyEmailCommand)
 export class SendUserVerifyEmailHandler
@@ -10,6 +10,8 @@ export class SendUserVerifyEmailHandler
   async execute({
     userVerifyEmailDto,
   }: SendUserVerifyEmailCommand): Promise<any> {
+    console.log('SendUserVerifyEmailCommand');
+
     await this.mailService.sendUserVerifyEmail(userVerifyEmailDto);
   }
 }

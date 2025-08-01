@@ -69,7 +69,7 @@ export class CreateUserDto {
     message: 'firstName should be minimum 3 and max 20 characters long',
   })
   @IsString()
-  firstName: string;
+  firstName?: string;
 
   @MinLength(3, {
     message: 'lastName should be minimum 3 and max 20 characters long',
@@ -78,7 +78,7 @@ export class CreateUserDto {
     message: 'lastName should be minimum 3 and max 20 characters long',
   })
   @IsString()
-  lastName: string;
+  lastName?: string;
 
   @IsOptional()
   @Type(() => Date)

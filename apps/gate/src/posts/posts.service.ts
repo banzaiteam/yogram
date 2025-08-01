@@ -9,7 +9,7 @@ import { PostPaginatedResponseDto } from 'apps/libs/Posts/dto/output/post-pagina
 import { UpdatePostDto } from '../../../../apps/libs/Posts/dto/input/update-post.dto';
 import { CancelUploadDto } from '../../../../apps/libs/Posts/dto/input/cancel-upload.dto';
 import { UsersService } from '../users/users.service';
-import { ResponsePostsMainPage } from 'apps/libs/Posts/dto/output/response-posts-main-page.dto';
+import { ResponsePostsMainPage } from '../../../libs/Posts/dto/output/response-posts-main-page.dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()

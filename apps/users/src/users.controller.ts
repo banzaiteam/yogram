@@ -143,7 +143,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              process.env.NODE_ENV === 'DEVELOPMENT'
+              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
                 ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,
@@ -225,7 +225,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              process.env.NODE_ENV === 'DEVELOPMENT'
+              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
                 ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,

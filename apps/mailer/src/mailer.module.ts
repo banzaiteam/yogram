@@ -12,9 +12,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { SendUserVerifyEmailCommand } from './features/verifyEmail/command/send-user-verify-email.command';
 import { SendUserVerifyEmailHandler } from './features/verifyEmail/command/send-user-verify-email.handler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UsersBindingKeysEnum } from 'apps/users/src/message-brokers/rabbit/users-queue-bindings.constant';
-import { RabbitConsumerModule } from 'apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
-import { MailerBindingKeysEnum } from 'apps/libs/Mailer/constants';
+import { UsersBindingKeysEnum } from '../../../apps/users/src/message-brokers/rabbit/users-queue-bindings.constant';
+import { RabbitConsumerModule } from '../../../apps/libs/common/message-brokers/rabbit/rabbit-consumer.module';
+import { MailerBindingKeysEnum } from '../../../apps/libs/Mailer/constants';
 import { SendEmailCommand } from './features/sendEmail/command/send-email.command';
 import { SendEmailHandler } from './features/sendEmail/command/send-email.handler';
 
@@ -23,9 +23,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/mailer/src/.env.development',
     'apps/mailer/src/.env',
   ];
-  console.log('getEnvFilePath MAILER');
 
   if (env === EnvironmentMode.TESTING) {
+    console.log('TEST MAILER');
     return ['apps/mailer/src/.env.test', ...defaultEnvFilePath];
   }
   return defaultEnvFilePath;

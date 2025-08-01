@@ -5,7 +5,7 @@ import { Subscriber } from '../../entity/Subscriber.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ISubscriberQueryRepository } from '../../../../../../apps/users/src/interfaces/query/subscriber-query.interface';
 import { plainToInstance } from 'class-transformer';
-import { ResponseSubscribersDto } from 'apps/libs/Users/dto/profile/response-subscribers.dto';
+import { ResponseSubscribersDto } from '../../../../../../apps/libs/Users/dto/profile/response-subscribers.dto';
 
 @Injectable()
 export class SubscriberQueryRepository implements ISubscriberQueryRepository {

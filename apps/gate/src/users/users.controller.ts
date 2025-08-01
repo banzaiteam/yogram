@@ -13,37 +13,37 @@ import {
   Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from '@libs/Users/dto/user/create-user.dto';
+import { CreateUserDto } from '../../../libs/Users/dto/user/create-user.dto';
 import { ApiExcludeEndpoint, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { ResponseUserDto } from '@libs/Users/dto/user/response-user.dto';
-import { FindUserByCriteriaDto } from '@libs/Users/dto/user/find-user-criteria.dto';
+import { ResponseUserDto } from '../../../libs/Users/dto/user/response-user.dto';
+import { FindUserByCriteriaDto } from '../../../libs/Users/dto/user/find-user-criteria.dto';
 import { plainToInstance } from 'class-transformer';
 import { FindUserByCriteriaSwagger } from './decorators/swagger/find-one-by-swagger.decorator';
 import { UpdateSwagger } from './decorators/swagger/update-swagger.decorator';
 import {
   IPagination,
   PaginationParams,
-} from '@libs/common/pagination/decorators/pagination.decorator';
+} from '../../../libs/common/pagination/decorators/pagination.decorator';
 import {
   ISorting,
   SortingParams,
-} from '@libs/common/pagination/decorators/sorting.decorator';
-import { IFiltering } from '@libs/common/pagination/decorators/filtering.decorator';
-import { Public } from '@gate/common/decorators/public.decorator';
-import { ResponseProfilePageDto } from '@libs/Users/dto/profile/response-profile-page.dto';
+} from '../../../libs/common/pagination/decorators/sorting.decorator';
+import { IFiltering } from '../../../libs/common/pagination/decorators/filtering.decorator';
+import { Public } from '../../../gate/common/decorators/public.decorator';
+import { ResponseProfilePageDto } from '../../../libs/Users/dto/profile/response-profile-page.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ProfilePageSwagger } from './decorators/swagger/profile-page-swagger.decorator';
 import { User } from '../auth/decorators/user.decorator';
-import { ResponseSubscriptionsDto } from '@libs/Users/dto/profile/response-subscriptions.dto';
+import { ResponseSubscriptionsDto } from '../../../libs/Users/dto/profile/response-subscriptions.dto';
 import { SubscribeSwagger } from './decorators/swagger/subscribe-swagger.decorator';
-import { UnsubscribeDto } from '@libs/Users/dto/subscriber/unsubscribe.dto';
+import { UnsubscribeDto } from '../../../libs/Users/dto/subscriber/unsubscribe.dto';
 import { UnsubscribeSwagger } from './decorators/swagger/unsubscribe-swagger.decorator';
 import { GetAllSubscriptionsSwagger } from './decorators/swagger/get-all-subscriptions-swagger.decorator';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { HttpUsersPath } from '@libs/Users/constants/path.enum';
-import { GetFilesUrlDto } from '@libs/Files/dto/get-files.dto';
+import { HttpUsersPath } from '../../../libs/Users/constants/path.enum';
+import { GetFilesUrlDto } from '../../../libs/Files/dto/get-files.dto';
 import { GetAvatarsSwagger } from './decorators/swagger/get-avatars-swagger.decorator';
 import { SwitchAvatarSwagger } from './decorators/swagger/switch-avatar-swagger.decorator';
 import { DeleteAvatarSwagger } from './decorators/swagger/delete-avatar-swagger.decorator';
