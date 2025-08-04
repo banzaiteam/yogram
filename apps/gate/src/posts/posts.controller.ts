@@ -240,6 +240,7 @@ export class PostsController {
   }
 
   @GetSwagger()
+  @Public()
   @Get()
   async get(
     @PaginationParams() pagination: IPagination,
