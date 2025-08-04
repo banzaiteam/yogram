@@ -15,7 +15,6 @@ export class FilesQueryService {
     bucketName: string,
   ): Promise<GetFilesUrlDto[]> {
     const prefix = this.configService.get('UPLOAD_SERVICE_URL_PREFIX');
-    console.log('🚀 ~ FilesQueryService ~ getFilesUrl ~ prefix:', prefix);
     const files = await this.uploaderService.listObjects(bucketName, path);
     if (!files)
       throw new NotFoundException(

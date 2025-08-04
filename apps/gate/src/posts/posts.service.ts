@@ -42,10 +42,12 @@ export class PostsService {
     filtering: IFiltering,
     id?: string,
   ): Promise<ResponsePostsMainPage> {
+    console.log('🚀 ~ PostsService ~ main ~ pagination:', pagination);
     const [posts, usersAmount] = await Promise.all([
       this.get(pagination, sorting, filtering),
       this.usersService.usersAmount(),
     ]);
+    console.log('🚀 ~ PostsService ~ main ~ posts:', posts);
     if (!id) {
       const responsePostsMainPage: ResponsePostsMainPage = {
         posts: posts.items,

@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -53,6 +54,7 @@ import { AddCommentSwagger } from './decorators/swagger/add-comment-swagger.deco
 import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagger.decorator';
 import { User } from '../auth/decorators/user.decorator';
 import { JwtService } from '@nestjs/jwt';
+import { ResponsePostsMainPage } from 'apps/libs/Posts/dto/output/response-posts-main-page.dto';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -143,11 +145,23 @@ export class PostsController {
 
   @Public()
   @Get('main')
-  async main(@Req() req: Request) {
+  async main(
+    @Req() req: Request,
+    @Query() pagination: { limit: number; page: number; offset: number },
+  ): Promise<ResponsePostsMainPage> {
     // todo get users count and 4 last posts
     // todo sse on each user registration, then front compare checkpoint(100) and next (105), or the same with posts
     const token = req.headers?.authorization;
-    const pagination: IPagination = { page: 1, limit: 4, offset: 0 };
+    const page = pagination.page || 1;
+    const limit = pagination.limit || 4;
+    const offset = limit * page - limit;
+
+    pagination = {
+      page,
+      limit,
+      offset,
+    };
+
     const filter: IFiltering = {
       filterProperty: 'isPublished',
       rule: 'eq',
