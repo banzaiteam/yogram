@@ -78,6 +78,10 @@ import {
   DeleteAvatarCommand,
   DeleteAvatarHandler,
 } from './features/avatars/command/delete-avatar.handler';
+import {
+  SubscribersHandler,
+  SubscribersQuery,
+} from './features/subscribe/query/subscribers.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -157,6 +161,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     UnsubscribeHandler,
     SubscriptionsHandler,
     SubscriptionsQuery,
+    SubscribersQuery,
+    SubscribersHandler,
     GetAvatarsHandler,
     GetAvatarsQuery,
     SwitchAvatarCommand,

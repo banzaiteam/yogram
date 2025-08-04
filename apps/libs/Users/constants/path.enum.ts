@@ -10,7 +10,9 @@ export enum HttpUsersPath {
   Subscribe = 'users/subscribe',
   Unsubscribe = 'users/unsubscribe',
   GetAllSubscribedOn = 'users/subscriptions',
+  GetAllSubscribers = 'users/subscribers',
   GetAvatars = 'users/avatars',
   SwitchAvatar = 'users/avatar/switch',
   DeleteAvatar = 'users/:id/avatar/delete',
+  Amount = 'users/amount',
 }

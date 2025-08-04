@@ -16,4 +16,6 @@ export class ResponseSubscriptionsDto {
   subscriber: Subscribe;
   @Expose()
   subscriptions: Subscribe[];
+  @Expose()
+  amount: number;
 }

@@ -12,8 +12,6 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
-  console.log(process.env.NODE_ENV?.trim(), 'NODE_ENV');
-  console.log(process.env.PORT, 'process.env.PORT');
   return {
     NODE_ENV: (Environments.includes(process.env.NODE_ENV?.trim())
       ? process.env.NODE_ENV.trim()
@@ -23,5 +21,7 @@ export const getConfiguration = () => {
     AWS_REGION: process.env.AWS_REGION,
     AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
     AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
+    UPLOAD_SERVICE_URL_PREFIX: process.env.UPLOAD_SERVICE_URL_PREFIX,
+    BUCKET: process.env.BUCKET,
   };
 };

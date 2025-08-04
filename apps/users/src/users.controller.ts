@@ -61,6 +61,9 @@ import { SwitchAvatarDto } from '../../../apps/libs/Users/dto/user/switch-avatar
 import { SwitchAvatarCommand } from './features/avatars/command/switch-avatar.handler';
 import { DeleteAvatarDto } from '../../../apps/libs/Users/dto/user/delete-avatar.dto';
 import { DeleteAvatarCommand } from './features/avatars/command/delete-avatar.handler';
+import { UsersQueryService } from './users-query.service';
+import { ResponseSubscribersDto } from 'apps/libs/Users/dto/profile/response-subscribers.dto';
+import { SubscribersQuery } from './features/subscribe/query/subscribers.handler';
 
 @Controller()
 export class UsersController {
@@ -70,6 +73,7 @@ export class UsersController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly providerQueryService: ProviderQueryService,
+    private readonly usersQueryService: UsersQueryService,
   ) {
     this.usersEmmiter = new EventEmmiter();
   }
@@ -110,6 +114,11 @@ export class UsersController {
     );
   }
 
+  @Get('users/amount')
+  async usersAmount(): Promise<number> {
+    return await this.usersQueryService.usersAmount();
+  }
+
   @Get('users/findone/:providerid')
   async findUserByProviderId(
     @Param('providerid') providerId: string,
@@ -134,7 +143,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              process.env.NODE_ENV === 'DEVELOPMENT'
+              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
                 ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,
@@ -216,7 +225,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              process.env.NODE_ENV === 'DEVELOPMENT'
+              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
                 ? 'apps/users/src/uploads/avatars'
                 : '/home/node/dist/users/src/uploads/avatars',
               req,
@@ -304,6 +313,13 @@ export class UsersController {
     @Param('id') id: string,
   ): Promise<ResponseSubscriptionsDto> {
     return await this.queryBus.execute(new SubscriptionsQuery(id));
+  }
+
+  @Get('users/subscribers/:id')
+  async getAllSubscribers(
+    @Param('id') id: string,
+  ): Promise<ResponseSubscribersDto> {
+    return await this.queryBus.execute(new SubscribersQuery(id));
   }
 
   @Delete('users/unsubscribe/:subscriber/:unsubscribeFrom')

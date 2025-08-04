@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -8,11 +8,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { AuthModule } from '../auth/auth.module';
 import { ChunksFileUploader } from '../../../libs/common/chunks-upload/chunks-file-uploader.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     AuthModule,
     HttpModule,
+    forwardRef(() => UsersModule),
     JwtModule.registerAsync({
       inject: [ConfigService],
       imports: [ConfigModule],
