@@ -12,7 +12,7 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
-  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES'];
+  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES', 'BUSINESS'];
 
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {
