@@ -173,9 +173,9 @@ export class UsersController {
       sorting,
       filtering,
     );
-    if (payload) {
-      return userInfo;
-    }
+    // if (payload) {
+    return userInfo;
+    // }
     // else {
     //   userInfo.posts.items = userInfo.posts.items.filter(
     //     (post) => post.isPublished,
