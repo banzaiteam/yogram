@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { BusinessController } from './business.controller';
 import { BusinessService } from './business.service';
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +7,7 @@ import {
   EnvironmentsTypes,
   getConfiguration,
 } from './settings/configuration';
+import { BusinessController } from './api/business.controller';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   console.log('posts env...');

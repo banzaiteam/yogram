@@ -3,9 +3,6 @@ import args from 'minimist';
 // create | generate | run | revert
 const acceptableTypes = ['create', 'generate', 'run', 'revert'];
 const { type, service, env, name } = args(process.argv.slice(2));
-console.log(
-  `${type} migration for ${service} in ${env} environment with name ${name}`,
-);
 if (
   !acceptableTypes.includes(type) ||
   !service ||
@@ -22,8 +19,11 @@ if (
 }
 
 const basePath = `./apps/${service}/src/db`;
+console.log('🚀 ~ basePath:', basePath);
 const migrationDir = `${basePath}/migrations${env === 'prod' ? '-prod' : ''}`;
+console.log('🚀 ~ migrationDir:', migrationDir);
 const dataSource = `${basePath}/typeorm${env === 'prod' ? '-prod' : ''}.config.ts`;
+console.log('🚀 ~ dataSource:', dataSource);
 
 let command = '';
 
