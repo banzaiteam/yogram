@@ -175,12 +175,13 @@ export class UsersController {
     );
     if (payload) {
       return userInfo;
-    } else {
-      userInfo.posts.items = userInfo.posts.items.filter(
-        (post) => post.isPublished,
-      );
-      return userInfo;
     }
+    // else {
+    //   userInfo.posts.items = userInfo.posts.items.filter(
+    //     (post) => post.isPublished,
+    //   );
+    //   return userInfo;
+    // }
   }
 
   @GetAvatarsSwagger()
