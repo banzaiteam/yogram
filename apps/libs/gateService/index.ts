@@ -27,6 +27,7 @@ export class GateService {
       POSTS: this.configService.get('POSTS_SERVICE_URL'),
       USERS: this.configService.get('USERS_SERVICE_URL'),
       FILES: this.configService.get('FILES_SERVICE_URL'),
+      BUSINESS: this.configService.get('BUSINESS_SERVICE_URL'),
     });
   }
 

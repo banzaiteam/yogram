@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { SignupModule } from './signup/signup.module';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
+import { BusinessModule } from './business/business.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = [
@@ -20,6 +21,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/gate/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
+    console.log('testing.....');
+
     return ['apps/gate/src/.env.test', ...defaultEnvFilePath];
   }
 
@@ -90,6 +93,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     // }),
     SignupModule,
     AuthModule,
+    BusinessModule,
   ],
   controllers: [],
   providers: [],

@@ -171,5 +171,6 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     DeleteAvatarHandler,
     UsersCommandService,
   ],
+  exports: [],
 })
 export class UsersModule {}

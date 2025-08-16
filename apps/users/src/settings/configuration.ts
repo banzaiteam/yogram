@@ -1,6 +1,3 @@
-import path from 'path';
-import { cwd } from 'process';
-
 export type EnvironmentsTypes =
   | 'DEVELOPMENT'
   | 'STAGING'
@@ -13,10 +10,6 @@ export const EnvironmentMode = {
   TESTING: 'TESTING',
 };
 export const Environments = Object.keys(EnvironmentMode);
-console.log(
-  'dirname',
-  path.join(cwd(), '/apps/users/src/**/*.entity{.ts,.js}'),
-);
 
 export const getConfiguration = () => {
   console.log(process.env.NODE_ENV?.trim(), 'NODE_ENV');

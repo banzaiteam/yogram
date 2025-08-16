@@ -12,7 +12,7 @@ export const EnvironmentMode = {
 export const Environments = Object.keys(EnvironmentMode);
 
 export const getConfiguration = () => {
-  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES'];
+  const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES', 'BUSINESS'];
 
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {
@@ -29,7 +29,6 @@ export const getConfiguration = () => {
   );
   console.log('SERVICES_URLS', SERVICES_URLS);
 
-  console.log(process.env.NODE_ENV?.trim(), 'NODE_ENV--');
   return {
     NODE_ENV: (Environments.includes(process.env.NODE_ENV?.trim())
       ? process.env.NODE_ENV.trim()
