@@ -1,18 +1,18 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddUsersUrl1750528020327 implements MigrationInterface {
-    name = 'AddUsersUrl1750528020327'
+export class AddUserid1755254955393 implements MigrationInterface {
+    name = 'AddUserid1755254955393'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            ALTER TABLE "users"
-            ADD "url" character varying
+            ALTER TABLE "payments"
+            ADD "userId" uuid NOT NULL
         `);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
-            ALTER TABLE "users" DROP COLUMN "url"
+            ALTER TABLE "payments" DROP COLUMN "userId"
         `);
     }
 

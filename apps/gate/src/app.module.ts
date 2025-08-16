@@ -21,6 +21,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     'apps/gate/src/.env',
   ];
   if (env === EnvironmentMode.TESTING) {
+    console.log('testing.....');
+
     return ['apps/gate/src/.env.test', ...defaultEnvFilePath];
   }
 

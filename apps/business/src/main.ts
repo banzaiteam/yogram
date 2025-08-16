@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { BusinessModule } from './business.module';
 import { useContainer } from 'class-validator';
 import { applyAppSettings } from './settings/main.settings';
+import { BusinessModule } from './business.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(BusinessModule);

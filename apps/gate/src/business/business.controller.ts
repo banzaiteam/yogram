@@ -1,8 +1,9 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { GateService } from '../../../../apps/libs/gateService';
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
-import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { UpdatePlanDto } from '../../../../apps/libs/Business/dto/input/update-plan.dto';
+import { User } from '../auth/decorators/user.decorator';
 
 @Controller('business')
 export class BusinessController {
@@ -11,13 +12,16 @@ export class BusinessController {
     private readonly gateService: GateService,
   ) {}
 
-  @Public()
-  @Post()
-  async get(): Promise<void> {
+  @Post('update-plan')
+  async updatePlan(
+    @User('id') id: string,
+    @Body() updatePlanDto: UpdatePlanDto,
+  ): Promise<void> {
+    updatePlanDto.id = id;
     return await this.gateService.requestHttpServicePost(
       HttpServices.Business,
       'business/update-plan',
-      {},
+      updatePlanDto,
       {},
     );
   }

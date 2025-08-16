@@ -28,7 +28,7 @@ export class DatabaseModule {
               idleTimeoutMillis: 30000,
               maxQueryExecutionTime: 5000,
               migrationsTableName: configService.get('migrationsTableName'),
-              entities: [`${__dirname}/../**/*.entity{.ts,.js}`],
+              entities: [`${__dirname}/infrastructure/**/*.entity{.ts,.js}`],
               migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
               autoLoadEntities: configService.get('autoLoadEntities'),
               synchronize: configService.get('synchronize'),

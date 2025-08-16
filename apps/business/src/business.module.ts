@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BusinessService } from './business.service';
+import { BusinessCommandService } from './business-command.service';
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import {
@@ -8,12 +8,19 @@ import {
   getConfiguration,
 } from './settings/configuration';
 import { BusinessController } from './api/business.controller';
+import { PaymentCommandRepository } from './infrastructure/repository/command/payment-command.repository';
+import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
+import {
+  UpdatePlanCommand,
+  UpdatePlanHandler,
+} from './application/command/update-plan.handler';
+import { CqrsModule } from '@nestjs/cqrs';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Payment } from './infrastructure/entity/payment.entity';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
-  console.log('posts env...');
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
   if (env === EnvironmentMode.TESTING) {
-    console.log('business test env...');
     return ['apps/business/src/.env.test', ...defaultEnvFilePath];
   }
   return defaultEnvFilePath;
@@ -21,6 +28,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 
 @Module({
   imports: [
+    CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],
@@ -30,8 +38,15 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
+    TypeOrmModule.forFeature([Payment]),
   ],
   controllers: [BusinessController],
-  providers: [BusinessService],
+  providers: [
+    BusinessCommandService,
+    UpdatePlanCommand,
+    UpdatePlanHandler,
+    PaymentCommandRepository,
+    { provide: IPaymentCommandRepository, useClass: PaymentCommandRepository },
+  ],
 })
 export class BusinessModule {}
