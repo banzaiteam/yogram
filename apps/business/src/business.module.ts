@@ -17,6 +17,8 @@ import {
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from './infrastructure/entity/payment.entity';
+import { PaymentModule } from './payment/payment.module';
+import { RequestContextModule } from 'nestjs-request-context';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -28,7 +30,9 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
 
 @Module({
   imports: [
+    RequestContextModule,
     CqrsModule,
+    PaymentModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [getConfiguration],

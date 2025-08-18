@@ -1,1 +1,3 @@
-export const HttpBusinessPath = {};
+export const HttpBusinessPath = {
+  UpdatePlan: 'business/update-plan',
+};
