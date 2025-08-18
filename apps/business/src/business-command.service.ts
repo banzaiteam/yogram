@@ -11,6 +11,8 @@ import { v4 } from 'uuid';
 import { SubscriptionType } from '../../../apps/libs/Business/constants/subscription-type.enum';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { getSubscriptionPrice } from './helper/get-subscription-price.helper';
+import { IPaymentService } from './payment/interfaces/payment-service.interface';
 
 @Injectable()
 export class BusinessCommandService {
@@ -18,13 +20,14 @@ export class BusinessCommandService {
     private readonly dataSource: DataSource,
     private readonly paymentCommandRepository: IPaymentCommandRepository<Payment>,
     private readonly configService: ConfigService,
+    private readonly paymentService: IPaymentService,
   ) {}
 
   async updatePlan(updatePlan: UpdatePlanDto): Promise<Payment> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     try {
-      const price = this.getSubscriptionPrice(updatePlan.subscriptionType);
+      const price = getSubscriptionPrice(updatePlan.subscriptionType);
       const paymentDate = new Date();
       let expiresAt = structuredClone(paymentDate);
       expiresAt = new Date(
@@ -44,6 +47,7 @@ export class BusinessCommandService {
         updatePlanObject,
         queryRunner.manager,
       );
+      await this.paymentService.pay('s', SubscriptionType.Month);
       await queryRunner.commitTransaction();
       return updatedPlan;
     } catch (err) {
@@ -59,19 +63,6 @@ export class BusinessCommandService {
       );
     } finally {
       await queryRunner.release();
-    }
-  }
-
-  getSubscriptionPrice(subscriptionType: SubscriptionType) {
-    switch (subscriptionType) {
-      case SubscriptionType.OneDay:
-        return 10;
-      case SubscriptionType.SevenDays:
-        return 50;
-      case SubscriptionType.Month:
-        return 100;
-      default:
-        throw new BadRequestException('error: invalid subscriptionPrice value');
     }
   }
 }

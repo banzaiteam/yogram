@@ -21,3 +21,19 @@ spec:
            ports:
              - containerPort: PORT_CONTAINER
 
+           env:
+             - name: POSTGRES_TYPE
+               valueFrom:
+                 secretKeyRef:
+                   name: business-production-config-secret
+                   key: POSTGRES_TYPE
+             - name: BUSINESS_SERVICE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: business-production-config-secret
+                   key: BUSINESS_SERVICE_URL
+             - name: POSTGRES_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: business-production-config-secret
+                   key: POSTGRES_URL
