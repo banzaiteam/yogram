@@ -14,7 +14,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
+import { HttpUsersPath } from '../../../../../../../../apps/libs/Users/constants/path.enum';
 
 export class PostsQueryRepository
   implements IPostQueryRepository<PostPaginatedResponseDto>
