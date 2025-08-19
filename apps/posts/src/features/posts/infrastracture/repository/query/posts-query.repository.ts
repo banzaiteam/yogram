@@ -12,6 +12,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { HttpUsersPath } from 'apps/libs/Users/constants/path.enum';
 
 export class PostsQueryRepository
   implements IPostQueryRepository<PostPaginatedResponseDto>
@@ -19,6 +22,7 @@ export class PostsQueryRepository
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    private readonly configService: ConfigService,
   ) {}
 
   async get(
@@ -26,7 +30,6 @@ export class PostsQueryRepository
     sorting?: ISorting,
     filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
-    console.log('🚀 ~ PostsQueryRepository ~ get ~ filtering:', filtering);
     let sort = {},
       filter = {};
 
@@ -35,22 +38,28 @@ export class PostsQueryRepository
     }
     if (filtering) {
       filter = getFilteringObject(filtering);
-      console.log('🚀 ~ PostsQueryRepository ~ get ~ filter:', filter);
     }
-    const data = await this.postRepository.findAndCount({
-      skip: pagination.offset,
-      take: pagination.limit,
-      order: sort,
-      where: filter,
-      relations: {
-        files: true,
-        comments: true,
-      },
+    const usersUrl = `${this.configService.get('USERS_SERVICE_URL')}/${HttpUsersPath.FindUserByCriteria}?id=${filtering.value}`;
+    let [user, posts] = await Promise.all([
+      axios.get(usersUrl),
+      this.postRepository.findAndCount({
+        skip: pagination.offset,
+        take: pagination.limit,
+        order: sort,
+        where: filter,
+        relations: {
+          files: true,
+          comments: true,
+        },
+      }),
+    ]);
+    posts[0] = posts[0].map((post) => {
+      post['avatar'] = user.data.url;
+      return post;
     });
-    console.log('🚀 ~ data:', data);
     const paginatedResponse: PostPaginatedResponseDto = {
-      items: data[0],
-      totalItems: data[1],
+      items: posts[0],
+      totalItems: posts[1],
       page: pagination.page,
       limit: pagination.limit,
     };

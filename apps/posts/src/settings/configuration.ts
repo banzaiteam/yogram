@@ -40,6 +40,7 @@ export const getConfiguration = () => {
     dropSchema: process.env.DROP_SCHEMA === 'true',
     RMQ_URL: process.env.RMQ_URL,
     FILES_SERVICE_URL: process.env.FILES_SERVICE_URL,
+    USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
     BUCKET: process.env.BUCKET,
     FILES_SERVICE_POSTS_UPLOAD_PATH:
       process.env.FILES_SERVICE_POSTS_UPLOAD_PATH,
