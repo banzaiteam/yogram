@@ -26,7 +26,6 @@ export class PostsQueryRepository
     sorting?: ISorting,
     filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
-    console.log('🚀 ~ PostsQueryRepository ~ get ~ filtering:', filtering);
     let sort = {},
       filter = {};
 
@@ -35,9 +34,9 @@ export class PostsQueryRepository
     }
     if (filtering) {
       filter = getFilteringObject(filtering);
-      console.log('🚀 ~ PostsQueryRepository ~ get ~ filter:', filter);
     }
-    const data = await this.postRepository.findAndCount({
+
+    let posts = await this.postRepository.findAndCount({
       skip: pagination.offset,
       take: pagination.limit,
       order: sort,
@@ -47,10 +46,10 @@ export class PostsQueryRepository
         comments: true,
       },
     });
-    console.log('🚀 ~ data:', data);
+
     const paginatedResponse: PostPaginatedResponseDto = {
-      items: data[0],
-      totalItems: data[1],
+      items: posts[0],
+      totalItems: posts[1],
       page: pagination.page,
       limit: pagination.limit,
     };
