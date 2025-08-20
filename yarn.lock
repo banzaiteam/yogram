@@ -45,6 +45,125 @@
     ora "5.4.1"
     rxjs "7.8.1"
 
+"@apimatic/authentication-adapters@^0.5.4":
+  version "0.5.11"
+  resolved "https://registry.yarnpkg.com/@apimatic/authentication-adapters/-/authentication-adapters-0.5.11.tgz#84b6c0d514c3bfbd67a3c6b456f95c513291fc03"
+  integrity sha512-qEf0rL5lQ9ArbkX6T3XNQq5KuEtrcn3/rXRUTcYjy4u2lOY9qtWxPDA+/Bk5vPSnvSdZ9PGwSVzCByhsSbht3w==
+  dependencies:
+    "@apimatic/core-interfaces" "^0.2.12"
+    "@apimatic/http-headers" "^0.3.7"
+    "@apimatic/http-query" "^0.3.7"
+    tslib "^2.8.1"
+
+"@apimatic/axios-client-adapter@^0.3.7":
+  version "0.3.15"
+  resolved "https://registry.yarnpkg.com/@apimatic/axios-client-adapter/-/axios-client-adapter-0.3.15.tgz#7d00d7e5728bc703c09586104291484919448197"
+  integrity sha512-rliG4FDUVjqmcdN1wxREIi8eqkiyxH7ISelEPsT0n6xJOZCVO1N1hLApokRT3lE9pnpuVB6Ums7wlF5gbbnXzg==
+  dependencies:
+    "@apimatic/convert-to-stream" "^0.1.7"
+    "@apimatic/core-interfaces" "^0.2.12"
+    "@apimatic/file-wrapper" "^0.3.7"
+    "@apimatic/http-headers" "^0.3.7"
+    "@apimatic/http-query" "^0.3.7"
+    "@apimatic/json-bigint" "^1.2.0"
+    "@apimatic/proxy" "^0.1.2"
+    "@apimatic/schema" "^0.7.18"
+    axios "^1.8.4"
+    detect-browser "^5.3.0"
+    detect-node "^2.1.0"
+    form-data "^4.0.1"
+    lodash.flatmap "^4.5.0"
+    tiny-warning "^1.0.3"
+    tslib "^2.8.1"
+
+"@apimatic/convert-to-stream@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@apimatic/convert-to-stream/-/convert-to-stream-0.1.7.tgz#1d9518239be2ab7724712b9e8a7f311ec8d4ce61"
+  integrity sha512-uOCSy8YV0umHI4422l6wXcY/CN/oplLgoitpOY+P52I8dSrkQK+P+8HCITLDW4ND1I5OvRfvb1OwvN4+1JdgvA==
+  dependencies:
+    tslib "2.8.1"
+
+"@apimatic/core-interfaces@^0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@apimatic/core-interfaces/-/core-interfaces-0.2.12.tgz#0083f46cb4c7359f184f776f3ca0634a75905033"
+  integrity sha512-XdEbSEfLEUY6KvKWQVXGMMGQmt589Zj0MnssPZ7FdgWFCrqe4aNgYt2Fl/fOC9r64GZvd7o1T9m4HKFilXi4nw==
+  dependencies:
+    "@apimatic/file-wrapper" "^0.3.7"
+    tslib "^2.8.1"
+
+"@apimatic/core@^0.10.16":
+  version "0.10.24"
+  resolved "https://registry.yarnpkg.com/@apimatic/core/-/core-0.10.24.tgz#b8b1008cbd2e05e3e515101b667dd36d149a4a7d"
+  integrity sha512-2ctPLanGG6nGS8OIIuulqayuJmLlQBQRDgjtrrl1TXZEIgLI/79yB6SxA3F1MIAwsokN51Hp4V7booclVFS+/A==
+  dependencies:
+    "@apimatic/convert-to-stream" "^0.1.7"
+    "@apimatic/core-interfaces" "^0.2.12"
+    "@apimatic/file-wrapper" "^0.3.7"
+    "@apimatic/http-headers" "^0.3.7"
+    "@apimatic/http-query" "^0.3.7"
+    "@apimatic/json-bigint" "^1.2.0"
+    "@apimatic/schema" "^0.7.18"
+    detect-browser "^5.3.0"
+    detect-node "^2.1.0"
+    form-data "^4.0.1"
+    lodash.defaultsdeep "^4.6.1"
+    lodash.flatmap "^4.5.0"
+    tiny-warning "^1.0.3"
+    tslib "^2.8.1"
+
+"@apimatic/file-wrapper@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@apimatic/file-wrapper/-/file-wrapper-0.3.7.tgz#82035170f3b6e0c16d4ea827d8c2222b3883a83a"
+  integrity sha512-uJh2immpzZiZYOiG+Q9qtArg3bUk7lmx7eYFRI38wIOS2zlxQh90WkuJzaL2nvSmNsJ3p+yg5ePAyRpqoJmw7Q==
+  dependencies:
+    tslib "2.8.1"
+
+"@apimatic/http-headers@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@apimatic/http-headers/-/http-headers-0.3.7.tgz#f24681df9095d347381689005ed5ffba47f68a8c"
+  integrity sha512-DxLmwDMnAT5sOiuYI7EIuQq2PAVhbV9ICDLSdICRFflklgfKQ9agVEyNRgYVhuXz1m7IDoqqjGb1hs6iMJJpEg==
+  dependencies:
+    tslib "2.8.1"
+
+"@apimatic/http-query@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@apimatic/http-query/-/http-query-0.3.7.tgz#f18de14a97ebaf026205fe8e806fe64efe36803a"
+  integrity sha512-HauS4Jsuve1tGy1pnAidjHNL/TFVLesOxL7QtOdZyb+s0EHiHF6Vhx/kNroJ4mH/yCN3OHcHcqMJlfg0V5ET9g==
+  dependencies:
+    "@apimatic/file-wrapper" "^0.3.7"
+    tslib "^2.8.1"
+
+"@apimatic/json-bigint@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@apimatic/json-bigint/-/json-bigint-1.2.0.tgz#05223455ec135976fe7a55456c2d21a3bbde56d8"
+  integrity sha512-+bmVzYMdZu0Ya5L+my4FXFUih54OvQA/qlZsFOYdOoostyUuB27UDrVWQs/WVCmS0ADdo5vTU0eeTrrBkHoySw==
+
+"@apimatic/oauth-adapters@^0.4.8":
+  version "0.4.14"
+  resolved "https://registry.yarnpkg.com/@apimatic/oauth-adapters/-/oauth-adapters-0.4.14.tgz#5262c742678cf324308ec493b548a10a9d96b0eb"
+  integrity sha512-OrGA4mklrd5B2mL5vR3QBKonYXYxymUt4BQfk0+n4HkZHWJfEtmW//Qx2YbU3Jtvq9zcB6oE60rzOqzvEyQwzg==
+  dependencies:
+    "@apimatic/core-interfaces" "^0.2.12"
+    "@apimatic/file-wrapper" "^0.3.7"
+    "@apimatic/http-headers" "^0.3.7"
+    "@apimatic/schema" "^0.7.18"
+    tslib "^2.8.1"
+
+"@apimatic/proxy@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@apimatic/proxy/-/proxy-0.1.2.tgz#7696a94797f241a61919c4622ce9b0a9222aaeb5"
+  integrity sha512-Xo3PO69tos+ssAfjcBGxSxXu1jpdEwse+yYnWC8D8bCsuWKUVJh8TwWl01Zyw3s60FdikyGCGtiQ3LB2cBrbeg==
+  dependencies:
+    http-proxy-agent "^7.0.2"
+    https-proxy-agent "^7.0.6"
+
+"@apimatic/schema@^0.7.14", "@apimatic/schema@^0.7.18":
+  version "0.7.18"
+  resolved "https://registry.yarnpkg.com/@apimatic/schema/-/schema-0.7.18.tgz#0a362e2d2486de6d7bb42f9fd424f52ff4706dc5"
+  integrity sha512-Cyj04ztP+cTwiYwHRkhJcehXBQcKUSXW4H2k2ELIbzb6fCDAlBqOjVqLi9FJkutTgYES6D60xlFKfcm3uTsOyQ==
+  dependencies:
+    tslib "^2.8.1"
+
 "@apollo/cache-control-types@^1.0.2", "@apollo/cache-control-types@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@apollo/cache-control-types/-/cache-control-types-1.0.3.tgz#5da62cf64c3b4419dabfef4536b57a40c8ff0b47"
@@ -1997,6 +2116,17 @@
   dependencies:
     "@noble/hashes" "^1.1.5"
 
+"@paypal/paypal-server-sdk@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@paypal/paypal-server-sdk/-/paypal-server-sdk-1.1.0.tgz#bf866f2a11ad7137a8697ac724e69096859bf92a"
+  integrity sha512-MaJQmSVpQb5nEeZWZDTtGRxeaHj6O51G9Olmm3zQ5E4XNgR4emAI08CKC2ZPhBldVoxAoBVjLyvKjGV5lC1n2Q==
+  dependencies:
+    "@apimatic/authentication-adapters" "^0.5.4"
+    "@apimatic/axios-client-adapter" "^0.3.7"
+    "@apimatic/core" "^0.10.16"
+    "@apimatic/oauth-adapters" "^0.4.8"
+    "@apimatic/schema" "^0.7.14"
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
@@ -2869,6 +2999,13 @@
   dependencies:
     undici-types "~6.19.2"
 
+"@types/paypal-rest-sdk@^1.7.9":
+  version "1.7.9"
+  resolved "https://registry.yarnpkg.com/@types/paypal-rest-sdk/-/paypal-rest-sdk-1.7.9.tgz#6d81537cb5d1b2d1f5f8001c216eb72c0370ce15"
+  integrity sha512-Wu/F8HaC0UbAPGn983o6KLMsF5zxAzsLOj9dzOU9xRyqbsDuNBp1No1bM/9T3vdFiV5HdfwhXrhfhD1gRTycTg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/pug@^2.0.10":
   version "2.0.10"
   resolved "https://registry.yarnpkg.com/@types/pug/-/pug-2.0.10.tgz#52f8dbd6113517aef901db20b4f3fca543b88c1f"
@@ -3217,6 +3354,11 @@ agent-base@6, agent-base@^6.0.2:
   dependencies:
     debug "4"
 
+agent-base@^7.1.0, agent-base@^7.1.2:
+  version "7.1.4"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-7.1.4.tgz#e3cd76d4c548ee895d3c3fd8dc1f6c5b9032e7a8"
+  integrity sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==
+
 agentkeepalive@^4.2.1:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/agentkeepalive/-/agentkeepalive-4.6.0.tgz#35f73e94b3f40bf65f105219c623ad19c136ea6a"
@@ -3435,6 +3577,15 @@ available-typed-arrays@^1.0.7:
   dependencies:
     possible-typed-array-names "^1.0.0"
 
+axios@^1.8.4:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.11.0.tgz#c2ec219e35e414c025b2095e8b8280278478fdb6"
+  integrity sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==
+  dependencies:
+    follow-redirects "^1.15.6"
+    form-data "^4.0.4"
+    proxy-from-env "^1.1.0"
+
 axios@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.9.0.tgz#25534e3b72b54540077d33046f77e3b8d7081901"
@@ -3639,6 +3790,11 @@ bser@2.1.1:
   integrity sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==
   dependencies:
     node-int64 "^0.4.0"
+
+buffer-crc32@^0.2.3:
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
+  integrity sha512-VO9Ht/+p3SN7SKWqcrgEzjGbRSJYTx+Q1pTQC0wrWqHx0vpJraQ6GtHx8tvcg1rlK1byhU5gccxgOgj7B0TDkQ==
 
 buffer-equal-constant-time@^1.0.1:
   version "1.0.1"
@@ -4339,6 +4495,11 @@ destroy@1.2.0:
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.2.0.tgz#4803735509ad8be552934c67df614f94e66fa015"
   integrity sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==
 
+detect-browser@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/detect-browser/-/detect-browser-5.3.0.tgz#9705ef2bddf46072d0f7265a1fe300e36fe7ceca"
+  integrity sha512-53rsFbGdwMwlF7qvCt0ypLM5V5/Mbl0szB7GPN8y9NCcbknYOeVVXdrXEq+90IwAfrrzt6Hd+u2E2ntakICU8w==
+
 detect-indent@^6.0.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-6.1.0.tgz#592485ebbbf6b3b1ab2be175c8393d04ca0d57e6"
@@ -4354,7 +4515,7 @@ detect-newline@^3.0.0, detect-newline@^3.1.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
 
-detect-node@2.1.0, detect-node@^2.0.4:
+detect-node@2.1.0, detect-node@^2.0.4, detect-node@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
@@ -5137,6 +5298,17 @@ form-data@^4.0.0:
     es-set-tostringtag "^2.1.0"
     mime-types "^2.1.12"
 
+form-data@^4.0.1, form-data@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.4.tgz#784cdcce0669a9d68e94d11ac4eea98088edd2c4"
+  integrity sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.8"
+    es-set-tostringtag "^2.1.0"
+    hasown "^2.0.2"
+    mime-types "^2.1.12"
+
 form-data@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.3.tgz#608b1b3f3e28be0fccf5901fc85fb3641e5cf0ae"
@@ -5509,12 +5681,28 @@ http-proxy-agent@^5.0.0:
     agent-base "6"
     debug "4"
 
+http-proxy-agent@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/http-proxy-agent/-/http-proxy-agent-7.0.2.tgz#9a8b1f246866c028509486585f62b8f2c18c270e"
+  integrity sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==
+  dependencies:
+    agent-base "^7.1.0"
+    debug "^4.3.4"
+
 https-proxy-agent@^5.0.0:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz#c59ef224a04fe8b754f3db0063a25ea30d0005d6"
   integrity sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==
   dependencies:
     agent-base "6"
+    debug "4"
+
+https-proxy-agent@^7.0.6:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-7.0.6.tgz#da8dfeac7da130b05c2ba4b59c9b6cd66611a6b9"
+  integrity sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==
+  dependencies:
+    agent-base "^7.1.2"
     debug "4"
 
 human-signals@^2.1.0:
@@ -6648,6 +6836,16 @@ lodash.defaults@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.defaults/-/lodash.defaults-4.2.0.tgz#d09178716ffea4dde9e5fb7b37f6f0802274580c"
   integrity sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==
+
+lodash.defaultsdeep@^4.6.1:
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/lodash.defaultsdeep/-/lodash.defaultsdeep-4.6.1.tgz#512e9bd721d272d94e3d3a63653fa17516741ca6"
+  integrity sha512-3j8wdDzYuWO3lM3Reg03MuQR957t287Rpcxp1njpEa8oDrikb+FwGdW3n+FELh/A6qib6yPit0j/pv9G/yeAqA==
+
+lodash.flatmap@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.flatmap/-/lodash.flatmap-4.5.0.tgz#ef8cbf408f6e48268663345305c6acc0b778702e"
+  integrity sha512-/OcpcAGWlrZyoHGeHh3cAoa6nGdX6QYtmzNP84Jqol6UEQQ2gIaU3H+0eICcjcKGl0/XF8LWOujNn9lffsnaOg==
 
 lodash.flatten@^4.4.0:
   version "4.4.0"
@@ -7814,6 +8012,14 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
+paypal-rest-sdk@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/paypal-rest-sdk/-/paypal-rest-sdk-1.8.1.tgz#5023fd42f43da628d18cc00d6bd566eacba74528"
+  integrity sha512-Trj2GuPn10GqpICAxQh5wjxuDT7rq7DMOkvyatz05wI5xPGmqXN7UC0WfDSF9WSBs4YdcWZP0g+nY+sOdaFggw==
+  dependencies:
+    buffer-crc32 "^0.2.3"
+    semver "^5.0.3"
+
 peberminta@^0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/peberminta/-/peberminta-0.9.0.tgz#8ec9bc0eb84b7d368126e71ce9033501dca2a352"
@@ -8466,7 +8672,7 @@ selderee@^0.11.0:
   dependencies:
     parseley "^0.12.0"
 
-semver@^5.5.0:
+semver@^5.0.3, semver@^5.5.0:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.2.tgz#48d55db737c3287cd4835e17fa13feace1c41ef8"
   integrity sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==
@@ -9039,6 +9245,11 @@ through@^2.3.6:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
+
+tiny-warning@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-warning/-/tiny-warning-1.0.3.tgz#94a30db453df4c643d0fd566060d60a875d84754"
+  integrity sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==
 
 tlds@1.255.0:
   version "1.255.0"

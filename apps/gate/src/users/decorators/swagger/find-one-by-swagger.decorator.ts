@@ -1,19 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
-import {
-  ApiHeader,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 import { ResponseUserDto } from '../../../../../../apps/libs/Users/dto/user/response-user.dto';
 
 export function FindUserByCriteriaSwagger() {
   return applyDecorators(
-    ApiHeader({
-      name: 'Authorization',
-      description: ' Authorization with bearer token',
-    }),
     ApiOperation({
       summary: 'Find one user by id, email, username or providerId',
     }),
