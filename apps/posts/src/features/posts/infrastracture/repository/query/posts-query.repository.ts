@@ -12,9 +12,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
-import axios from 'axios';
-import { ConfigService } from '@nestjs/config';
-import { HttpUsersPath } from '../../../../../../../../apps/libs/Users/constants/path.enum';
 
 export class PostsQueryRepository
   implements IPostQueryRepository<PostPaginatedResponseDto>
@@ -22,7 +19,6 @@ export class PostsQueryRepository
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    private readonly configService: ConfigService,
   ) {}
 
   async get(
@@ -39,24 +35,18 @@ export class PostsQueryRepository
     if (filtering) {
       filter = getFilteringObject(filtering);
     }
-    const usersUrl = `${this.configService.get('USERS_SERVICE_URL')}/${HttpUsersPath.FindUserByCriteria}?id=${filtering.value}`;
-    let [user, posts] = await Promise.all([
-      axios.get(usersUrl),
-      this.postRepository.findAndCount({
-        skip: pagination.offset,
-        take: pagination.limit,
-        order: sort,
-        where: filter,
-        relations: {
-          files: true,
-          comments: true,
-        },
-      }),
-    ]);
-    posts[0] = posts[0].map((post) => {
-      post['avatar'] = user.data.url;
-      return post;
+
+    let posts = await this.postRepository.findAndCount({
+      skip: pagination.offset,
+      take: pagination.limit,
+      order: sort,
+      where: filter,
+      relations: {
+        files: true,
+        comments: true,
+      },
     });
+
     const paginatedResponse: PostPaginatedResponseDto = {
       items: posts[0],
       totalItems: posts[1],
