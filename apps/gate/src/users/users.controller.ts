@@ -117,6 +117,7 @@ export class UsersController {
     }
   }
 
+  @Public()
   @FindUserByCriteriaSwagger()
   @Get('findone')
   async findUserByCriteria(
