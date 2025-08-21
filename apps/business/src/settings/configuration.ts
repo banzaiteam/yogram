@@ -18,6 +18,10 @@ export const getConfiguration = () => {
       ? process.env.NODE_ENV.trim()
       : 'DEVELOPMENT') as EnvironmentsTypes,
     PORT: process.env.PORT,
+    PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID,
+    PAYPAL_SECRET: process.env.PAYPAL_SECRET,
+    BUSINESS_SERVICE_URL: process.env.BUSINESS_SERVICE_URL,
+    USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
     url: process.env.POSTGRES_URL,
     type: process.env.POSTGRES_TYPE,
     autoLoadEntities: process.env.AUTOLOAD_ENTITIES === 'true',

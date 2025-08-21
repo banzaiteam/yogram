@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -7,27 +6,25 @@ import {
 import { UpdatePlanDto } from '../../libs/Business/dto/input/update-plan.dto';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
-import { v4 } from 'uuid';
-import { SubscriptionType } from '../../../apps/libs/Business/constants/subscription-type.enum';
-import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { getSubscriptionPrice } from './helper/get-subscription-price.helper';
 import { IPaymentService } from './payment/interfaces/payment-service.interface';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class BusinessCommandService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly paymentCommandRepository: IPaymentCommandRepository<Payment>,
-    private readonly configService: ConfigService,
     private readonly paymentService: IPaymentService,
   ) {}
 
-  async updatePlan(updatePlan: UpdatePlanDto): Promise<Payment> {
+  async updatePlan(updatePlan: UpdatePlanDto): Promise<string> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     try {
       const price = getSubscriptionPrice(updatePlan.subscriptionType);
+      console.log('🚀 ~ BusinessCommandService ~ updatePlan ~ price:', price);
       const paymentDate = new Date();
       let expiresAt = structuredClone(paymentDate);
       expiresAt = new Date(
@@ -36,7 +33,7 @@ export class BusinessCommandService {
       const updatePlanObject: Payment = {
         id: v4(),
         userId: updatePlan.id,
-        paymentType: 'paypal',
+        paymentType: updatePlan.paymentType,
         subscriptionType: updatePlan.subscriptionType,
         price,
         paymentDate,
@@ -47,15 +44,16 @@ export class BusinessCommandService {
         updatePlanObject,
         queryRunner.manager,
       );
-      await this.paymentService.pay('s', SubscriptionType.Month);
+      const paypalLink = await this.paymentService.pay(
+        updatePlan.paymentType,
+        updatePlan.subscriptionType,
+      );
       await queryRunner.commitTransaction();
-      return updatedPlan;
+      return paypalLink;
     } catch (err) {
       console.log('🚀 ~ BusinessCommandService ~ updatePlan ~ err:', err);
       await queryRunner.rollbackTransaction();
       if (err.response.httpStatusCode) {
-        console.log('errrrr');
-
         throw new HttpException(err.response, err.response.httpStatusCode);
       }
       throw new InternalServerErrorException(

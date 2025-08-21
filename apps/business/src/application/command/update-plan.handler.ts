@@ -10,8 +10,7 @@ export class UpdatePlanCommand {
 export class UpdatePlanHandler implements ICommandHandler<UpdatePlanCommand> {
   constructor(private readonly businessService: BusinessCommandService) {}
 
-  async execute({ updatePlan }: UpdatePlanCommand): Promise<void> {
-    const result = await this.businessService.updatePlan(updatePlan);
-    console.log('🚀 ~ UpdatePlanHandler ~ execute ~ result:', result);
+  async execute({ updatePlan }: UpdatePlanCommand): Promise<string> {
+    return await this.businessService.updatePlan(updatePlan);
   }
 }

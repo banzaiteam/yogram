@@ -19,6 +19,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { PaymentModule } from './payment/payment.module';
 import { RequestContextModule } from 'nestjs-request-context';
+import { BusinessQueryService } from './business-query.service';
+import {
+  PayPalSuccessHandler,
+  PayPalSuccessQuery,
+} from './application/query/paypal-success.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -46,7 +51,10 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   ],
   controllers: [BusinessController],
   providers: [
+    PayPalSuccessQuery,
+    PayPalSuccessHandler,
     BusinessCommandService,
+    BusinessQueryService,
     UpdatePlanCommand,
     UpdatePlanHandler,
     PaymentCommandRepository,

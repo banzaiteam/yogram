@@ -6,8 +6,8 @@ import { Column, DeepPartial, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column({ type: 'enum', enum: PaymentType, default: PaymentType.PayPal })
-  paymentType: string;
+  @Column({ type: 'enum', enum: PaymentType })
+  paymentType: PaymentType;
   @Column({ type: 'int' })
   price: number;
   @Column({

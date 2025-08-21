@@ -1,9 +1,12 @@
+import { PaypalPaymentDto } from '../../../../../apps/libs/Business/dto/input/paypal-payment.dto';
+import { PaymentType } from '../../../../../apps/libs/Business/constants/payment-type.enum';
 import { SubscriptionType } from '../../../../../apps/libs/Business/constants/subscription-type.enum';
-import { Payment } from '../../infrastructure/entity/payment.entity';
 
 export abstract class IPaymentService {
+  abstract paymentSuccess(paypalPaymentDto: PaypalPaymentDto): Promise<string>;
+
   abstract pay(
-    address: string,
+    paymentType: PaymentType,
     subscriptionType: SubscriptionType,
-  ): Promise<Payment>;
+  ): Promise<string>;
 }

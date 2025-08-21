@@ -5,6 +5,7 @@ import { HttpServices } from '../../../../apps/gate/common/constants/http-servic
 import { UpdatePlanDto } from '../../../../apps/libs/Business/dto/input/update-plan.dto';
 import { User } from '../auth/decorators/user.decorator';
 import { HttpBusinessPath } from '../../../../apps/libs/Business/constants/path.constant';
+import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
 
 @Controller('business')
 export class BusinessController {
@@ -20,6 +21,7 @@ export class BusinessController {
     @Query('payment') payment: string,
   ): Promise<void> {
     updatePlanDto.id = id;
+    updatePlanDto.paymentType = PaymentType[payment.toUpperCase()];
     const path = [HttpBusinessPath.UpdatePlan, `payment=${payment}`].join('?');
     return await this.gateService.requestHttpServicePost(
       HttpServices.Business,

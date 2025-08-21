@@ -6,20 +6,25 @@ import { RequestContext } from 'nestjs-request-context';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PaymentFactory {
-  constructor(
-    private readonly paypalService: PayPalService,
-    private readonly stripeService: StripeService,
-  ) {}
+  // private paypalService: PayPalService;
+  private readonly stripeService: StripeService;
+  constructor() {}
 
-  getPaymenttService() {
+  getPaymenttService(
+    clientId: string,
+    secret: string,
+    businessServiceUrl: string,
+  ) {
     const service: PaymentType = RequestContext.currentContext.req?.query
       ?.payment as PaymentType;
 
     switch (service) {
-      case PaymentType.PayPal:
-        return this.paypalService;
-      case PaymentType.Stripe:
+      case PaymentType.PAYPAL: {
+        return new PayPalService(clientId, secret, businessServiceUrl);
+      }
+      case PaymentType.STRIPE: {
         return this.stripeService;
+      }
       default:
         throw new BadRequestException('Not correct payment service');
     }
