@@ -21,9 +21,9 @@ import { PaymentModule } from './payment/payment.module';
 import { RequestContextModule } from 'nestjs-request-context';
 import { BusinessQueryService } from './business-query.service';
 import {
-  PayPalSuccessHandler,
-  PayPalSuccessQuery,
-} from './application/query/paypal-success.handler';
+  PayPalCapturePaymentCommand,
+  PayPalCapturePaymentHandler,
+} from './application/command/paypal-capture-payment.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -51,8 +51,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   ],
   controllers: [BusinessController],
   providers: [
-    PayPalSuccessQuery,
-    PayPalSuccessHandler,
+    PayPalCapturePaymentCommand,
+    PayPalCapturePaymentHandler,
     BusinessCommandService,
     BusinessQueryService,
     UpdatePlanCommand,

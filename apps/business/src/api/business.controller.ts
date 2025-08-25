@@ -2,10 +2,9 @@ import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { UpdatePlanDto } from '../../../../apps/libs/Business/dto/input/update-plan.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdatePlanCommand } from '../application/command/update-plan.handler';
-import { PayPalSuccessQuery } from '../application/query/paypal-success.handler';
+import { PayPalCapturePaymentCommand } from '../application/command/paypal-capture-payment.handler';
 import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { PaypalPaymentDto } from 'apps/libs/Business/dto/input/paypal-payment.dto';
 
 @Controller()
 export class BusinessController {
@@ -19,29 +18,17 @@ export class BusinessController {
     @Body() updatePlan: UpdatePlanDto,
     @Res() res: Response,
   ): Promise<void> {
-    console.log(
-      '🚀 ~ BusinessController ~ updatePlan ~ updatePlan:',
-      updatePlan,
-    );
     const link = await this.commandBus.execute(
       new UpdatePlanCommand(updatePlan),
     );
     res.redirect(link);
-    return link;
   }
 
   @ApiExcludeEndpoint()
-  @Get('business/paypal-success')
-  async paypalSuccess(
-    @Query('PayerID') PayerID: string,
-    @Query('paymentId') paymentId: string,
-  ): Promise<string> {
-    const paypalPaymentDto: PaypalPaymentDto = {
-      PayerID,
-      paymentId,
-    };
-    return await this.queryBus.execute(
-      new PayPalSuccessQuery(paypalPaymentDto),
+  @Get('business/paypal-capture')
+  async paypalSuccess(@Query('token') token: string): Promise<string> {
+    return await this.commandBus.execute(
+      new PayPalCapturePaymentCommand(token),
     );
   }
 

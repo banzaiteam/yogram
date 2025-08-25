@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentFactory } from './payment.factory';
-import { PayPalService } from './payment-services/paypal.service';
-import { StripeService } from './payment-services/stripe.service';
+import { PayPalService } from './payment-services/paypal/paypal.service';
+import { StripeService } from './payment-services/stripe/stripe.service';
 import { PaymentModule } from './payment.module';
 import { RequestContext } from 'nestjs-request-context';
 import { createMock } from '@golevelup/ts-jest';

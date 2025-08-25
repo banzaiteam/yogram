@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Scope } from '@nestjs/common';
-import { PayPalService } from './payment-services/paypal.service';
-import { StripeService } from './payment-services/stripe.service';
+import { PayPalService } from './payment-services/paypal/paypal.service';
+import { StripeService } from './payment-services/stripe/stripe.service';
 import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
 import { RequestContext } from 'nestjs-request-context';
 

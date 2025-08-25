@@ -71,6 +71,7 @@
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "braintree": "^3.33.1",
     "cache-manager": "^7.1.0",
     "cache-manager-ioredis": "^2.1.0",
     "class-transformer": "^0.5.1",
