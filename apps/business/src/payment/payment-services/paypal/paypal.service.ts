@@ -1,11 +1,14 @@
 import { IPaymentService } from '../../interfaces/payment-service.interface';
-import { SubscriptionType } from '../../../../../libs/Business/constants/subscription-type.enum';
-import { getSubscriptionPrice } from '../../../helper/get-subscription-price.helper';
 import { InternalServerErrorException } from '@nestjs/common';
 import { EnvironmentMode } from '../../../settings/configuration';
 import { HttpBusinessPath } from '../../../../../libs/Business/constants/path.constant';
 import { PaymentType } from '../../../../../libs/Business/constants/payment-type.enum';
+import { PaypalCapturePaymentResponse } from 'apps/libs/Business/dto/response/paypal-capture-payment-response.dto';
+import { createBusinessProduct } from './helpers/create-business-product.helper';
 import { Currency } from '../../../../../libs/Business/constants/currency.enum';
+import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
+import { IProduct } from './interfaces/product.interface';
+import { getSubscriptionPrice } from 'apps/business/src/helper/get-subscription-price.helper';
 import paypal, {
   CheckoutPaymentIntent,
   Client,
@@ -14,8 +17,8 @@ import paypal, {
   OrderRequest,
   OrdersController,
 } from '@paypal/paypal-server-sdk';
-import { IProduct } from '../../interfaces/product.interface';
-import { PaypalCapturePaymentResponse } from 'apps/libs/Business/dto/response/paypal-capture-payment-response.dto';
+import axios from 'axios';
+import { createBusinessPlan } from './helpers/create-business-plan.helper';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -47,31 +50,21 @@ export class PayPalService implements IPaymentService {
     });
   }
 
-  async capturePayment(token: string): Promise<PaypalCapturePaymentResponse> {
-    const ordersController = new OrdersController(this.client);
-    const response = await ordersController.captureOrder({ id: token });
-    const orderResult = await ordersController.getOrder({
-      id: response.result.id,
-    });
-    const body = JSON.parse(orderResult.body.toString());
-    const subscriptions = body.purchase_units
-      .map((item) =>
-        item.items.map((innerItem) => {
-          return JSON.parse(innerItem.description);
-        }),
-      )
-      .flat()
-      .flat();
-    console.log(
-      '🚀 ~ PayPalService ~ capturePayment ~ subscriptions:',
-      subscriptions,
+  async authentication(): Promise<string> {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'client_credentials');
+    const result = await axios.post(
+      'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+      params,
+      {
+        auth: { username: this.client_id, password: this.client_secret },
+        headers: {},
+      },
     );
-    const capturePaymentResponse: PaypalCapturePaymentResponse = {
-      status: response.result.status,
-      subscriptions: subscriptions[0],
-    };
-    return capturePaymentResponse;
+    return result.data.access_token;
   }
+
+  async subscribeToPlan() {}
 
   async pay(
     userId: string,
@@ -79,8 +72,9 @@ export class PayPalService implements IPaymentService {
     subscriptionType: SubscriptionType,
   ): Promise<string> {
     const ordersController = new OrdersController(this.client);
-
     const price = getSubscriptionPrice(subscriptionType);
+    //todo! delete
+    console.log('listProducts', await this.listPlans());
     const product = {
       name: 'businessSubscription',
       quantity: '1',
@@ -138,85 +132,110 @@ export class PayPalService implements IPaymentService {
     return link[0].href;
   }
 
-  // async pay(
-  //   paymentType: PaymentType,
-  //   subscriptionType: SubscriptionType,
-  // ): Promise<string> {
-  //   const price = getSubscriptionPrice(subscriptionType);
+  async capturePayment(token: string): Promise<PaypalCapturePaymentResponse> {
+    const ordersController = new OrdersController(this.client);
+    const response = await ordersController.captureOrder({ id: token });
+    const orderResult = await ordersController.getOrder({
+      id: response.result.id,
+    });
+    const body = JSON.parse(orderResult.body.toString());
+    const subscriptions = body.purchase_units
+      .map((item) =>
+        item.items.map((innerItem) => {
+          return JSON.parse(innerItem.description);
+        }),
+      )
+      .flat()
+      .flat();
+    const capturePaymentResponse: PaypalCapturePaymentResponse = {
+      status: response.result.status,
+      subscriptions: subscriptions[0],
+    };
+    return capturePaymentResponse;
+  }
 
-  //   const create_payment_json = {
-  //     intent: 'sale',
-  //     payer: {
-  //       payment_method: 'paypal',
-  //     },
-  //     redirect_urls: {
-  //       return_url: `${this.businessServiceUrl}/${HttpBusinessPath.PaypalSuccess}?payment=${paymentType}`,
-  //       cancel_url: `${this.businessServiceUrl}/${HttpBusinessPath.PaypalCancel}`,
-  //     },
-  //     transactions: [
-  //       {
-  //         amount: {
-  //           currency: Currency.Usd,
-  //           total: price.toString(),
-  //         },
-  //         description: 'Business subscribe',
-  //       },
-  //     ],
-  //   };
+  private async createProduct(
+    subscriptionType: SubscriptionType,
+  ): Promise<object> {
+    const businessProduct: IProduct = createBusinessProduct(subscriptionType);
+    const token = await this.authentication();
+    return await axios.post(
+      'https://api-m.sandbox.paypal.com/v1/catalogs/products',
+      businessProduct,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+        },
+      },
+    );
+  }
 
-  //   const promise = new Promise((res, rej) => {
-  //     paypal.payment.create(
-  //       create_payment_json,
-  //       async function (error, payment) {
-  //         if (error) {
-  //           rej(error);
-  //         } else {
-  //           payment.links.map(async (link) => {
-  //             {
-  //               if (link.rel === 'approval_url') {
-  //                 console.log('🚀 ~ PayPalService ~ pay ~ link.rel:', link);
-  //                 res(link.href);
-  //               }
-  //             }
-  //           });
-  //         }
-  //       },
-  //     );
-  //   });
-  //   try {
-  //     const paypalLink = <string>await promise;
-  //     return paypalLink;
-  //   } catch (error) {
-  //     console.log('🚀 ~ PayPalService ~ pay ~ error:', error);
-  //     throw new InternalServerErrorException(error);
-  //   }
-  // }
+  private async listProducts() {
+    const token = await this.authentication();
+    return (
+      await axios.get(
+        'https://api-m.sandbox.paypal.com/v1/catalogs/products?page_size=10&page=1&total_required=true',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+    ).data;
+  }
 
-  private async createProduct(product: IProduct) {}
+  async createPlan(
+    subscriptionType: SubscriptionType,
+    name: string,
+    description: string,
+  ) {
+    const products = await this.listProducts();
+    const price = getSubscriptionPrice(subscriptionType);
+    const product = products.products.filter((product) => {
+      const jsonSubscriptionType = JSON.parse(product.description);
+      if (jsonSubscriptionType.subscriptionType === subscriptionType) {
+        product.description = JSON.parse(product.description);
+        return product;
+      }
+    });
+    const token = await this.authentication();
 
-  // async paymentSuccess(paypalPaymentDto: PaypalPaymentDto): Promise<string> {
-  //   const PayerID = paypalPaymentDto.PayerID;
-  //   const paymentId = paypalPaymentDto.paymentId;
+    const plan = createBusinessPlan(
+      name,
+      subscriptionType,
+      product,
+      price,
+      description,
+    );
 
-  //   const execute_payment_json = {
-  //     payer_id: PayerID,
-  //     transactions: [],
-  //   };
+    const planResponse = await axios.post(
+      'https://api-m.sandbox.paypal.com/v1/billing/plans',
+      JSON.stringify(plan),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      },
+    );
+  }
 
-  //   const promise = new Promise((res, rej) => {
-  //     paypal.payment.execute(
-  //       paymentId,
-  //       execute_payment_json,
-  //       function (error, payment) {
-  //         if (error) {
-  //           rej(error);
-  //           throw error;
-  //         } else {
-  //           res(payment.state);
-  //         }
-  //       },
-  //     );
-  //   });
-  //   return <string>await promise;
-  // }
+  async listPlans() {
+    const token = await this.authentication();
+    return (
+      await axios.get(
+        'https://api-m.sandbox.paypal.com/v1/billing/plans?sort_by=create_time&sort_order=desc',
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Prefer: 'return=minimal',
+          },
+        },
+      )
+    ).data;
+  }
 }

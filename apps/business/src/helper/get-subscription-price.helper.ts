@@ -2,10 +2,6 @@ import { BadRequestException } from '@nestjs/common';
 import { SubscriptionType } from '../../../../apps/libs/Business/constants/subscription-type.enum';
 
 export function getSubscriptionPrice(subscriptionType: SubscriptionType) {
-  console.log(
-    '🚀 ~ getSubscriptionPrice ~ subscriptionType:',
-    subscriptionType,
-  );
   switch (subscriptionType) {
     case SubscriptionType.OneDay:
       return 10;
