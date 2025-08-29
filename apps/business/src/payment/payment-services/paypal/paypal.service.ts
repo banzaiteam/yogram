@@ -19,6 +19,7 @@ import paypal, {
 } from '@paypal/paypal-server-sdk';
 import axios from 'axios';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
+import { IPlan } from './interfaces/plan.interface';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -64,8 +65,6 @@ export class PayPalService implements IPaymentService {
     return result.data.access_token;
   }
 
-  async subscribeToPlan() {}
-
   async pay(
     userId: string,
     paymentType: PaymentType,
@@ -73,7 +72,14 @@ export class PayPalService implements IPaymentService {
   ): Promise<string> {
     const ordersController = new OrdersController(this.client);
     const price = getSubscriptionPrice(subscriptionType);
-    //todo! delete
+    // await this.subscribeToPlan(userId, paymentType, subscriptionType);
+    //todo! delete res.plans[4].billing_cycles[0]
+    // await this.createPlan(
+    //   subscriptionType,
+    //   `Business subscription for ${subscriptionType > 1 ? `${subscriptionType} days` : `${subscriptionType} day`}`,
+    //   `Business subscription for ${subscriptionType > 1 ? `${subscriptionType} days` : `${subscriptionType} day`}`,
+    // );
+    await this.deactivatePlan('P-81A26868JX719014ENCW7BYA');
     console.log('listProducts', await this.listPlans());
     const product = {
       name: 'businessSubscription',
@@ -232,10 +238,96 @@ export class PayPalService implements IPaymentService {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            Prefer: 'return=minimal',
+            Prefer: 'return=representation',
           },
         },
       )
     ).data;
+  }
+
+  async subscribeToPlan(
+    userId: string,
+    paymentType: PaymentType,
+    subscriptionType: SubscriptionType,
+  ): Promise<any> {
+    const plans = await this.listPlans();
+    const subscriptionPrice = getSubscriptionPrice(subscriptionType);
+    let plan = {};
+    for (let i = 0; i < plans.plans.length; i++) {
+      if (plans.plans[i].status === 'ACTIVE') {
+        const price = Number(
+          plans.plans[i].billing_cycles[0].pricing_scheme.fixed_price.value,
+        );
+        if (price == subscriptionPrice) {
+          plan = plans.plans[i];
+          break;
+        }
+      }
+    }
+
+    const token = await this.authentication();
+    const today = new Date();
+    const nextDay = new Date(today.setDate(today.getDate() + 1)).toISOString();
+    // plan P-92M99033MH486801ANCYD6CQ
+    const subscribe = {
+      plan_id: plan['id'],
+      quantity: 1,
+      start_time: today,
+      application_context: {
+        payment_method: {
+          payer_selected: 'PAYPAL',
+          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
+        },
+        returnUrl: `${this.businessServiceUrl}/${HttpBusinessPath.PayPalCapture}?payment=${paymentType}`,
+        cancelUrl: `${this.businessServiceUrl}/${HttpBusinessPath.PayPalCancel}`,
+      },
+    };
+
+    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ subscribe:', subscribe);
+    //todo? make subscribe object
+    const response = await axios.post(
+      'https://api-m.sandbox.paypal.com/v1/billing/subscriptions',
+      subscribe,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+        },
+      },
+    );
+
+    // const response = await axios.get(
+    //   'https://api-m.sandbox.paypal.com/v1/billing/subscriptions?sort_by=create_time&sort_order=desc',
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //       Prefer: 'return=minimal',
+    //     },
+    //   },
+    // );
+    console.log(
+      '🚀 ~ PayPalService ~ subscribeToPlan ~ response:',
+      response.data,
+    );
+  }
+
+  async deactivatePlan(id: string) {
+    const token = await this.authentication();
+    const plans = await this.listPlans();
+    plans.plans.map(async (plan) => {
+      if (plan.id === id) {
+        await axios.post(
+          `https://api-m.sandbox.paypal.com/v1/billing/plans/${plan.id}/deactivate`,
+          JSON.stringify({}),
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          },
+        );
+      }
+    });
   }
 }

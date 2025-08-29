@@ -6,12 +6,12 @@ import { Payment } from '../../../apps/business/src/infrastructure/entity/paymen
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import request from 'supertest';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { UpdatePlanDto } from '../../../apps/libs/Business/dto/input/update-plan.dto';
+import { SubscribeDto } from '../../libs/Business/dto/input/subscribe.dto';
 import { SubscriptionType } from '../../../apps/libs/Business/constants/subscription-type.enum';
 import { chromium } from 'playwright';
 
 const userId = 'd25a77e9-1e92-469f-8e01-c325e8220cc9';
-const updatePlan: UpdatePlanDto = {
+const updatePlan: SubscribeDto = {
   id: userId,
   subscriptionType: SubscriptionType.Month,
 };

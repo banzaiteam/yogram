@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
-import { UpdatePlanDto } from '../../../../apps/libs/Business/dto/input/update-plan.dto';
+import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { UpdatePlanCommand } from '../application/command/update-plan.handler';
+import { SubscribeCommand } from '../application/command/update-plan.handler';
 import { PayPalCapturePaymentCommand } from '../application/command/paypal-capture-payment.handler';
 import { Request, Response } from 'express';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
@@ -13,13 +13,13 @@ export class BusinessController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Post('business/update-plan')
-  async updatePlan(
-    @Body() updatePlan: UpdatePlanDto,
+  @Post('business/subscribe')
+  async subscribe(
+    @Body() updatePlan: SubscribeDto,
     @Res() res: Response,
   ): Promise<void> {
     const link = await this.commandBus.execute(
-      new UpdatePlanCommand(updatePlan),
+      new SubscribeCommand(updatePlan),
     );
     res.redirect(link);
   }
@@ -27,6 +27,8 @@ export class BusinessController {
   @ApiExcludeEndpoint()
   @Get('business/paypal-capture')
   async paypalSuccess(@Query('token') token: string): Promise<string> {
+    console.log('ggggg');
+
     return await this.commandBus.execute(
       new PayPalCapturePaymentCommand(token),
     );

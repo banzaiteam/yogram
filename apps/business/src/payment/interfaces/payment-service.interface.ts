@@ -10,4 +10,10 @@ export abstract class IPaymentService {
     paymentType: PaymentType,
     subscriptionType: SubscriptionType,
   ): Promise<any>;
+
+  abstract subscribeToPlan(
+    userId: string,
+    paymentType: PaymentType,
+    subscriptionType: SubscriptionType,
+  ): Promise<any>;
 }

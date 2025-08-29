@@ -3,7 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UpdatePlanDto } from '../../libs/Business/dto/input/update-plan.dto';
+import { SubscribeDto } from '../../libs/Business/dto/input/subscribe.dto';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
 import { getSubscriptionPrice } from './helper/get-subscription-price.helper';
@@ -17,9 +17,9 @@ export class BusinessCommandService {
     private readonly paymentService: IPaymentService,
   ) {}
 
-  async updatePlan(updatePlan: UpdatePlanDto): Promise<string> {
+  async updatePlan(updatePlan: SubscribeDto): Promise<string> {
     try {
-      return await this.paymentService.pay(
+      return await this.paymentService.subscribeToPlan(
         updatePlan.id,
         updatePlan.paymentType,
         updatePlan.subscriptionType,

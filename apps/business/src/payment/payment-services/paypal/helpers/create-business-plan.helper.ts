@@ -1,11 +1,11 @@
-import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
+import { SubscriptionType } from '../../../../../../../apps/libs/Business/constants/subscription-type.enum';
 import {
   IntervalCount,
   IntervalUnit,
   IPlan,
 } from '../interfaces/plan.interface';
 import { IProduct } from '../interfaces/product.interface';
-import { Currency } from 'apps/libs/Business/constants/currency.enum';
+import { Currency } from '../../../../../../../apps/libs/Business/constants/currency.enum';
 
 export const createBusinessPlan = (
   name: string,
@@ -15,7 +15,6 @@ export const createBusinessPlan = (
   description: string,
 ): IPlan => {
   const intervalCount = findKeyByValue(IntervalUnit, subscriptionType);
-  console.log('🚀 ~ createBusinessPlan ~ intervalCount:', intervalCount);
   const plan: IPlan = {
     name,
     product_id: product.filter((product) => {
@@ -34,13 +33,17 @@ export const createBusinessPlan = (
         tenure_type: 'REGULAR',
         total_cycles: 0,
         pricing_scheme: {
-          fixed_price: { value: price, currency_code: Currency.Usd },
+          fixed_price: {
+            value: price,
+            currency_code: Currency.Usd,
+          },
         },
       },
     ],
     payment_preferences: {
       auto_bill_outstanding: true,
       payment_failure_threshold: 3,
+      payment_preferences: { value: 10, currency_code: Currency.Usd },
       setup_fee_failure_action: 'CONTINUE',
     },
     description,

@@ -3,7 +3,7 @@ import { SubscriptionType } from '../../constants/subscription-type.enum';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { PaymentType } from '../../constants/payment-type.enum';
 
-export class UpdatePlanDto {
+export class SubscribeDto {
   @ApiHideProperty()
   @IsOptional()
   @IsUUID()
