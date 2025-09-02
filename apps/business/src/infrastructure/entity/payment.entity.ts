@@ -1,6 +1,13 @@
 import { PaymentType } from '../../../../../apps/libs/Business/constants/payment-type.enum';
 import { SubscriptionType } from '../../../../../apps/libs/Business/constants/subscription-type.enum';
-import { Column, DeepPartial, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeepPartial,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Subscription } from './subscription.entity';
 
 @Entity('payments')
 export class Payment {
@@ -16,13 +23,11 @@ export class Payment {
     default: SubscriptionType.OneDay,
   })
   subscriptionType: SubscriptionType;
-  @Column({ type: 'date' })
-  paymentDate: Date;
-  @Column({ type: 'date' })
-  expiresAt: Date;
-
   @Column({ type: 'uuid' })
   userId: string;
+
+  @ManyToOne(() => Subscription, (subscription) => subscription.payments)
+  subscription: Subscription;
 
   constructor(entity: DeepPartial<Payment>) {
     Object.assign(this, entity);

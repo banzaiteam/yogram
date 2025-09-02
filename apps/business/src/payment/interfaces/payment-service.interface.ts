@@ -16,4 +16,12 @@ export abstract class IPaymentService {
     paymentType: PaymentType,
     subscriptionType: SubscriptionType,
   ): Promise<any>;
+
+  abstract listPlans();
+
+  abstract listProducts();
+
+  abstract getProduct(id: string);
+
+  abstract getPlan(id: string);
 }

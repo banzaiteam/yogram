@@ -14,6 +14,7 @@ const userId = 'd25a77e9-1e92-469f-8e01-c325e8220cc9';
 const updatePlan: SubscribeDto = {
   id: userId,
   subscriptionType: SubscriptionType.Month,
+  price: 10,
 };
 
 describe('Business (e2e)', () => {

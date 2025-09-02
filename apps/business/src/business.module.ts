@@ -11,9 +11,9 @@ import { BusinessController } from './api/business.controller';
 import { PaymentCommandRepository } from './infrastructure/repository/command/payment-command.repository';
 import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
 import {
-  UpdatePlanCommand,
-  UpdatePlanHandler,
-} from './application/command/update-plan.handler';
+  SubscribeCommand,
+  SubscribeHandler,
+} from './application/command/subscribe.handler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from './infrastructure/entity/payment.entity';
@@ -24,6 +24,11 @@ import {
   PayPalCapturePaymentCommand,
   PayPalCapturePaymentHandler,
 } from './application/command/paypal-capture-payment.handler';
+import { Subscription } from './infrastructure/entity/subscription.entity';
+import {
+  SaveSubscriptionCommand,
+  SaveSubscriptionHandler,
+} from './application/command/save-subscribtion.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -47,7 +52,7 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([Payment]),
+    TypeOrmModule.forFeature([Payment, Subscription]),
   ],
   controllers: [BusinessController],
   providers: [
@@ -55,8 +60,10 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     PayPalCapturePaymentHandler,
     BusinessCommandService,
     BusinessQueryService,
-    UpdatePlanCommand,
-    UpdatePlanHandler,
+    SubscribeCommand,
+    SubscribeHandler,
+    SaveSubscriptionCommand,
+    SaveSubscriptionHandler,
     PaymentCommandRepository,
     { provide: IPaymentCommandRepository, useClass: PaymentCommandRepository },
   ],

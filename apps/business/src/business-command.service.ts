@@ -8,19 +8,25 @@ import { Payment } from './infrastructure/entity/payment.entity';
 import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
 import { getSubscriptionPrice } from './helper/get-subscription-price.helper';
 import { IPaymentService } from './payment/interfaces/payment-service.interface';
-import { v4 } from 'uuid';
+import { SaveSubscriptionDto } from './payment/payment-services/paypal/dto/save-subscription.dto';
+import { DataSource } from 'typeorm';
+import { Subscription } from './infrastructure/entity/subscription.entity';
 
 @Injectable()
 export class BusinessCommandService {
   constructor(
-    private readonly paymentCommandRepository: IPaymentCommandRepository<Payment>,
+    private readonly paymentCommandRepository: IPaymentCommandRepository<
+      Payment,
+      Subscription
+    >,
     private readonly paymentService: IPaymentService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async updatePlan(updatePlan: SubscribeDto): Promise<string> {
     try {
       return await this.paymentService.subscribeToPlan(
-        updatePlan.id,
+        updatePlan.userId,
         updatePlan.paymentType,
         updatePlan.subscriptionType,
       );
@@ -50,17 +56,17 @@ export class BusinessCommandService {
           paymentDate.getDate() + subscriptions.subscriptionType,
         ),
       );
-      const updatePlanObject: Payment = {
-        id: v4(),
-        userId: subscriptions.userId,
-        paymentType: subscriptions.paymentType,
-        subscriptionType: subscriptions.subscriptionType,
-        price,
-        paymentDate,
-        expiresAt,
-      };
+      // const updatePlanObject: Payment = {
+      //   id: v4(),
+      //   userId: subscriptions.userId,
+      //   paymentType: subscriptions.paymentType,
+      //   subscriptionType: subscriptions.subscriptionType,
+      //   price,
+      //   paymentDate,
+      //   expiresAt,
+      // };
 
-      await this.paymentCommandRepository.updatePlan(updatePlanObject);
+      // await this.paymentCommandRepository.updatePlan(updatePlanObject);
       return 'success';
     } catch (err) {
       if (err.response.httpStatusCode) {
@@ -69,6 +75,43 @@ export class BusinessCommandService {
       throw new InternalServerErrorException(
         'BusinessCommandService error: plan was not updated',
       );
+    }
+  }
+
+  async saveSubscription(saveSubscriptionDto: SaveSubscriptionDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    const price = getSubscriptionPrice(saveSubscriptionDto.subscriptionType);
+    try {
+      const updatePlanDto = {
+        subscriptionType: saveSubscriptionDto.subscriptionType,
+        userId: saveSubscriptionDto.userId,
+        paymentType: saveSubscriptionDto.paymentType,
+        price,
+      };
+
+      await queryRunner.startTransaction('READ COMMITTED');
+      const payment = await this.paymentCommandRepository.savePayment(
+        updatePlanDto,
+        queryRunner.manager,
+      );
+      saveSubscriptionDto.paymentId = payment.id;
+      saveSubscriptionDto.payment = [payment];
+      const subscription = await this.paymentCommandRepository.saveSubscription(
+        saveSubscriptionDto,
+        queryRunner.manager,
+      );
+      console.log(
+        '🚀 ~ BusinessCommandService ~ saveSubscription ~ subscription:',
+        subscription,
+      );
+      await queryRunner.commitTransaction();
+      return subscription;
+    } catch (err) {
+      console.log('🚀 ~ BusinessCommandService ~ saveSubscription ~ err:', err);
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
     }
   }
 }

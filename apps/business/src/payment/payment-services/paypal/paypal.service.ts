@@ -72,15 +72,7 @@ export class PayPalService implements IPaymentService {
   ): Promise<string> {
     const ordersController = new OrdersController(this.client);
     const price = getSubscriptionPrice(subscriptionType);
-    // await this.subscribeToPlan(userId, paymentType, subscriptionType);
-    //todo! delete res.plans[4].billing_cycles[0]
-    // await this.createPlan(
-    //   subscriptionType,
-    //   `Business subscription for ${subscriptionType > 1 ? `${subscriptionType} days` : `${subscriptionType} day`}`,
-    //   `Business subscription for ${subscriptionType > 1 ? `${subscriptionType} days` : `${subscriptionType} day`}`,
-    // );
     await this.deactivatePlan('P-81A26868JX719014ENCW7BYA');
-    console.log('listProducts', await this.listPlans());
     const product = {
       name: 'businessSubscription',
       quantity: '1',
@@ -126,7 +118,6 @@ export class PayPalService implements IPaymentService {
     const link = orderBody.links.filter((link) => {
       if (link.rel === 'payer-action') {
         console.log('link.href', link.href);
-
         return link.href;
       }
     });
@@ -177,11 +168,25 @@ export class PayPalService implements IPaymentService {
     );
   }
 
-  private async listProducts() {
+  async listProducts() {
     const token = await this.authentication();
     return (
       await axios.get(
         'https://api-m.sandbox.paypal.com/v1/catalogs/products?page_size=10&page=1&total_required=true',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+    ).data;
+  }
+
+  async getProduct(id: string) {
+    const token = await this.authentication();
+    return (
+      await axios.get(
+        `https://api-m.sandbox.paypal.com/v1/catalogs/products/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -234,11 +239,24 @@ export class PayPalService implements IPaymentService {
     return (
       await axios.get(
         'https://api-m.sandbox.paypal.com/v1/billing/plans?sort_by=create_time&sort_order=desc',
-
         {
           headers: {
             Authorization: `Bearer ${token}`,
             Prefer: 'return=representation',
+          },
+        },
+      )
+    ).data;
+  }
+
+  async getPlan(id: string): Promise<any> {
+    const token = await this.authentication();
+    return (
+      await axios.get(
+        `https://api-m.sandbox.paypal.com/v1/billing/plans/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         },
       )
@@ -268,23 +286,12 @@ export class PayPalService implements IPaymentService {
     const token = await this.authentication();
     const today = new Date();
     const nextDay = new Date(today.setDate(today.getDate() + 1)).toISOString();
-    // plan P-92M99033MH486801ANCYD6CQ
     const subscribe = {
       plan_id: plan['id'],
       quantity: 1,
-      start_time: today,
-      application_context: {
-        payment_method: {
-          payer_selected: 'PAYPAL',
-          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
-        },
-        returnUrl: `${this.businessServiceUrl}/${HttpBusinessPath.PayPalCapture}?payment=${paymentType}`,
-        cancelUrl: `${this.businessServiceUrl}/${HttpBusinessPath.PayPalCancel}`,
-      },
+      start_time: nextDay,
     };
 
-    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ subscribe:', subscribe);
-    //todo? make subscribe object
     const response = await axios.post(
       'https://api-m.sandbox.paypal.com/v1/billing/subscriptions',
       subscribe,
@@ -295,20 +302,14 @@ export class PayPalService implements IPaymentService {
         },
       },
     );
+    const link = response.data.links.filter((link) => {
+      if (link.rel === 'approve') {
+        return link.href;
+      }
+    })[0].href;
+    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ link:', link);
 
-    // const response = await axios.get(
-    //   'https://api-m.sandbox.paypal.com/v1/billing/subscriptions?sort_by=create_time&sort_order=desc',
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       Prefer: 'return=minimal',
-    //     },
-    //   },
-    // );
-    console.log(
-      '🚀 ~ PayPalService ~ subscribeToPlan ~ response:',
-      response.data,
-    );
+    return link;
   }
 
   async deactivatePlan(id: string) {

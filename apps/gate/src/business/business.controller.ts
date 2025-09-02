@@ -20,7 +20,7 @@ export class BusinessController {
     @Body() updatePlanDto: SubscribeDto,
     @Query('payment') payment: string,
   ): Promise<void> {
-    updatePlanDto.id = id;
+    updatePlanDto.userId = id;
     updatePlanDto.paymentType = PaymentType[payment.toUpperCase()];
     const path = [HttpBusinessPath.Subscribe, `payment=${payment}`].join('?');
     return await this.gateService.requestHttpServicePost(

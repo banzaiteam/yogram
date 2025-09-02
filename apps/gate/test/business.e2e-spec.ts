@@ -11,7 +11,7 @@ import { Payment } from '../../../apps/business/src/infrastructure/entity/paymen
 import {
   UpdatePlanCommand,
   UpdatePlanHandler,
-} from '../../../apps/business/src/application/command/update-plan.handler';
+} from '../../business/src/application/command/subscribe.handler';
 
 describe('Comments (e2e)', () => {
   let app: INestApplication;
