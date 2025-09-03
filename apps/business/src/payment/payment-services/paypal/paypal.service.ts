@@ -1,15 +1,19 @@
 import { IPaymentService } from '../../interfaces/payment-service.interface';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { EnvironmentMode } from '../../../settings/configuration';
 import { HttpBusinessPath } from '../../../../../libs/Business/constants/path.constant';
 import { PaymentType } from '../../../../../libs/Business/constants/payment-type.enum';
-import { PaypalCapturePaymentResponse } from 'apps/libs/Business/dto/response/paypal-capture-payment-response.dto';
+import { PaypalCapturePaymentResponse } from '../../../../../../apps/libs/Business/dto/response/paypal-capture-payment-response.dto';
 import { createBusinessProduct } from './helpers/create-business-product.helper';
 import { Currency } from '../../../../../libs/Business/constants/currency.enum';
-import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
+import { SubscriptionType } from '../../../../../../apps/libs/Business/constants/subscription-type.enum';
 import { IProduct } from './interfaces/product.interface';
-import { getSubscriptionPrice } from 'apps/business/src/helper/get-subscription-price.helper';
-import paypal, {
+import { getSubscriptionPrice } from '../../../../../../apps/business/src/helper/get-subscription-price.helper';
+import {
   CheckoutPaymentIntent,
   Client,
   Environment,
@@ -19,7 +23,6 @@ import paypal, {
 } from '@paypal/paypal-server-sdk';
 import axios from 'axios';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
-import { IPlan } from './interfaces/plan.interface';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -151,21 +154,21 @@ export class PayPalService implements IPaymentService {
     return capturePaymentResponse;
   }
 
-  private async createProduct(
-    subscriptionType: SubscriptionType,
-  ): Promise<object> {
+  async createProduct(subscriptionType: SubscriptionType): Promise<object> {
     const businessProduct: IProduct = createBusinessProduct(subscriptionType);
     const token = await this.authentication();
-    return await axios.post(
-      'https://api-m.sandbox.paypal.com/v1/catalogs/products',
-      businessProduct,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Prefer: 'return=minimal',
+    return (
+      await axios.post(
+        'https://api-m.sandbox.paypal.com/v1/catalogs/products',
+        businessProduct,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Prefer: 'return=minimal',
+          },
         },
-      },
-    );
+      )
+    ).data;
   }
 
   async listProducts() {
@@ -198,40 +201,40 @@ export class PayPalService implements IPaymentService {
 
   async createPlan(
     subscriptionType: SubscriptionType,
+    productId: string,
     name: string,
     description: string,
-  ) {
-    const products = await this.listProducts();
+  ): Promise<object> {
+    const product = await this.getProduct(productId);
+    if (!product)
+      throw new NotFoundException(
+        'Paypal service error: product does not exist',
+      );
     const price = getSubscriptionPrice(subscriptionType);
-    const product = products.products.filter((product) => {
-      const jsonSubscriptionType = JSON.parse(product.description);
-      if (jsonSubscriptionType.subscriptionType === subscriptionType) {
-        product.description = JSON.parse(product.description);
-        return product;
-      }
-    });
     const token = await this.authentication();
 
     const plan = createBusinessPlan(
       name,
       subscriptionType,
-      product,
+      productId,
       price,
       description,
     );
 
-    const planResponse = await axios.post(
-      'https://api-m.sandbox.paypal.com/v1/billing/plans',
-      JSON.stringify(plan),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Prefer: 'return=minimal',
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+    return (
+      await axios.post(
+        'https://api-m.sandbox.paypal.com/v1/billing/plans',
+        JSON.stringify(plan),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Prefer: 'return=minimal',
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
         },
-      },
-    );
+      )
+    ).data;
   }
 
   async listPlans() {
@@ -263,11 +266,7 @@ export class PayPalService implements IPaymentService {
     ).data;
   }
 
-  async subscribeToPlan(
-    userId: string,
-    paymentType: PaymentType,
-    subscriptionType: SubscriptionType,
-  ): Promise<any> {
+  async subscribeToPlan(subscriptionType: SubscriptionType): Promise<any> {
     const plans = await this.listPlans();
     const subscriptionPrice = getSubscriptionPrice(subscriptionType);
     let plan = {};
@@ -282,7 +281,8 @@ export class PayPalService implements IPaymentService {
         }
       }
     }
-
+    if (!plan)
+      throw new BadRequestException('Paypal error: plan does not exist');
     const token = await this.authentication();
     const today = new Date();
     const nextDay = new Date(today.setDate(today.getDate() + 1)).toISOString();
@@ -307,9 +307,32 @@ export class PayPalService implements IPaymentService {
         return link.href;
       }
     })[0].href;
-    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ link:', link);
+    console.log('link:', link);
+    const responseDto = {
+      status: response.data.status,
+      id: response.data.id,
+      createTime: response.data.create_time,
+      link: response.data.links.filter((link) => {
+        if (link.rel === 'approve') {
+          return link.href;
+        }
+      })[0].href,
+    };
+    return responseDto;
+  }
 
-    return link;
+  async getSubscription(id: string): Promise<any> {
+    const token = await this.authentication();
+    return (
+      await axios.get(
+        `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+    ).data;
   }
 
   async deactivatePlan(id: string) {

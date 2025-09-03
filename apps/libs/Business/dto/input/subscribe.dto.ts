@@ -8,7 +8,10 @@ export class SubscribeDto {
   @IsOptional()
   @IsUUID()
   userId?: string;
-  @ApiProperty({ description: 'business subscription days amount' })
+  @ApiProperty({
+    description: 'business subscription days amount',
+    enum: SubscriptionType,
+  })
   @IsEnum(SubscriptionType)
   subscriptionType: SubscriptionType;
   @ApiHideProperty()

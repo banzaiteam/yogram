@@ -11,6 +11,6 @@ export class SubscribeHandler implements ICommandHandler<SubscribeCommand> {
   constructor(private readonly businessService: BusinessCommandService) {}
 
   async execute({ subscribeDto }: SubscribeCommand): Promise<string> {
-    return await this.businessService.updatePlan(subscribeDto);
+    return await this.businessService.subscribe(subscribeDto);
   }
 }

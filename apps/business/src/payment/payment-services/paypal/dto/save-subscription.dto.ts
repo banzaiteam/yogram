@@ -1,4 +1,11 @@
-import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { SubscriptionStatus } from '../constants/subscription-status.enum';
 import { Payment } from '../../../../../../../apps/business/src/infrastructure/entity/payment.entity';
 import { SubscriptionType } from '../../../../../../../apps/libs/Business/constants/subscription-type.enum';
@@ -6,7 +13,7 @@ import { PaymentType } from '../../../../../../../apps/libs/Business/constants/p
 
 export class SaveSubscriptionDto {
   @IsString()
-  subscribeId: string;
+  subscriptionId: string;
   @IsUUID()
   userId: string;
   @IsUUID()
@@ -15,9 +22,9 @@ export class SaveSubscriptionDto {
   @IsEnum({ enum: SubscriptionStatus })
   status: SubscriptionStatus;
   @IsDate()
-  expiresAt: Date;
+  expiresAt?: Date;
   @IsDate()
-  startAt: Date;
+  startAt?: Date;
   @IsEnum({ enum: SubscriptionType })
   subscriptionType: SubscriptionType;
   @IsEnum({ enum: PaymentType })

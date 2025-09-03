@@ -12,4 +12,9 @@ export abstract class IPaymentCommandRepository<R, S> {
     saveSubscriptionDto: SaveSubscriptionDto,
     entityManager?: EntityManager,
   ): Promise<S>;
+
+  abstract getSubscription(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<S>;
 }

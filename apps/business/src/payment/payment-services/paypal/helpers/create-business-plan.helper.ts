@@ -4,24 +4,19 @@ import {
   IntervalUnit,
   IPlan,
 } from '../interfaces/plan.interface';
-import { IProduct } from '../interfaces/product.interface';
 import { Currency } from '../../../../../../../apps/libs/Business/constants/currency.enum';
 
 export const createBusinessPlan = (
   name: string,
   subscriptionType: SubscriptionType,
-  product: IProduct[],
+  productId: string,
   price: number,
   description: string,
 ): IPlan => {
   const intervalCount = findKeyByValue(IntervalUnit, subscriptionType);
   const plan: IPlan = {
     name,
-    product_id: product.filter((product) => {
-      if (product.description['subscriptionType'] === subscriptionType) {
-        return product.id;
-      }
-    })[0].id,
+    product_id: productId,
     status: 'ACTIVE',
     billing_cycles: [
       {
@@ -43,7 +38,7 @@ export const createBusinessPlan = (
     payment_preferences: {
       auto_bill_outstanding: true,
       payment_failure_threshold: 3,
-      payment_preferences: { value: 10, currency_code: Currency.Usd },
+      payment_preferences: { value: 1, currency_code: Currency.Usd },
       setup_fee_failure_action: 'CONTINUE',
     },
     description,

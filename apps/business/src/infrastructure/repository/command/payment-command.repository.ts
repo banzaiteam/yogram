@@ -13,9 +13,11 @@ export class PaymentCommandRepository
   constructor(
     @InjectRepository(Payment)
     private readonly paymentCommandRepository: Repository<Payment>,
+    @InjectRepository(Subscription)
+    private readonly subscriptionCommandRepository: Repository<Subscription>,
   ) {}
   async savePayment(
-    updatePlanDto: Payment,
+    updatePlanDto: any,
     entityManager?: EntityManager,
   ): Promise<Payment> {
     const payment = new Payment(updatePlanDto);
@@ -33,6 +35,18 @@ export class PaymentCommandRepository
     if (entityManager) {
       return await entityManager.save(subscription);
     }
-    return await this.paymentCommandRepository.save(subscription);
+    return await this.subscriptionCommandRepository.save(subscription);
+  }
+
+  async getSubscription(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<Subscription> {
+    if (entityManager) {
+      return await entityManager.findOneBy(Subscription, {
+        subscriptionId: id,
+      });
+    }
+    return await this.subscriptionCommandRepository.findOneBy({ id });
   }
 }

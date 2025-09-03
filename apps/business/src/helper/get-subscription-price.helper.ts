@@ -9,8 +9,6 @@ export function getSubscriptionPrice(subscriptionType: SubscriptionType) {
       return 50;
     case SubscriptionType.Month:
       return 100;
-    case SubscriptionType.Year:
-      return 100000;
     default:
       throw new BadRequestException('error: invalid subscriptionPrice value');
   }

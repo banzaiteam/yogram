@@ -15,6 +15,13 @@ export class PaymentFactory {
     secret: string,
     businessServiceUrl: string,
   ) {
+    if (
+      RequestContext.currentContext.req.url.includes(
+        '/api/v1/business/payment-sse',
+      )
+    )
+      return;
+
     const service: PaymentType = RequestContext.currentContext.req?.query
       ?.payment as PaymentType;
 
