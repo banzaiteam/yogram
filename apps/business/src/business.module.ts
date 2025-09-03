@@ -8,8 +8,8 @@ import {
   getConfiguration,
 } from './settings/configuration';
 import { BusinessController } from './api/business.controller';
-import { PaymentCommandRepository } from './infrastructure/repository/command/payment-command.repository';
-import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
+import { BusinessCommandRepository } from './infrastructure/repository/command/business-command.repository';
+import { IBusinessCommandRepository } from './interfaces/business-command-repository.interface';
 import {
   SubscribeCommand,
   SubscribeHandler,
@@ -20,15 +20,13 @@ import { Payment } from './infrastructure/entity/payment.entity';
 import { PaymentModule } from './payment/payment.module';
 import { RequestContextModule } from 'nestjs-request-context';
 import { BusinessQueryService } from './business-query.service';
-import {
-  PayPalCapturePaymentCommand,
-  PayPalCapturePaymentHandler,
-} from './application/command/paypal-capture-payment.handler';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import {
   SaveSubscriptionCommand,
   SaveSubscriptionHandler,
 } from './application/command/save-subscribtion.handler';
+import { IBusinessQueryRepository } from './interfaces/business-query-repository.interface';
+import { BusinessQueryRepository } from './infrastructure/repository/query/business-query.repository';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -56,16 +54,20 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   ],
   controllers: [BusinessController],
   providers: [
-    PayPalCapturePaymentCommand,
-    PayPalCapturePaymentHandler,
     BusinessCommandService,
     BusinessQueryService,
     SubscribeCommand,
     SubscribeHandler,
     SaveSubscriptionCommand,
     SaveSubscriptionHandler,
-    PaymentCommandRepository,
-    { provide: IPaymentCommandRepository, useClass: PaymentCommandRepository },
+    {
+      provide: IBusinessCommandRepository,
+      useClass: BusinessCommandRepository,
+    },
+    {
+      provide: IBusinessQueryRepository,
+      useClass: BusinessQueryRepository,
+    },
   ],
 })
 export class BusinessModule {}

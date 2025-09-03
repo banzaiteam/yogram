@@ -1,14 +1,14 @@
-import { IPaymentCommandRepository } from '../../../../../../apps/business/src/interfaces/payment-command-repository.interface';
+import { IBusinessCommandRepository as IBusinessCommandRepository } from '../../../interfaces/business-command-repository.interface';
 import { Payment } from '../../entity/payment.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Subscription } from '../../entity/subscription.entity';
-import { SaveSubscriptionDto } from '../../../../../../apps/business/src/payment/payment-services/paypal/dto/save-subscription.dto';
+import { SaveSubscriptionDto } from '../../../payment/payment-services/paypal/dto/save-subscription.dto';
 
 @Injectable()
-export class PaymentCommandRepository
-  implements IPaymentCommandRepository<Payment, Subscription>
+export class BusinessCommandRepository
+  implements IBusinessCommandRepository<Payment, Subscription>
 {
   constructor(
     @InjectRepository(Payment)
@@ -36,17 +36,5 @@ export class PaymentCommandRepository
       return await entityManager.save(subscription);
     }
     return await this.subscriptionCommandRepository.save(subscription);
-  }
-
-  async getSubscription(
-    id: string,
-    entityManager?: EntityManager,
-  ): Promise<Subscription> {
-    if (entityManager) {
-      return await entityManager.findOneBy(Subscription, {
-        subscriptionId: id,
-      });
-    }
-    return await this.subscriptionCommandRepository.findOneBy({ id });
   }
 }

@@ -11,7 +11,6 @@ import {
 import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { SubscribeCommand } from '../application/command/subscribe.handler';
-import { PayPalCapturePaymentCommand } from '../application/command/paypal-capture-payment.handler';
 import { Request, Response } from 'express';
 import { PaypalEvents } from '../payment/payment-services/paypal/constants/paypal-events.enum';
 import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
@@ -27,13 +26,6 @@ export class BusinessController {
   @Post('business/subscribe')
   async subscribe(@Body() subscribeDto: SubscribeDto): Promise<any> {
     return await this.commandBus.execute(new SubscribeCommand(subscribeDto));
-  }
-
-  @Get('business/paypal-capture')
-  async paypalSuccess(@Query('token') token: string): Promise<string> {
-    return await this.commandBus.execute(
-      new PayPalCapturePaymentCommand(token),
-    );
   }
 
   @Post('business/paypal-proccess')

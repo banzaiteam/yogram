@@ -2,7 +2,7 @@ import { EntityManager } from 'typeorm';
 import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
 import { SaveSubscriptionDto } from '../payment/payment-services/paypal/dto/save-subscription.dto';
 
-export abstract class IPaymentCommandRepository<R, S> {
+export abstract class IBusinessCommandRepository<R, S> {
   abstract savePayment(
     updatePlanDto: SubscribeDto,
     entityManager?: EntityManager,
@@ -10,11 +10,6 @@ export abstract class IPaymentCommandRepository<R, S> {
 
   abstract saveSubscription(
     saveSubscriptionDto: SaveSubscriptionDto,
-    entityManager?: EntityManager,
-  ): Promise<S>;
-
-  abstract getSubscription(
-    id: string,
     entityManager?: EntityManager,
   ): Promise<S>;
 }
