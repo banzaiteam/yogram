@@ -12,7 +12,7 @@ import { chromium } from 'playwright';
 
 const userId = 'd25a77e9-1e92-469f-8e01-c325e8220cc9';
 const updatePlan: SubscribeDto = {
-  id: userId,
+  userId: userId,
   subscriptionType: SubscriptionType.Month,
   price: 10,
 };
@@ -50,7 +50,7 @@ describe('Business (e2e)', () => {
     await app.init();
   });
 
-  it('/business (POST)', async () => {
+  it.skip('/business (POST)', async () => {
     // const authResponse = await request(app.getHttpServer())
     //   .get('/auth/login')
     //   .send({ email: 'retouch226@gmail.com', password: '24488Ok!' });

@@ -8,10 +8,6 @@ import { IBusinessCommandRepository } from '../../business/src/interfaces/busine
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from '../../../apps/business/src/infrastructure/entity/payment.entity';
-import {
-  UpdatePlanCommand,
-  UpdatePlanHandler,
-} from '../../business/src/application/command/subscribe.handler';
 
 describe('Comments (e2e)', () => {
   let app: INestApplication;
@@ -25,8 +21,6 @@ describe('Comments (e2e)', () => {
       ],
       providers: [
         BusinessCommandService,
-        UpdatePlanCommand,
-        UpdatePlanHandler,
         BusinessCommandRepository,
         {
           provide: IBusinessCommandRepository,
