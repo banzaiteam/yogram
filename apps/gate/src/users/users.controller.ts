@@ -139,10 +139,6 @@ export class UsersController {
     @PaginationParams() pagination: IPagination,
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
   ): Promise<ResponseProfilePageDto> {
-    console.log(
-      '🚀 ~ UsersController ~ profilePage ~ loggedUserId:',
-      loggedUserId,
-    );
     const filtering: IFiltering = {
       filterProperty: 'userId',
       rule: 'eq',
