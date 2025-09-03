@@ -68,9 +68,8 @@ describe('Payment Factory', () => {
     }).compile();
     paymentFactory = await module.resolve<PaymentFactory>(PaymentFactory);
   });
-  it.skip('should return paypal', async () => {
+  it('should return paypal', async () => {
     // const mockRequestContext = await createMock<RequestContext>();
     // await mockRequestContext.req.query.payment.mockReturnValueOnce('paypal');
-    const res = paymentFactory.getPaymenttService();
   });
 });
