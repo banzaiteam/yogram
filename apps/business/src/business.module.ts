@@ -8,17 +8,25 @@ import {
   getConfiguration,
 } from './settings/configuration';
 import { BusinessController } from './api/business.controller';
-import { PaymentCommandRepository } from './infrastructure/repository/command/payment-command.repository';
-import { IPaymentCommandRepository } from './interfaces/payment-command-repository.interface';
+import { BusinessCommandRepository } from './infrastructure/repository/command/business-command.repository';
+import { IBusinessCommandRepository } from './interfaces/business-command-repository.interface';
 import {
-  UpdatePlanCommand,
-  UpdatePlanHandler,
-} from './application/command/update-plan.handler';
+  SubscribeCommand,
+  SubscribeHandler,
+} from './application/command/subscribe.handler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { PaymentModule } from './payment/payment.module';
 import { RequestContextModule } from 'nestjs-request-context';
+import { BusinessQueryService } from './business-query.service';
+import { Subscription } from './infrastructure/entity/subscription.entity';
+import {
+  SaveSubscriptionCommand,
+  SaveSubscriptionHandler,
+} from './application/command/save-subscribtion.handler';
+import { IBusinessQueryRepository } from './interfaces/business-query-repository.interface';
+import { BusinessQueryRepository } from './infrastructure/repository/query/business-query.repository';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -42,15 +50,24 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
     DatabaseModule.register(),
-    TypeOrmModule.forFeature([Payment]),
+    TypeOrmModule.forFeature([Payment, Subscription]),
   ],
   controllers: [BusinessController],
   providers: [
     BusinessCommandService,
-    UpdatePlanCommand,
-    UpdatePlanHandler,
-    PaymentCommandRepository,
-    { provide: IPaymentCommandRepository, useClass: PaymentCommandRepository },
+    BusinessQueryService,
+    SubscribeCommand,
+    SubscribeHandler,
+    SaveSubscriptionCommand,
+    SaveSubscriptionHandler,
+    {
+      provide: IBusinessCommandRepository,
+      useClass: BusinessCommandRepository,
+    },
+    {
+      provide: IBusinessQueryRepository,
+      useClass: BusinessQueryRepository,
+    },
   ],
 })
 export class BusinessModule {}

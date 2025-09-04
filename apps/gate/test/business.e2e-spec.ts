@@ -3,15 +3,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { BusinessModule } from '../../../apps/business/src/business.module';
 import { BusinessCommandService } from '../../../apps/business/src/business-command.service';
-import { PaymentCommandRepository } from '../../../apps/business/src/infrastructure/repository/command/payment-command.repository';
-import { IPaymentCommandRepository } from '../../../apps/business/src/interfaces/payment-command-repository.interface';
+import { BusinessCommandRepository } from '../../business/src/infrastructure/repository/command/business-command.repository';
+import { IBusinessCommandRepository } from '../../business/src/interfaces/business-command-repository.interface';
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Payment } from '../../../apps/business/src/infrastructure/entity/payment.entity';
-import {
-  UpdatePlanCommand,
-  UpdatePlanHandler,
-} from '../../../apps/business/src/application/command/update-plan.handler';
 
 describe('Comments (e2e)', () => {
   let app: INestApplication;
@@ -25,12 +21,10 @@ describe('Comments (e2e)', () => {
       ],
       providers: [
         BusinessCommandService,
-        UpdatePlanCommand,
-        UpdatePlanHandler,
-        PaymentCommandRepository,
+        BusinessCommandRepository,
         {
-          provide: IPaymentCommandRepository,
-          useClass: PaymentCommandRepository,
+          provide: IBusinessCommandRepository,
+          useClass: BusinessCommandRepository,
         },
       ],
     }).compile();
