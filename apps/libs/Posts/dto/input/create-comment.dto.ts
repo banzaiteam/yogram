@@ -15,7 +15,7 @@ export class CreateCommentDto {
   @IsOptional()
   userId?: string;
   @IsString()
-  @MinLength(2, { message: 'comment should be not less than 2 characters' })
+  @MinLength(1, { message: 'comment should be not less than 1 characters' })
   @MaxLength(300, {
     message: 'comment should be not longer than 300 characters',
   })

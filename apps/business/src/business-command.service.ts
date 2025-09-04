@@ -55,13 +55,10 @@ export class BusinessCommandService {
   async saveSubscription(id: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction('READ COMMITTED');
+    await queryRunner.startTransaction();
     try {
       let [subscription, paypalSubscription] = await Promise.all([
-        await this.businessQueryService.getSubscription(
-          id,
-          queryRunner.manager,
-        ),
+        await this.businessQueryService.getSubscription(id),
         await this.paymentService.getSubscription(id),
       ]);
       if (!subscription || !paypalSubscription)

@@ -23,6 +23,7 @@ export const getConfiguration = () => {
     BUSINESS_SERVICE_URL: process.env.BUSINESS_SERVICE_URL,
     USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
     url: process.env.POSTGRES_URL,
+    urlSlave: process.env.POSTGRES_URL_SLAVE,
     type: process.env.POSTGRES_TYPE,
     autoLoadEntities: process.env.AUTOLOAD_ENTITIES === 'true',
     synchronize: process.env.SYNCHRONIZE === 'true',

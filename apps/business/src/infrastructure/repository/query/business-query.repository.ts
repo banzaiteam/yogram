@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IBusinessQueryRepository } from 'apps/business/src/interfaces/business-query-repository.interface';
+import { IBusinessQueryRepository } from '../../../../../../apps/business/src/interfaces/business-query-repository.interface';
 import { Payment } from '../../entity/payment.entity';
 import { Subscription } from '../../entity/subscription.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -25,6 +25,8 @@ export class BusinessQueryRepository
         subscriptionId: id,
       });
     }
-    return await this.subscriptionQueryRepository.findOneBy({ id });
+    return await this.subscriptionQueryRepository.findOneBy({
+      subscriptionId: id,
+    });
   }
 }

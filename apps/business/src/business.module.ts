@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BusinessCommandService } from './business-command.service';
-import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   EnvironmentMode,
   EnvironmentsTypes,
@@ -27,6 +26,7 @@ import {
 } from './application/command/save-subscribtion.handler';
 import { IBusinessQueryRepository } from './interfaces/business-query-repository.interface';
 import { BusinessQueryRepository } from './infrastructure/repository/query/business-query.repository';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -49,8 +49,42 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
         process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
-    DatabaseModule.register(),
+    // DatabaseModule.register(),
     TypeOrmModule.forFeature([Payment, Subscription]),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return <DataSourceOptions>{
+          type: configService.get('type').toString(),
+          replication: {
+            defaultMode: 'master',
+            master: {
+              url: configService.get('url'),
+              migrationsTableName: configService.get('migrationsTableName'),
+              migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+              autoLoadEntities: configService.get('autoLoadEntities'),
+              synchronize: configService.get('synchronize'),
+              dropSchema: configService.get('dropSchema'),
+            },
+            slaves: [
+              {
+                url: configService.get('urlSlave'),
+                migrationsTableName: configService.get('migrationsTableName'),
+                migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+                autoLoadEntities: configService.get('autoLoadEntities'),
+                synchronize: configService.get('synchronize'),
+                dropSchema: configService.get('dropSchema'),
+              },
+            ],
+          },
+          entities: [Payment, Subscription],
+        };
+      },
+      dataSourceFactory: async (options) => {
+        return await new DataSource(options).initialize();
+      },
+    }),
   ],
   controllers: [BusinessController],
   providers: [
