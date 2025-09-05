@@ -212,7 +212,6 @@ export class PostsController {
             ...req.headers,
             postid,
             userid: user.id,
-            'Content-Type': 'application/json',
           },
           responseType: 'stream',
           maxBodyLength: 1500000000,
