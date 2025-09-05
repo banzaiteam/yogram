@@ -214,6 +214,10 @@ export class PostsController {
           maxContentLength: 1500000000,
         },
       );
+      console.log(
+        '🚀 ~ PostsController ~ create ~ microserviceResponse:',
+        microserviceResponse,
+      );
 
       res.setHeader('content-type', 'application/json');
       microserviceResponse.data.pipe(res);
