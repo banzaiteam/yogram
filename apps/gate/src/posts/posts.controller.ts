@@ -218,7 +218,6 @@ export class PostsController {
           responseType: 'stream',
           maxBodyLength: 1500000000,
           maxContentLength: 1500000000,
-          timeout: 60000,
         },
       );
       console.log(
