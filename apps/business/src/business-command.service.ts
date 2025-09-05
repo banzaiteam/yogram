@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -29,9 +30,19 @@ export class BusinessCommandService {
 
   async subscribe(subscribeDto: SubscribeDto): Promise<any> {
     try {
+      const currentSubscriptions =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscribeDto.userId,
+        );
+      if (currentSubscriptions.length > 1) {
+        throw new BadRequestException(
+          'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
+        );
+      }
       const response = await this.paymentService.subscribeToPlan(
         subscribeDto.subscriptionType,
       );
+
       const saveSubscriptionDto: SaveSubscriptionDto = {
         paymentType: subscribeDto.paymentType,
         subscriptionType: subscribeDto.subscriptionType,
@@ -102,5 +113,9 @@ export class BusinessCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async suspendSubscription(id: string): Promise<any> {
+    const result = await this.paymentService.suspendSubscription(id);
   }
 }

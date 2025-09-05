@@ -27,6 +27,10 @@ import {
 import { IBusinessQueryRepository } from './interfaces/business-query-repository.interface';
 import { BusinessQueryRepository } from './infrastructure/repository/query/business-query.repository';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import {
+  GetCurrentSubscriptionsHandler,
+  GetCurrentSubscriptionsQuery,
+} from './application/query/get-current-subscriptions-query.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -94,6 +98,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscribeHandler,
     SaveSubscriptionCommand,
     SaveSubscriptionHandler,
+    GetCurrentSubscriptionsQuery,
+    GetCurrentSubscriptionsHandler,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,

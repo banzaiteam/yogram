@@ -16,15 +16,13 @@ export class BusinessQueryRepository
     private readonly subscriptionQueryRepository: Repository<Subscription>,
   ) {}
 
-  async getSubscription(
-    id: string,
-    entityManager?: EntityManager,
-  ): Promise<Subscription> {
-    if (entityManager) {
-      return await entityManager.findOneBy(Subscription, {
-        subscriptionId: id,
-      });
-    }
+  async getUserSubscriptions(id: string): Promise<Subscription[]> {
+    return await this.subscriptionQueryRepository.find({
+      where: { userId: id },
+    });
+  }
+
+  async getSubscription(id: string): Promise<Subscription> {
     return await this.subscriptionQueryRepository.findOneBy({
       subscriptionId: id,
     });

@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -15,6 +17,9 @@ import { Request, Response } from 'express';
 import { PaypalEvents } from '../payment/payment-services/paypal/constants/paypal-events.enum';
 import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
 import axios from 'axios';
+import { Subscription } from '../infrastructure/entity/subscription.entity';
+import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
+import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 
 @Controller()
 export class BusinessController {
@@ -79,5 +84,19 @@ export class BusinessController {
       console.log('PostsController ~ sse-cancel-token ~ error:', error);
       res.write(`data: ${error}\n\n`);
     }
+  }
+
+  @Patch('business/subscriptions/:id/suspend')
+  async suspendSubscription(@Param('id') id: string): Promise<void> {
+    return await this.queryBus.execute(new SuspendSubscriptionCommand(id));
+  }
+
+  @Get('business/subscriptions/:id')
+  async getCurrentSubscriptions(
+    @Param('id') userId: string,
+  ): Promise<Subscription[]> {
+    return await this.queryBus.execute(
+      new GetCurrentSubscriptionsQuery(userId),
+    );
   }
 }

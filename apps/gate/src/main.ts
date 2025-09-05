@@ -30,6 +30,7 @@ async function bootstrap() {
       'Connection',
       'User-Agent',
       'x-recaptcha-token',
+      '*',
     ],
     exposedHeaders: ['Set-cookie'],
 
@@ -40,6 +41,7 @@ async function bootstrap() {
       'https://localhost:3000',
       'http://localhost:3000',
       'http://localhost',
+      '*',
     ],
     credentials: true,
   });
