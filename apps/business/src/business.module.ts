@@ -31,6 +31,10 @@ import {
   GetCurrentSubscriptionsHandler,
   GetCurrentSubscriptionsQuery,
 } from './application/query/get-current-subscriptions-query.handler';
+import {
+  SuspendSubscriptionCommand,
+  SuspendSubscriptionHandler,
+} from './application/command/suspend-subscription.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -100,6 +104,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SaveSubscriptionHandler,
     GetCurrentSubscriptionsQuery,
     GetCurrentSubscriptionsHandler,
+    SuspendSubscriptionCommand,
+    SuspendSubscriptionHandler,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,

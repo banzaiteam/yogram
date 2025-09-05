@@ -28,6 +28,7 @@ export class BusinessController {
   //todo* check if current subscription exists(expiresAt>now), if yes, current subscriptionType !== new subscriptionType(you cant have 2 the same subscr like 30 and 30)
   //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended
   //todo* when buy the second subscription, need to check if have another active subscr, if have - suspend it22
+  //todo* when renew have been proceeded need to do event and patch subscr expiresAt
   async subscribe(
     @User('id') id: string,
     @Body() subscribeDto: SubscribeDto,
@@ -52,8 +53,11 @@ export class BusinessController {
     return await this.businessService.getCurrentSubscriptions(id);
   }
 
-  @Patch('subscription/:id/suspend')
-  async suspendSubscription(@Param('id') id: string): Promise<void> {
-    return await this.businessService.suspendSubscription(id);
+  @Patch('subscription/:subscriptionId/suspend')
+  async suspendSubscription(
+    @Param('subscriptionId') id: string,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    return await this.businessService.suspendSubscription(id, payment);
   }
 }

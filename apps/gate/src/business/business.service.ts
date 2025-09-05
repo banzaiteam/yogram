@@ -31,10 +31,12 @@ export class BusinessService {
     );
   }
 
-  async suspendSubscription(id: string): Promise<void> {
-    const path = [HttpBusinessPath.SuspendSubscription.replace(':id', id)].join(
-      '/',
-    );
+  async suspendSubscription(id: string, payment: PaymentType): Promise<void> {
+    const path = [
+      [HttpBusinessPath.SuspendSubscription.replace(':id', id)].join('/'),
+      `payment=${payment}`,
+    ].join('?');
+    console.log('🚀 ~ BusinessService ~ suspendSubscription ~ path:', path);
     return await this.gateService.requestHttpServicePatch(
       HttpServices.Business,
       path,

@@ -6,7 +6,7 @@ export class SuspendSubscriptionCommand {
 }
 
 @CommandHandler(SuspendSubscriptionCommand)
-export class SaveSubscriptionHandler
+export class SuspendSubscriptionHandler
   implements ICommandHandler<SuspendSubscriptionCommand>
 {
   constructor(

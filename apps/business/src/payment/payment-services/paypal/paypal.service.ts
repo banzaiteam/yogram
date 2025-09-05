@@ -1,5 +1,10 @@
 import { IPaymentService } from '../../interfaces/payment-service.interface';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  NotFoundException,
+} from '@nestjs/common';
 import { EnvironmentMode } from '../../../settings/configuration';
 import { createBusinessProduct } from './helpers/create-business-product.helper';
 import { SubscriptionType } from '../../../../../../apps/libs/Business/constants/subscription-type.enum';
@@ -8,6 +13,7 @@ import { getSubscriptionPrice } from '../../../../../../apps/business/src/helper
 import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
 import axios from 'axios';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
+import { SubscriptionStatus } from './constants/subscription-status.enum';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -222,17 +228,31 @@ export class PayPalService implements IPaymentService {
 
   async suspendSubscription(id: string): Promise<any> {
     const token = await this.authentication();
-    await axios.post(
-      `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/suspend`,
-      JSON.stringify({}),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
+    const status = (await this.getSubscription(id)).status;
+    if (status === SubscriptionStatus.Suspended)
+      throw new ConflictException(
+        'PayPalService error: subscription is suspended already',
+      );
+
+    try {
+      return await axios.post(
+        `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/suspend`,
+        { reason: 'Item out of stock' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
         },
-      },
-    );
+      );
+    } catch (err) {
+      console.log(
+        '🚀 ~ PayPalService ~ suspendSubscription ~ err:',
+        err.response.data.details,
+      );
+      throw new HttpException(err.response.data, err.response.status);
+    }
   }
 
   async getSubscription(id: string): Promise<any> {

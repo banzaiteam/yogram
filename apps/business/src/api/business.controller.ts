@@ -88,7 +88,7 @@ export class BusinessController {
 
   @Patch('business/subscriptions/:id/suspend')
   async suspendSubscription(@Param('id') id: string): Promise<void> {
-    return await this.queryBus.execute(new SuspendSubscriptionCommand(id));
+    return await this.commandBus.execute(new SuspendSubscriptionCommand(id));
   }
 
   @Get('business/subscriptions/:id')

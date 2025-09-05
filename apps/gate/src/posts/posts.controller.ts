@@ -55,7 +55,6 @@ import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagge
 import { User } from '../auth/decorators/user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ResponsePostsMainPage } from 'apps/libs/Posts/dto/output/response-posts-main-page.dto';
-import { timeout } from 'rxjs';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -201,7 +200,6 @@ export class PostsController {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const postid = v4();
-      console.log('🚀 ~ PostsController ~ create ~ postid:', postid);
       const microserviceResponse = await axios.post(
         [
           this.configService.get('POSTS_SERVICE_URL'),
@@ -219,10 +217,6 @@ export class PostsController {
           maxBodyLength: 1500000000,
           maxContentLength: 1500000000,
         },
-      );
-      console.log(
-        '🚀 ~ PostsController ~ create ~ microserviceResponse:',
-        microserviceResponse,
       );
 
       res.setHeader('content-type', 'application/json');

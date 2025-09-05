@@ -116,6 +116,7 @@ export class BusinessCommandService {
   }
 
   async suspendSubscription(id: string): Promise<any> {
-    const result = await this.paymentService.suspendSubscription(id);
+    // todo patch db, when
+    return await this.paymentService.suspendSubscription(id);
   }
 }

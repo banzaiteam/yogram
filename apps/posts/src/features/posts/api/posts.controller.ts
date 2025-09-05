@@ -174,10 +174,6 @@ export class PostsController {
     @Req() req: Request,
   ): Promise<PostResponse> {
     createPostDto.userId = <string>req.headers.userid;
-    console.log(
-      '🚀 ~ PostsController ~ createPost ~ createPostDto.userId:',
-      createPostDto.userId,
-    );
     createPostDto.postId = req.body.postId;
     return await this.commandBus.execute(
       new CreatePostCommand(createPostDto, files, this.postEmmiter),
