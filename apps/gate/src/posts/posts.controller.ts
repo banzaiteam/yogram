@@ -209,7 +209,7 @@ export class PostsController {
         {
           // generate uuid for posts because of multer call destination method on each uploaded file
           headers: {
-            // ...req.headers,
+            ...req.headers,
             postid,
             userid: user.id,
             'Content-Type': 'application/json',
