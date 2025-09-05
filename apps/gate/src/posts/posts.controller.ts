@@ -55,6 +55,7 @@ import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagge
 import { User } from '../auth/decorators/user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ResponsePostsMainPage } from 'apps/libs/Posts/dto/output/response-posts-main-page.dto';
+import { timeout } from 'rxjs';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -216,6 +217,7 @@ export class PostsController {
           responseType: 'stream',
           maxBodyLength: 1500000000,
           maxContentLength: 1500000000,
+          timeout: 60000,
         },
       );
       console.log(
