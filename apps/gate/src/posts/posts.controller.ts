@@ -201,6 +201,7 @@ export class PostsController {
     try {
       // todo! error 413, bodyparser limit 150 mb does not help when use gateService
       const postid = v4();
+      console.log('🚀 ~ PostsController ~ create ~ postid:', postid);
       const microserviceResponse = await axios.post(
         [
           this.configService.get('POSTS_SERVICE_URL'),
