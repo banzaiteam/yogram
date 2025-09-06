@@ -37,7 +37,19 @@ export class BusinessService {
       [HttpBusinessPath.SuspendSubscription.replace(':id', id)].join('/'),
       `payment=${payment}`,
     ].join('?');
-    console.log('🚀 ~ BusinessService ~ suspendSubscription ~ path:', path);
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Business,
+      path,
+      {},
+      {},
+    );
+  }
+
+  async activateSubscription(id: string, payment: PaymentType): Promise<void> {
+    const path = [
+      [HttpBusinessPath.ActivateSubscription.replace(':id', id)].join('/'),
+      `payment=${payment}`,
+    ].join('?');
     return await this.gateService.requestHttpServicePatch(
       HttpServices.Business,
       path,

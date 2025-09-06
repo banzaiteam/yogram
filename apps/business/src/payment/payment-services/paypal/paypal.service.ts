@@ -237,7 +237,7 @@ export class PayPalService implements IPaymentService {
     try {
       return await axios.post(
         `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/suspend`,
-        { reason: 'Item out of stock' },
+        { reason: 'Suspend' },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -249,6 +249,35 @@ export class PayPalService implements IPaymentService {
     } catch (err) {
       console.log(
         '🚀 ~ PayPalService ~ suspendSubscription ~ err:',
+        err.response.data.details,
+      );
+      throw new HttpException(err.response.data, err.response.status);
+    }
+  }
+
+  async activateSubscription(id: string): Promise<any> {
+    const token = await this.authentication();
+    const status = (await this.getSubscription(id)).status;
+    if (status === SubscriptionStatus.Active)
+      throw new ConflictException(
+        'PayPalService error: subscription is active already',
+      );
+
+    try {
+      return await axios.post(
+        `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/activate`,
+        { reason: 'Activate' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      console.log(
+        '🚀 ~ PayPalService ~ activateSubscription ~ err:',
         err.response.data.details,
       );
       throw new HttpException(err.response.data, err.response.status);

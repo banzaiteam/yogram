@@ -18,6 +18,7 @@ import { BusinessService } from './business.service';
 import { Response } from 'express';
 import { GetSubscriptionsSwagger } from './decorators/swagger/get-subscriptions-swagger.decorator';
 import { SuspendSubscriptionSwagger } from './decorators/swagger/suspend-subscription-swagger.decorator';
+import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subscription-swagger.decorator';
 
 @Controller('business')
 export class BusinessController {
@@ -25,7 +26,7 @@ export class BusinessController {
 
   @HttpCode(200)
   @SubscribeSwagger()
-  @Post('subscribe')
+  @Post('subscriptions/subscribe')
   //todo* check if current subscription exists(expiresAt>now), if yes, current subscriptionType !== new subscriptionType(you cant have 2 the same subscr like 30 and 30)
   //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended
   //todo* when buy the second subscription, need to check if have another active subscr, if have - suspend it22
@@ -42,7 +43,6 @@ export class BusinessController {
       subscribeDto,
       payment,
     );
-    console.log('🚀 ~ BusinessController ~ subscribe ~ response:', response);
     console.log('link:', response.link);
     res.status(200).redirect(303, response.link);
   }
@@ -56,11 +56,20 @@ export class BusinessController {
   }
 
   @SuspendSubscriptionSwagger()
-  @Patch('subscription/:id/suspend')
+  @Patch('subscriptions/:id/suspend')
   async suspendSubscription(
     @Param('id') id: string,
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
     return await this.businessService.suspendSubscription(id, payment);
+  }
+
+  @ActivateSubscriptionSwagger()
+  @Patch('subscriptions/:id/activate')
+  async activateSubscription(
+    @Param('id') id: string,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    return await this.businessService.activateSubscription(id, payment);
   }
 }

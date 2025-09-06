@@ -9,7 +9,9 @@ export function GetSubscriptionsSwagger() {
       description: ' Authorization with bearer token',
     }),
     ApiOperation({
-      summary: 'Get all user`s business subscriptions',
+      summary: 'Get all user`s not expired subscriptions',
+      description:
+        'subscriptions can be suspended or active but while subscription is not expired, it can be activated again',
     }),
     ApiResponse({
       status: 200,

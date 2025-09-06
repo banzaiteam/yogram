@@ -25,4 +25,6 @@ export abstract class IPaymentService {
   abstract getSubscription(id: string): Promise<any>;
 
   abstract suspendSubscription(id: string): Promise<any>;
+
+  abstract activateSubscription(id: string): Promise<any>;
 }
