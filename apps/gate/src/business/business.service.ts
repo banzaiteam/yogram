@@ -9,12 +9,13 @@ import { Subscription } from '../../../../apps/business/src/infrastructure/entit
 @Injectable()
 export class BusinessService {
   constructor(private readonly gateService: GateService) {}
+
   async subscribe(
     subscribeDto: SubscribeDto,
     payment: PaymentType,
   ): Promise<any> {
     const path = [HttpBusinessPath.Subscribe, `payment=${payment}`].join('?');
-    const response = await this.gateService.requestHttpServicePost(
+    return await this.gateService.requestHttpServicePost(
       HttpServices.Business,
       path,
       subscribeDto,
