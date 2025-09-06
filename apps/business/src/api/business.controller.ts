@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -20,6 +19,7 @@ import axios from 'axios';
 import { Subscription } from '../infrastructure/entity/subscription.entity';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
+import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 
 @Controller()
 export class BusinessController {
@@ -89,6 +89,12 @@ export class BusinessController {
   @Patch('business/subscriptions/:id/suspend')
   async suspendSubscription(@Param('id') id: string): Promise<void> {
     return await this.commandBus.execute(new SuspendSubscriptionCommand(id));
+  }
+
+  @Patch('business/subscriptions/:id/activate')
+  async activateSubscription(@Param('id') id: string): Promise<void> {
+    console.log('🚀 ~ BusinessController ~ activateSubscription ~ id:', id);
+    return await this.commandBus.execute(new ActivateSubscriptionCommand(id));
   }
 
   @Get('business/subscriptions/:id')

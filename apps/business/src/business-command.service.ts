@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SubscribeDto } from '../../libs/Business/dto/input/subscribe.dto';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { IBusinessCommandRepository } from './interfaces/business-command-repository.interface';
@@ -103,6 +97,17 @@ export class BusinessCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async activateSubscription(id: string): Promise<any> {
+    const subscription = await this.businessQueryService.getSubscription(id);
+    if (!subscription)
+      throw new NotFoundException(
+        'BusinessCommandService error: subscription does not exist',
+      );
+    await this.paymentService.activateSubscription(id);
+    subscription.status = SubscriptionStatus.Active;
+    return await this.businessCommandRepository.saveSubscription(subscription);
   }
 
   async suspendSubscription(id: string): Promise<any> {

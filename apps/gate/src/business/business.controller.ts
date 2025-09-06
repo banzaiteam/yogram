@@ -18,6 +18,7 @@ import { BusinessService } from './business.service';
 import { Response } from 'express';
 import { GetSubscriptionsSwagger } from './decorators/swagger/get-subscriptions-swagger.decorator';
 import { SuspendSubscriptionSwagger } from './decorators/swagger/suspend-subscription-swagger.decorator';
+import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subscription-swagger.decorator';
 
 @Controller('business')
 export class BusinessController {
@@ -42,7 +43,6 @@ export class BusinessController {
       subscribeDto,
       payment,
     );
-    console.log('🚀 ~ BusinessController ~ subscribe ~ response:', response);
     console.log('link:', response.link);
     res.status(200).redirect(303, response.link);
   }
@@ -62,5 +62,14 @@ export class BusinessController {
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
     return await this.businessService.suspendSubscription(id, payment);
+  }
+
+  @ActivateSubscriptionSwagger()
+  @Patch('subscription/:id/activate')
+  async activateSubscription(
+    @Param('id') id: string,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    return await this.businessService.activateSubscription(id, payment);
   }
 }
