@@ -26,7 +26,7 @@ export class BusinessController {
 
   @HttpCode(200)
   @SubscribeSwagger()
-  @Post('subscribe')
+  @Post('subscriptions/subscribe')
   //todo* check if current subscription exists(expiresAt>now), if yes, current subscriptionType !== new subscriptionType(you cant have 2 the same subscr like 30 and 30)
   //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended
   //todo* when buy the second subscription, need to check if have another active subscr, if have - suspend it22
@@ -56,7 +56,7 @@ export class BusinessController {
   }
 
   @SuspendSubscriptionSwagger()
-  @Patch('subscription/:id/suspend')
+  @Patch('subscriptions/:id/suspend')
   async suspendSubscription(
     @Param('id') id: string,
     @Query('payment') payment: PaymentType,
@@ -65,7 +65,7 @@ export class BusinessController {
   }
 
   @ActivateSubscriptionSwagger()
-  @Patch('subscription/:id/activate')
+  @Patch('subscriptions/:id/activate')
   async activateSubscription(
     @Param('id') id: string,
     @Query('payment') payment: PaymentType,
