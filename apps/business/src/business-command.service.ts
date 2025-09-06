@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -18,7 +19,7 @@ import { BusinessQueryService } from './business-query.service';
 @Injectable()
 export class BusinessCommandService {
   constructor(
-    private readonly paymentCommandRepository: IBusinessCommandRepository<
+    private readonly businessCommandRepository: IBusinessCommandRepository<
       Payment,
       Subscription
     >,
@@ -28,28 +29,28 @@ export class BusinessCommandService {
   ) {}
 
   async subscribe(subscribeDto: SubscribeDto): Promise<any> {
-    try {
-      const response = await this.paymentService.subscribeToPlan(
-        subscribeDto.subscriptionType,
+    const currentSubscriptions =
+      await this.businessQueryService.getCurrentUserSubscriptions(
+        subscribeDto.userId,
       );
-      const saveSubscriptionDto: SaveSubscriptionDto = {
-        paymentType: subscribeDto.paymentType,
-        subscriptionType: subscribeDto.subscriptionType,
-        status: response.status,
-        subscriptionId: response.id,
-        userId: subscribeDto.userId,
-      };
-      await this.paymentCommandRepository.saveSubscription(saveSubscriptionDto);
-      return response;
-    } catch (err) {
-      console.log('🚀 ~ BusinessCommandService ~ subscribe ~ err:', err);
-      if (err.response.httpStatusCode) {
-        throw new HttpException(err.response, err.response.httpStatusCode);
-      }
-      throw new InternalServerErrorException(
-        'BusinessCommandService error: subscription error',
-      );
-    }
+    // if (currentSubscriptions.length > 1) {
+    //   throw new BadRequestException(
+    //     'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
+    //   );
+    // }
+    const response = await this.paymentService.subscribeToPlan(
+      subscribeDto.subscriptionType,
+    );
+
+    const saveSubscriptionDto: SaveSubscriptionDto = {
+      paymentType: subscribeDto.paymentType,
+      subscriptionType: subscribeDto.subscriptionType,
+      status: response.status,
+      subscriptionId: response.id,
+      userId: subscribeDto.userId,
+    };
+    await this.businessCommandRepository.saveSubscription(saveSubscriptionDto);
+    return response;
   }
 
   async saveSubscription(id: string) {
@@ -73,7 +74,7 @@ export class BusinessCommandService {
         price,
       };
 
-      const payment = await this.paymentCommandRepository.savePayment(
+      const payment = await this.businessCommandRepository.savePayment(
         updatePlanDto,
         queryRunner.manager,
       );
@@ -90,7 +91,7 @@ export class BusinessCommandService {
       subscription.expiresAt = expiresAt;
       subscription.status = SubscriptionStatus.Active;
 
-      await this.paymentCommandRepository.saveSubscription(
+      await this.businessCommandRepository.saveSubscription(
         subscription,
         queryRunner.manager,
       );
@@ -102,5 +103,16 @@ export class BusinessCommandService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async suspendSubscription(id: string): Promise<any> {
+    const subscription = await this.businessQueryService.getSubscription(id);
+    if (!subscription)
+      throw new NotFoundException(
+        'BusinessCommandService error: subscription does not exist',
+      );
+    await this.paymentService.suspendSubscription(id);
+    subscription.status = SubscriptionStatus.Suspended;
+    return await this.businessCommandRepository.saveSubscription(subscription);
   }
 }

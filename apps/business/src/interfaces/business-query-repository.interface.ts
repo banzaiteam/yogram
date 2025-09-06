@@ -5,4 +5,6 @@ export abstract class IBusinessQueryRepository<R, S> {
     id: string,
     entityManager?: EntityManager,
   ): Promise<S>;
+
+  abstract getUserSubscriptions(id: string): Promise<S[]>;
 }

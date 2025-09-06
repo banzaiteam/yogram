@@ -10,7 +10,7 @@ export class SubscribeCommand {
 export class SubscribeHandler implements ICommandHandler<SubscribeCommand> {
   constructor(private readonly businessService: BusinessCommandService) {}
 
-  async execute({ subscribeDto }: SubscribeCommand): Promise<string> {
+  async execute({ subscribeDto }: SubscribeCommand): Promise<any> {
     return await this.businessService.subscribe(subscribeDto);
   }
 }
