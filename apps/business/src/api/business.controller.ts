@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -20,6 +21,7 @@ import { Subscription } from '../infrastructure/entity/subscription.entity';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
+import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
 
 @Controller()
 export class BusinessController {
@@ -54,6 +56,17 @@ export class BusinessController {
     }
   }
 
+  @Post('business/subscriptions/updated')
+  async subscriptionUpdatedSse(@Body() body: any) {
+    console.log('SubscriptionUpdated:', body);
+    const subscriptionId = body.resource.id;
+    const expiresAt = body.resource.billing_info.next_billing_time;
+    return await this.commandBus.execute(
+      new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
+    );
+    //todo* find subscription by id, update expresAt and create new payment with subscriptionId
+  }
+
   @Post('business/postPaypalSse')
   async postPaypalSse(@Body() body: any) {
     const email = body.resource.subscriber.email_address;
@@ -73,8 +86,8 @@ export class BusinessController {
       });
       res.flushHeaders();
       const data = req.query?.email;
-      console.log('🚀 ~ BusinessController ~ paymentSse ~ data:', data);
       if (data) {
+        console.log('🚀 ~ BusinessController ~ paymentSse ~ data:', data);
         res.write(`data: ${JSON.stringify(data)}\n\n`);
       }
       req.on('close', () => {
@@ -97,7 +110,7 @@ export class BusinessController {
     return await this.commandBus.execute(new ActivateSubscriptionCommand(id));
   }
 
-  @Get('business/subscriptions/:id')
+  @Get('business/subscriptions/get/:id')
   async getCurrentSubscriptions(
     @Param('id') userId: string,
   ): Promise<Subscription[]> {

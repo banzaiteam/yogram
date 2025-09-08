@@ -4,6 +4,7 @@ import { Payment } from './infrastructure/entity/payment.entity';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { EntityManager } from 'typeorm';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
+import { IPaymentService } from './payment/interfaces/payment-service.interface';
 
 @Injectable()
 export class BusinessQueryService {
@@ -12,7 +13,12 @@ export class BusinessQueryService {
       Payment,
       Subscription
     >,
+    private readonly paymentService: IPaymentService,
   ) {}
+
+  async getPaymentServiceSubscription(id: string) {
+    return await this.paymentService.getSubscription(id);
+  }
 
   async getSubscription(
     id: string,
@@ -29,9 +35,15 @@ export class BusinessQueryService {
     return subscription;
   }
 
-  async getUserSubscriptions(id: string): Promise<Subscription[]> {
+  async getUserSubscriptions(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<Subscription[]> {
     const subscriptions =
-      await this.businessQueryRepository.getUserSubscriptions(id);
+      await this.businessQueryRepository.getUserSubscriptions(
+        id,
+        entityManager,
+      );
     if (!subscriptions.length)
       throw new NotFoundException(
         'BusinessQueryService error: user`s subscriptions not found',
@@ -39,9 +51,15 @@ export class BusinessQueryService {
     return subscriptions;
   }
 
-  async getCurrentUserSubscriptions(id: string): Promise<Subscription[]> {
+  async getCurrentUserSubscriptions(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<Subscription[]> {
     const subscriptions =
-      await this.businessQueryRepository.getUserSubscriptions(id);
+      await this.businessQueryRepository.getUserSubscriptions(
+        id,
+        entityManager,
+      );
 
     const currentSubscriptions = subscriptions.filter((subscription) => {
       if (

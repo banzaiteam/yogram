@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IBusinessQueryRepository } from '../../../../../../apps/business/src/interfaces/business-query-repository.interface';
 import { Payment } from '../../entity/payment.entity';
 import { Subscription } from '../../entity/subscription.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -16,7 +16,13 @@ export class BusinessQueryRepository
     private readonly subscriptionQueryRepository: Repository<Subscription>,
   ) {}
 
-  async getUserSubscriptions(id: string): Promise<Subscription[]> {
+  async getUserSubscriptions(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<Subscription[]> {
+    if (entityManager) {
+      return await entityManager.find(Subscription, { where: { userId: id } });
+    }
     return await this.subscriptionQueryRepository.find({
       where: { userId: id },
     });

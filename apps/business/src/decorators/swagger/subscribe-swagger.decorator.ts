@@ -32,6 +32,11 @@ export const SubscribeSwagger = () =>
       description: 'Success and redirected',
     }),
     ApiResponse({
+      status: HttpStatus.BAD_REQUEST,
+      description:
+        'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously | BusinessCommandService error: you cant have 2 subscriptions with the same subscription type',
+    }),
+    ApiResponse({
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       description: 'BusinessCommandService error: subscription error',
     }),

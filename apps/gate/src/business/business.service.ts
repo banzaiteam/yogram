@@ -24,7 +24,10 @@ export class BusinessService {
   }
 
   async getCurrentSubscriptions(id: string): Promise<Subscription[]> {
-    const path = [HttpBusinessPath.CurrentSubscriptions, id].join('/');
+    const path = [
+      [HttpBusinessPath.CurrentSubscriptions, id].join('/'),
+      `payment=paypal`,
+    ].join('?');
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Business,
       path,
