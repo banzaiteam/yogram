@@ -12,7 +12,7 @@ import { IPaymentService } from './payment/interfaces/payment-service.interface'
 import { SaveSubscriptionDto } from './payment/payment-services/paypal/dto/save-subscription.dto';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { BusinessQueryService } from './business-query.service';
 import { SubscriptionUpdateDto } from './dto/subscription-update.dto';
 
@@ -138,22 +138,58 @@ export class BusinessCommandService {
 
   //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended
   async activateSubscription(id: string): Promise<any> {
-    console.log(
-      's =',
-      await this.businessQueryService.getPaymentServiceSubscription(id),
-    );
-
-    const subscription = await this.businessQueryService.getSubscription(id);
-    if (!subscription)
-      throw new NotFoundException(
-        'BusinessCommandService error: subscription does not exist',
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
+    try {
+      const subscription = await this.businessQueryService.getSubscription(
+        id,
+        queryRunner.manager,
       );
-    await this.paymentService.activateSubscription(id);
-    subscription.status = SubscriptionStatus.Active;
-    return await this.businessCommandRepository.saveSubscription(subscription);
+      if (!subscription)
+        throw new NotFoundException(
+          'BusinessCommandService error: subscription does not exist',
+        );
+      const currentSubscriptions =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+          queryRunner.manager,
+        );
+      await this.paymentService.activateSubscription(id);
+
+      subscription.status = SubscriptionStatus.Active;
+      const updatedSubscription =
+        await this.businessCommandRepository.saveSubscription(
+          subscription,
+          queryRunner.manager,
+        );
+
+      if (currentSubscriptions.length === 2) {
+        const anotherSubscription: Subscription[] = currentSubscriptions.filter(
+          (subscr) => subscr.id !== subscription.id,
+        );
+        await this.suspendSubscription(
+          anotherSubscription[0].subscriptionId,
+          queryRunner.manager,
+        );
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.log('BusinessCommandService activateSubscription ~ err:', err);
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        err.response,
+        err.response.httpStatusCode || err.httpStatusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async suspendSubscription(id: string): Promise<any> {
+  async suspendSubscription(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<any> {
     const subscription = await this.businessQueryService.getSubscription(id);
     if (!subscription)
       throw new NotFoundException(
@@ -161,7 +197,10 @@ export class BusinessCommandService {
       );
     await this.paymentService.suspendSubscription(id);
     subscription.status = SubscriptionStatus.Suspended;
-    return await this.businessCommandRepository.saveSubscription(subscription);
+    return await this.businessCommandRepository.saveSubscription(
+      subscription,
+      entityManager,
+    );
   }
 
   async updateSubscription(
