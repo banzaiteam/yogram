@@ -33,6 +33,10 @@ export class BusinessCommandService {
       await this.businessQueryService.getCurrentUserSubscriptions(
         subscribeDto.userId,
       );
+    console.log(
+      '🚀 ~ BusinessCommandService ~ subscribe ~ currentSubscriptions:',
+      currentSubscriptions,
+    );
 
     if (currentSubscriptions.length > 1) {
       throw new BadRequestException(
@@ -50,9 +54,27 @@ export class BusinessCommandService {
         );
       }
     });
+    //* if we already have subscription and buy a new one, the new one subscription should start on the day when the first subscription expires
+    console.log(
+      'currentSubscriptions[0].expiresAt',
+      currentSubscriptions[0]?.expiresAt,
+    );
 
+    const start_date =
+      currentSubscriptions.length === 1
+        ? new Date(currentSubscriptions[0].expiresAt)
+        : new Date();
+
+    // const nextDayExpiresAt = new Date(
+    //   firstSubscrExpiresAt.setDate(firstSubscrExpiresAt.getDate() + 1),
+    // ).toISOString();
+    // console.log(
+    //   '🚀 ~ BusinessCommandService ~ subscribe ~ nextDayExpiresAt:',
+    //   nextDayExpiresAt,
+    // );
     const response = await this.paymentService.subscribeToPlan(
       subscribeDto.subscriptionType,
+      currentSubscriptions.length === 1 ? start_date.toISOString() : undefined,
     );
 
     const saveSubscriptionDto: SaveSubscriptionDto = {
@@ -80,7 +102,11 @@ export class BusinessCommandService {
         throw new NotFoundException(
           'BusinessCommandService error: subscription not found',
         );
-
+      const currentSubscriptionsArr =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+        );
+      //todo* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
       const price = getSubscriptionPrice(subscription.subscriptionType);
       const updatePlanDto = {
         subscriptionType: subscription.subscriptionType,
@@ -93,7 +119,13 @@ export class BusinessCommandService {
         updatePlanDto,
         queryRunner.manager,
       );
-      const startDate = new Date(paypalSubscription.start_time);
+      //* expires+1 when it second subscription
+      const startDate = new Date(
+        currentSubscriptionsArr.length === 1
+          ? currentSubscriptionsArr[0].expiresAt
+          : paypalSubscription.start_time,
+      );
+
       const startDateCopy = structuredClone(startDate);
       const expiresAt = new Date(
         startDateCopy.setDate(
@@ -102,14 +134,21 @@ export class BusinessCommandService {
       );
       subscription.paymentId = payment.id;
       subscription.payments = [payment];
-      subscription.startAt = startDate;
-      subscription.expiresAt = expiresAt;
+      subscription.startAt = new Date(
+        startDate.setHours(startDate.getHours() + 8),
+      );
+
+      subscription.expiresAt = new Date(
+        expiresAt.setHours(expiresAt.getHours() + 8),
+      );
       subscription.status = SubscriptionStatus.Active;
 
       await this.businessCommandRepository.saveSubscription(
         subscription,
         queryRunner.manager,
       );
+
+      //* all next need to toggle first subscription to suspended if we create second subscription
       const currentSubscriptions =
         await this.businessQueryService.getCurrentUserSubscriptions(
           subscription.userId,
@@ -121,10 +160,6 @@ export class BusinessCommandService {
       if (currentSubscriptions.length === 2) {
         firstSubscription[0].status = SubscriptionStatus.Suspended;
         await this.suspendSubscription(firstSubscription[0].subscriptionId);
-        await this.businessCommandRepository.saveSubscription(
-          firstSubscription[0],
-          queryRunner.manager,
-        );
       }
       await queryRunner.commitTransaction();
       return subscription;
@@ -136,7 +171,6 @@ export class BusinessCommandService {
     }
   }
 
-  //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended
   async activateSubscription(id: string): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

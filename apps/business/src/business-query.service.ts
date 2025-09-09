@@ -67,6 +67,9 @@ export class BusinessQueryService {
         new Date(subscription.expiresAt) > new Date() &&
         subscription.status !== SubscriptionStatus.Approval_Pending
       ) {
+        if (subscription.status === SubscriptionStatus.Active) {
+          subscription['nextPayment'] = subscription.expiresAt;
+        }
         return subscription;
       }
     });
