@@ -33,10 +33,6 @@ export class BusinessCommandService {
       await this.businessQueryService.getCurrentUserSubscriptions(
         subscribeDto.userId,
       );
-    console.log(
-      '🚀 ~ BusinessCommandService ~ subscribe ~ currentSubscriptions:',
-      currentSubscriptions,
-    );
 
     if (currentSubscriptions.length > 1) {
       throw new BadRequestException(
@@ -55,23 +51,11 @@ export class BusinessCommandService {
       }
     });
     //* if we already have subscription and buy a new one, the new one subscription should start on the day when the first subscription expires
-    console.log(
-      'currentSubscriptions[0].expiresAt',
-      currentSubscriptions[0]?.expiresAt,
-    );
-
     const start_date =
       currentSubscriptions.length === 1
         ? new Date(currentSubscriptions[0].expiresAt)
         : new Date();
 
-    // const nextDayExpiresAt = new Date(
-    //   firstSubscrExpiresAt.setDate(firstSubscrExpiresAt.getDate() + 1),
-    // ).toISOString();
-    // console.log(
-    //   '🚀 ~ BusinessCommandService ~ subscribe ~ nextDayExpiresAt:',
-    //   nextDayExpiresAt,
-    // );
     const response = await this.paymentService.subscribeToPlan(
       subscribeDto.subscriptionType,
       currentSubscriptions.length === 1 ? start_date.toISOString() : undefined,
