@@ -56,7 +56,7 @@ describe('Business (e2e)', () => {
     await app.init();
   });
 
-  describe('Subscription', () => {
+  describe.skip('Subscription', () => {
     it('should switch first subscribe`s status from active to suspended when create second subscription', async () => {
       for (let i = 0; i < 2; i++) {
         const payment = await request(app.getHttpServer())

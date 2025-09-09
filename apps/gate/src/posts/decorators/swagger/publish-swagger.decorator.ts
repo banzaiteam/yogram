@@ -6,7 +6,7 @@ import {
   ApiResponse,
   PickType,
 } from '@nestjs/swagger';
-import { UpdatePostDto } from 'apps/libs/Posts/dto/input/update-post.dto';
+import { UpdatePostDto } from '../../../../../../apps/libs/Posts/dto/input/update-post.dto';
 class DescriptionDto extends PickType(UpdatePostDto, ['description']) {}
 
 export const PublishSwagger = () =>
