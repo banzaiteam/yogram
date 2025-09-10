@@ -262,4 +262,16 @@ export class BusinessCommandService {
       await queryRunner.release();
     }
   }
+  async editSubscriptionStatus(
+    id: string,
+    status: SubscriptionStatus,
+  ): Promise<Subscription> {
+    const subscription = await this.businessQueryService.getSubscription(id);
+    if (!subscription)
+      throw new NotFoundException(
+        'BusinessCommandService error: subscription does not exist',
+      );
+    subscription.status = status;
+    return await this.businessCommandRepository.saveSubscription(subscription);
+  }
 }

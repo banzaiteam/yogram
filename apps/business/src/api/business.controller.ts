@@ -22,6 +22,7 @@ import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-s
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
+import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
 
 @Controller()
 export class BusinessController {
@@ -58,13 +59,22 @@ export class BusinessController {
 
   @Post('business/subscriptions/updated')
   async subscriptionUpdatedSse(@Body() body: any) {
-    console.log('SubscriptionUpdated:', body);
+    console.log('SubscriptionUpdated:', body.resource);
     const subscriptionId = body.resource.id;
     const expiresAt = body.resource.billing_info.next_billing_time;
     return await this.commandBus.execute(
       new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
     );
     //todo* find subscription by id, update expresAt and create new payment with subscriptionId
+  }
+
+  @Post('business/subscriptions/expired')
+  async subscriptionExpredEvent(@Body() body: any): Promise<void> {
+    console.log('subscriptionExpredEvent:', body.resource);
+    const subscriptionId = 'I-X4ABDDVC0UHC';
+    return await this.commandBus.execute(
+      new SubscriptionExpiredCommand(subscriptionId),
+    );
   }
 
   @Post('business/postPaypalSse')
