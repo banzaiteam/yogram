@@ -6,6 +6,8 @@ import { Payment } from '../../entity/payment.entity';
 import { Subscription } from '../../entity/subscription.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
+import { ResponsePaymentDto } from '../../../../../../apps/libs/Business/dto/response/response-payment.dto';
 import {
   getSortingOrder,
   ISorting,
@@ -14,9 +16,6 @@ import {
   getFilteringObject,
   IFiltering,
 } from '../../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
-import { plainToInstance } from 'class-transformer';
-import { ResponsePaymentDto } from 'apps/libs/Business/dto/response/response-payment.dto';
-
 @Injectable()
 export class BusinessQueryRepository
   implements IBusinessQueryRepository<Payment, Subscription>
