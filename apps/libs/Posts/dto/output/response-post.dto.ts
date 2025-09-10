@@ -9,5 +9,5 @@ export class ResponsePostDto {
   updatedAt: Date;
   files: ResponseFileDto[];
   comments: any;
-  url?: string;
+  avatar?: string;
 }
