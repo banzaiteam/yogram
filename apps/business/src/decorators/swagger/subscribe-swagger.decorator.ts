@@ -24,7 +24,8 @@ export const SubscribeSwagger = () =>
     }),
     ApiOperation({
       summary: 'Buy subscription for 1, 7 or 30 days using paypal or stripe',
-      description: 'You cant have more than 2 not expired subscriptions',
+      description:
+        'Should redirect after completion. You cant have more than 2 not expired subscriptions',
     }),
     ApiBody({ type: SubscribeDto }),
     ApiResponse({

@@ -19,9 +19,20 @@ import { BusinessService } from './business.service';
 import { GetSubscriptionsSwagger } from './decorators/swagger/get-subscriptions-swagger.decorator';
 import { SuspendSubscriptionSwagger } from './decorators/swagger/suspend-subscription-swagger.decorator';
 import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subscription-swagger.decorator';
-import axios from 'axios';
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
+import { GetPaymentsSwagger } from './decorators/swagger/get-payments-swagger.decorator';
 import { Request, Response } from 'express';
+import axios from 'axios';
+import {
+  IPagination,
+  PaginationParams,
+} from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('business')
 export class BusinessController {
@@ -63,11 +74,11 @@ export class BusinessController {
   @HttpCode(200)
   @SubscribeSwagger()
   @Post('subscriptions/subscribe')
-  //todo* check if current subscription exists(expiresAt>now), if yes, current subscriptionType !== new subscriptionType(you cant have 2 the same subscr like 30 and 30) +
-  //todo* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended +
-  //todo* when buy the second subscription, need to check if have another active subscr, if have - suspend it22 +
-  //todo* when renew have been proceeded need to do event and patch subscr expiresAt +?
-  //todo* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
+  //* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
+  //* check if current subscription exists(expiresAt>now), if yes, current subscriptionType !== new subscriptionType(you cant have 2 the same subscr like 30 and 30) +
+  //* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended +
+  //* when buy the second subscription, need to check if have another active subscr, if have - suspend it22 +
+  //* when renew have been proceeded need to do event and patch subscr expiresAt +?
   async subscribe(
     @User('id') id: string,
     @Body() subscribeDto: SubscribeDto,
@@ -108,5 +119,23 @@ export class BusinessController {
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
     return await this.businessService.activateSubscription(id, payment);
+  }
+
+  @GetPaymentsSwagger()
+  @Get('payments')
+  async getPayments(
+    @User('id') userId: string,
+    @Query('payment') payment: PaymentType,
+    @PaginationParams() pagination: IPagination,
+    @SortingParams(['createdAt', 'paymentType']) sorting?: ISorting,
+  ): Promise<PaymentsPaginatedResponseDto> {
+    const filter = `userId:eq:${userId}`;
+    const payments = await this.businessService.getPayments(
+      payment,
+      pagination,
+      sorting,
+      filter,
+    );
+    return plainToInstance(PaymentsPaginatedResponseDto, payments);
   }
 }

@@ -26,7 +26,6 @@ export class PostsQueryService {
         axios.get(usersUrl),
         this.postQueryRepository.get(pagination, sorting, filtering),
       ]);
-
       postsPaginated.items = postsPaginated.items.map((post) => {
         post['avatar'] = user.data.url;
         return post;
@@ -44,6 +43,26 @@ export class PostsQueryService {
         post['avatar'] = user.data.url;
         return post;
       });
+      return postsPaginated;
+    } else {
+      const postsPaginated = await this.postQueryRepository.get(
+        pagination,
+        sorting,
+        filtering,
+      );
+      const postsWithUserAvatar = await Promise.all(
+        postsPaginated.items.map(async (post) => {
+          const usersUrl = `${this.configService.get('USERS_SERVICE_URL')}/${HttpUsersPath.FindUserByCriteria}?id=${post.userId}`;
+          const user = await axios.get(usersUrl);
+          console.log(
+            '🚀 ~ PostsQueryService ~ get ~ usersUrl:',
+            user.data.url,
+          );
+          post['avatar'] = user.data.url;
+          return post;
+        }),
+      );
+      postsPaginated.items = postsWithUserAvatar;
       return postsPaginated;
     }
   }

@@ -47,6 +47,10 @@ import {
   SubscriptionExpiredCommand,
   SubscriptionExpiredHandler,
 } from './application/command/subscription-expired.handler';
+import {
+  GetPaymentsHandler,
+  GetPaymentsQuery,
+} from './application/query/get-payments.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -124,6 +128,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscriptionUpdatedHandler,
     SubscriptionExpiredCommand,
     SubscriptionExpiredHandler,
+    GetPaymentsHandler,
+    GetPaymentsQuery,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,

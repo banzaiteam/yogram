@@ -5,6 +5,10 @@ import { Subscription } from './infrastructure/entity/subscription.entity';
 import { EntityManager } from 'typeorm';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
 import { IPaymentService } from './payment/interfaces/payment-service.interface';
+import { IFiltering } from '../../../apps/libs/common/pagination/decorators/filtering.decorator';
+import { IPagination } from '../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import { ISorting } from '../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { PaymentsPaginatedResponseDto } from '../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 
 @Injectable()
 export class BusinessQueryService {
@@ -74,5 +78,17 @@ export class BusinessQueryService {
       }
     });
     return currentSubscriptions;
+  }
+
+  async getPayments(
+    pagination: IPagination,
+    sorting: ISorting,
+    filtering: IFiltering,
+  ): Promise<PaymentsPaginatedResponseDto> {
+    return await this.businessQueryRepository.getPayments(
+      pagination,
+      sorting,
+      filtering,
+    );
   }
 }

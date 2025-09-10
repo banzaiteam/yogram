@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -16,13 +15,27 @@ import { SubscribeCommand } from '../application/command/subscribe.handler';
 import { Request, Response } from 'express';
 import { PaypalEvents } from '../payment/payment-services/paypal/constants/paypal-events.enum';
 import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
-import axios from 'axios';
 import { Subscription } from '../infrastructure/entity/subscription.entity';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
 import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
+import { GetPaymentsQuery } from '../application/query/get-payments.handler';
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
+import axios from 'axios';
+import {
+  IPagination,
+  PaginationParams,
+} from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import {
+  FilteringParams,
+  IFiltering,
+} from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 
 @Controller()
 export class BusinessController {
@@ -71,7 +84,7 @@ export class BusinessController {
   @Post('business/subscriptions/expired')
   async subscriptionExpredEvent(@Body() body: any): Promise<void> {
     console.log('subscriptionExpredEvent:', body.resource);
-    const subscriptionId = 'I-X4ABDDVC0UHC';
+    const subscriptionId = body.resource.id;
     return await this.commandBus.execute(
       new SubscriptionExpiredCommand(subscriptionId),
     );
@@ -126,6 +139,17 @@ export class BusinessController {
   ): Promise<Subscription[]> {
     return await this.queryBus.execute(
       new GetCurrentSubscriptionsQuery(userId),
+    );
+  }
+
+  @Get('business/payments')
+  async getPayments(
+    @PaginationParams() pagination: IPagination,
+    @FilteringParams(['userId']) filtering: IFiltering,
+    @SortingParams(['createdAt', 'paymentType']) sorting?: ISorting,
+  ): Promise<PaymentsPaginatedResponseDto> {
+    return await this.queryBus.execute(
+      new GetPaymentsQuery(pagination, sorting, filtering),
     );
   }
 }
