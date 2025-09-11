@@ -11,7 +11,7 @@ export function GetSubscriptionsSwagger() {
     ApiOperation({
       summary: 'Get all user`s not expired subscriptions',
       description:
-        'subscriptions can be suspended or active but while subscription is not expired, it can be activated again',
+        'subscriptions can be suspended or active but while subscription is not expired, it can be activated again. Current subscription has ACTIVE status.',
     }),
     ApiResponse({
       status: 200,

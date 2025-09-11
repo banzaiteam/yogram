@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   Res,
+  Sse,
 } from '@nestjs/common';
 import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -23,7 +24,9 @@ import { SubscriptionUpdatedCommand } from '../application/command/subscription-
 import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
 import { GetPaymentsQuery } from '../application/query/get-payments.handler';
 import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
-import axios from 'axios';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { fromEvent, map, Observable } from 'rxjs';
 import {
   IPagination,
   PaginationParams,
@@ -36,13 +39,17 @@ import {
   FilteringParams,
   IFiltering,
 } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
+import { SubscriptionsSse } from 'apps/libs/Business/dto/response/subscriptions-sse.dto';
 
 @Controller()
 export class BusinessController {
+  private eventEmitter: EventEmitter2;
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) {
+    this.eventEmitter = new EventEmitter2();
+  }
 
   @Post('business/subscribe')
   async subscribe(@Body() subscribeDto: SubscribeDto): Promise<any> {
@@ -90,35 +97,27 @@ export class BusinessController {
     );
   }
 
-  @Post('business/postPaypalSse')
+  @Public()
+  @Post('business/subscriptions/sse')
   async postPaypalSse(@Body() body: any) {
-    const email = body.resource.subscriber.email_address;
-    console.log('🚀 ~ BusinessController ~ postPaypalSse ~ email:', email);
-    await axios.get(
-      `http://localhost:3006/api/v1/business/payment-sse?email=${email}`,
-    );
+    const subscriptionSse: SubscriptionsSse = {
+      event: body.event_type,
+      userEmail: body.resource.subscriber.email_address,
+      subscriptionId: body.resource.id,
+    };
+    this.eventEmitter.emit('subscriptions.event', subscriptionSse);
   }
 
-  @Get('business/payment-sse')
-  async paymentSse(@Req() req: Request, @Res() res: Response) {
+  @Sse('business/subscriptions/sse')
+  sse(): Observable<any> {
     try {
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      });
-      res.flushHeaders();
-      const data = req.query?.email;
-      if (data) {
-        console.log('🚀 ~ BusinessController ~ paymentSse ~ data:', data);
-        res.write(`data: ${JSON.stringify(data)}\n\n`);
-      }
-      req.on('close', () => {
-        res.end();
-      });
-    } catch (error) {
-      console.log('PostsController ~ sse-cancel-token ~ error:', error);
-      res.write(`data: ${error}\n\n`);
+      return fromEvent(this.eventEmitter, 'subscriptions.event').pipe(
+        map((payload) => ({
+          data: JSON.stringify(payload),
+        })),
+      );
+    } catch (err) {
+      console.log('🚀 ~ BusinessController ~ sse ~ error:', err);
     }
   }
 

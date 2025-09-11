@@ -1,4 +1,3 @@
-import { applyDecorators } from '@nestjs/common';
 import {
   ApiHeader,
   ApiOperation,
@@ -6,6 +5,7 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
+import { applyDecorators } from '@nestjs/common';
 import { PaymentType } from '../../../../../../apps/libs/Business/constants/payment-type.enum';
 
 export function SuspendSubscriptionSwagger() {
@@ -28,6 +28,8 @@ export function SuspendSubscriptionSwagger() {
     }),
     ApiOperation({
       summary: 'Suspend active subscription',
+      description:
+        'if subscription is suspended, the next payment will not be charged.',
     }),
     ApiResponse({
       status: 200,

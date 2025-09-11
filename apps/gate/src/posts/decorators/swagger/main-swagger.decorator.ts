@@ -12,7 +12,7 @@ export const MainSwagger = () =>
     ApiHeader({
       name: 'Authorization',
       required: false,
-      description: ' Authorization with bearer token',
+      description: ' Authorization with bearer token, not required',
     }),
     ApiResponse({
       status: 200,

@@ -64,5 +64,6 @@ export const getConfiguration = () => {
     POSTS_SERVICE_URL: process.env.POSTS_SERVICE_URL,
     USERS_SERVICE_URL: process.env.USERS_SERVICE_URL,
     FILES_SERVICE_URL: process.env.FILES_SERVICE_URL,
+    BUSINESS_SERVICE_URL: process.env.BUSINESS_SERVICE_URL,
   };
 };

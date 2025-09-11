@@ -22,6 +22,7 @@ import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subsc
 import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
 import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { GetPaymentsSwagger } from './decorators/swagger/get-payments-swagger.decorator';
+import { plainToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import axios from 'axios';
 import {
@@ -32,15 +33,20 @@ import {
   ISorting,
   SortingParams,
 } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
-import { plainToInstance } from 'class-transformer';
+import { ConfigService } from '@nestjs/config';
+import { SubscriptionSseSwagger } from './decorators/swagger/subscription-sse-swagger.decorator';
 
 @Controller('business')
 export class BusinessController {
-  constructor(private readonly businessService: BusinessService) {}
+  constructor(
+    private readonly businessService: BusinessService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Public()
-  @Get('payment-sse')
-  async fileUploaded(@Req() req: Request, @Res() res: Response) {
+  @SubscriptionSseSwagger()
+  @Get('subscriptions/sse')
+  async sse(@Req() req: Request, @Res() res: Response) {
     try {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
@@ -48,26 +54,23 @@ export class BusinessController {
         Connection: 'keep-alive',
       });
       res.flushHeaders();
-
       const microserviceResponse = await axios.get(
-        ['http://localhost:3006/api/v1', 'business/payment-sse'].join('/'),
+        [
+          this.configService.get('BUSINESS_SERVICE_URL'),
+          'business/subscriptions/sse',
+        ].join('/'),
         {
-          responseType: 'stream',
           headers: { ...req.headers },
+          responseType: 'stream',
         },
-      );
-      console.log(
-        '🚀 ~ BusinessController ~ fileUploaded ~ microserviceResponse:',
-        microserviceResponse.data,
       );
       microserviceResponse.data.pipe(res);
 
       req.on('close', () => {
         res.end();
       });
-    } catch (error) {
-      console.log('🚀 ~ PostsController ~ posts-sse ~ error:', error);
-      res.write(`data: ${error}\n\n`);
+    } catch (err) {
+      console.log('🚀 ~ BusinessController ~ sse ~ error:', err);
     }
   }
 
@@ -79,6 +82,7 @@ export class BusinessController {
   //* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended +
   //* when buy the second subscription, need to check if have another active subscr, if have - suspend it22 +
   //* when renew have been proceeded need to do event and patch subscr expiresAt +?
+  //! create gate business/sse
   async subscribe(
     @User('id') id: string,
     @Body() subscribeDto: SubscribeDto,

@@ -1,3 +1,4 @@
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 import { HttpBusinessPath } from '../../../../apps/libs/Business/constants/path.constant';
 import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
@@ -6,7 +7,6 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
 import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
-import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

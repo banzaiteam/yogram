@@ -209,11 +209,18 @@ export class BusinessCommandService {
     entityManager?: EntityManager,
   ): Promise<any> {
     const subscription = await this.businessQueryService.getSubscription(id);
+    const paymentSubscription = await this.paymentService.getSubscription(id);
+    console.log(
+      '🚀 ~ BusinessCommandService ~ suspendSubscription ~ paymentSubscription:',
+      paymentSubscription,
+    );
     if (!subscription)
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
       );
-    await this.paymentService.suspendSubscription(id);
+    if (paymentSubscription.status !== SubscriptionStatus.Suspended) {
+      await this.paymentService.suspendSubscription(id);
+    }
     subscription.status = SubscriptionStatus.Suspended;
     return await this.businessCommandRepository.saveSubscription(
       subscription,

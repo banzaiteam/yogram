@@ -26,7 +26,6 @@ export class PaymentFactory {
 
     const service: PaymentType = RequestContext.currentContext.req?.query
       ?.payment as PaymentType;
-    console.log('🚀 ~ PaymentFactory ~ getPaymenttService ~ service:', service);
 
     switch (service) {
       case PaymentType.PAYPAL: {
