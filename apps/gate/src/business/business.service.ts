@@ -7,6 +7,7 @@ import { GateService } from '../../../../apps/libs/gateService';
 import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
 import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import { SubscriptionsSse } from '../../../../apps/libs/Business/dto/response/subscriptions-sse.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -22,6 +23,70 @@ export class BusinessService {
       HttpServices.Business,
       path,
       subscribeDto,
+      {},
+    );
+  }
+
+  async paypalProccess(
+    subscriptionId: string,
+    payment: PaymentType,
+  ): Promise<void> {
+    const path = [HttpBusinessPath.PaypalProcess, `payment=${payment}`].join(
+      '?',
+    );
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Business,
+      path,
+      { subscriptionId },
+      {},
+    );
+  }
+
+  async subscriptioExpiredEvent(
+    subscriptionId: string,
+    payment: PaymentType,
+  ): Promise<void> {
+    const path = [
+      HttpBusinessPath.SubscriptionsExpired,
+      `payment=${payment}`,
+    ].join('?');
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Business,
+      path,
+      { subscriptionId },
+      {},
+    );
+  }
+
+  async subscriptioUpdatedEvent(
+    subscriptionId: any,
+    payment: PaymentType,
+    expiresAt: Date,
+  ) {
+    const path = [
+      HttpBusinessPath.SubscriptionsUpdated,
+      `payment=${payment}`,
+    ].join('?');
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Business,
+      path,
+      { subscriptionId, expiresAt },
+      {},
+    );
+  }
+
+  async postPaypalSse(subscriptionSse: SubscriptionsSse, payment: PaymentType) {
+    console.log(
+      '🚀 ~ BusinessService ~ postPaypalSse ~ subscriptionSse:',
+      subscriptionSse,
+    );
+    const path = [HttpBusinessPath.PostPaypalSse, `payment=${payment}`].join(
+      '?',
+    );
+    return await this.gateService.requestHttpServicePost(
+      HttpServices.Business,
+      path,
+      subscriptionSse,
       {},
     );
   }

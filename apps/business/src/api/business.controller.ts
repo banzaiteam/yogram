@@ -1,31 +1,17 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Param,
-  Patch,
-  Post,
-  Req,
-  Res,
-  Sse,
-} from '@nestjs/common';
-import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { SubscribeCommand } from '../application/command/subscribe.handler';
-import { Request, Response } from 'express';
-import { PaypalEvents } from '../payment/payment-services/paypal/constants/paypal-events.enum';
-import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
-import { Subscription } from '../infrastructure/entity/subscription.entity';
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
 import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
+import { Body, Controller, Get, Param, Patch, Post, Sse } from '@nestjs/common';
+import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
+import { SubscribeCommand } from '../application/command/subscribe.handler';
+import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
+import { Subscription } from '../infrastructure/entity/subscription.entity';
 import { GetPaymentsQuery } from '../application/query/get-payments.handler';
-import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { fromEvent, map, Observable } from 'rxjs';
 import {
   IPagination,
@@ -39,7 +25,6 @@ import {
   FilteringParams,
   IFiltering,
 } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
-import { SubscriptionsSse } from 'apps/libs/Business/dto/response/subscriptions-sse.dto';
 
 @Controller()
 export class BusinessController {
@@ -58,54 +43,35 @@ export class BusinessController {
 
   @Post('business/paypal-proccess')
   async paypalProcess(
-    @Req() req: Request,
-    @Res() res: Response,
+    @Body('subscriptionId') subscriptionId: string,
   ): Promise<void> {
-    try {
-      if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
-        const subscriptionId = req.body.resource.id;
-        await this.commandBus.execute(
-          new SaveSubscriptionCommand(subscriptionId),
-        );
-        res.status(200).json();
-      }
-    } catch (err) {
-      console.log('BusinessController ~ business/paypal-hook ~ error:', err);
-      throw new InternalServerErrorException(
-        'BusinessController error: paypalProcess',
-      );
-    }
+    await this.commandBus.execute(new SaveSubscriptionCommand(subscriptionId));
   }
 
   @Post('business/subscriptions/updated')
-  async subscriptionUpdatedSse(@Body() body: any) {
-    console.log('SubscriptionUpdated:', body.resource);
-    const subscriptionId = body.resource.id;
-    const expiresAt = body.resource.billing_info.next_billing_time;
+  async subscriptionUpdatedEvent(
+    @Body() body: { subscriptionId: string; expiresAt: Date },
+  ) {
+    const { subscriptionId, expiresAt } = body;
     return await this.commandBus.execute(
       new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
     );
-    //todo* find subscription by id, update expresAt and create new payment with subscriptionId
   }
 
   @Post('business/subscriptions/expired')
-  async subscriptionExpredEvent(@Body() body: any): Promise<void> {
-    console.log('subscriptionExpredEvent:', body.resource);
-    const subscriptionId = body.resource.id;
+  async subscriptionExpiredEvent(
+    @Body('subscriptionId') subscriptionId: string,
+  ): Promise<void> {
+    console.log('subscriptionExpredEvent:', subscriptionId);
+
     return await this.commandBus.execute(
       new SubscriptionExpiredCommand(subscriptionId),
     );
   }
 
-  @Public()
   @Post('business/subscriptions/sse')
-  async postPaypalSse(@Body() body: any) {
-    const subscriptionSse: SubscriptionsSse = {
-      event: body.event_type,
-      userEmail: body.resource.subscriber.email_address,
-      subscriptionId: body.resource.id,
-    };
-    this.eventEmitter.emit('subscriptions.event', subscriptionSse);
+  async postPaypalSse(@Body() subscriptionsSse: any) {
+    this.eventEmitter.emit('subscriptions.event', subscriptionsSse);
   }
 
   @Sse('business/subscriptions/sse')

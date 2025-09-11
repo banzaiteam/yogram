@@ -11,9 +11,9 @@ import { SubscriptionType } from '../../../../../../apps/libs/Business/constants
 import { IProduct } from './interfaces/product.interface';
 import { getSubscriptionPrice } from '../../../../../../apps/business/src/helper/get-subscription-price.helper';
 import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
-import axios from 'axios';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
 import { SubscriptionStatus } from './constants/subscription-status.enum';
+import axios from 'axios';
 
 export class PayPalService implements IPaymentService {
   private client: Client;

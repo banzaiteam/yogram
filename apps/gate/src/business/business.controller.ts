@@ -24,7 +24,6 @@ import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto
 import { GetPaymentsSwagger } from './decorators/swagger/get-payments-swagger.decorator';
 import { plainToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
-import axios from 'axios';
 import {
   IPagination,
   PaginationParams,
@@ -33,8 +32,12 @@ import {
   ISorting,
   SortingParams,
 } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
-import { ConfigService } from '@nestjs/config';
 import { SubscriptionSseSwagger } from './decorators/swagger/subscription-sse-swagger.decorator';
+import { PaypalEvents } from '../../../../apps/business/src/payment/payment-services/paypal/constants/paypal-events.enum';
+import { SubscriptionsSse } from '../../../../apps/libs/Business/dto/response/subscriptions-sse.dto';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 
 @Controller('business')
 export class BusinessController {
@@ -42,6 +45,20 @@ export class BusinessController {
     private readonly businessService: BusinessService,
     private readonly configService: ConfigService,
   ) {}
+
+  @Public()
+  @Post('subscriptions/sse')
+  async postPaypalSse(
+    @Body() body: any,
+    @Query('payment') payment: PaymentType,
+  ) {
+    const subscriptionSse: SubscriptionsSse = {
+      event: body.event_type,
+      userEmail: body.resource.subscriber.email_address,
+      subscriptionId: body.resource.id,
+    };
+    return await this.businessService.postPaypalSse(subscriptionSse, payment);
+  }
 
   @Public()
   @SubscriptionSseSwagger()
@@ -82,7 +99,6 @@ export class BusinessController {
   //* when activating suspended subscription need to check if have another one and if it active need toggle it to suspended +
   //* when buy the second subscription, need to check if have another active subscr, if have - suspend it22 +
   //* when renew have been proceeded need to do event and patch subscr expiresAt +?
-  //! create gate business/sse
   async subscribe(
     @User('id') id: string,
     @Body() subscribeDto: SubscribeDto,
@@ -99,12 +115,49 @@ export class BusinessController {
     res.status(200).redirect(303, response.link);
   }
 
-  @GetSubscriptionsSwagger()
-  @Get('subscriptions')
-  async getCurrentSubscriptions(
-    @User('id') id: string,
-  ): Promise<Subscription[]> {
-    return await this.businessService.getCurrentSubscriptions(id);
+  @Public()
+  @ApiExcludeEndpoint()
+  @Post('paypal-proccess')
+  async paypalProcess(
+    @Req() req: Request,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
+      return await this.businessService.paypalProccess(
+        req.body.resource.id,
+        payment,
+      );
+    }
+  }
+
+  @Public()
+  @ApiExcludeEndpoint()
+  @Post('subscriptions/expired')
+  async subscriptionExpiredEvent(
+    @Body() body: any,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    const subscriptionId = body.resource.id;
+    return await this.businessService.subscriptioExpiredEvent(
+      subscriptionId,
+      payment,
+    );
+  }
+
+  @Public()
+  @ApiExcludeEndpoint()
+  @Post('subscriptions/updated')
+  async subscriptionUpdatedEvent(
+    @Body() body: any,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    const subscriptionId = body.resource.id;
+    const expiresAt = body.resource.billing_info.next_billing_time;
+    return await this.businessService.subscriptioUpdatedEvent(
+      subscriptionId,
+      payment,
+      expiresAt,
+    );
   }
 
   @SuspendSubscriptionSwagger()
@@ -141,5 +194,13 @@ export class BusinessController {
       filter,
     );
     return plainToInstance(PaymentsPaginatedResponseDto, payments);
+  }
+
+  @GetSubscriptionsSwagger()
+  @Get('subscriptions')
+  async getCurrentSubscriptions(
+    @User('id') id: string,
+  ): Promise<Subscription[]> {
+    return await this.businessService.getCurrentSubscriptions(id);
   }
 }

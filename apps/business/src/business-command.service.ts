@@ -210,10 +210,6 @@ export class BusinessCommandService {
   ): Promise<any> {
     const subscription = await this.businessQueryService.getSubscription(id);
     const paymentSubscription = await this.paymentService.getSubscription(id);
-    console.log(
-      '🚀 ~ BusinessCommandService ~ suspendSubscription ~ paymentSubscription:',
-      paymentSubscription,
-    );
     if (!subscription)
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
@@ -251,10 +247,6 @@ export class BusinessCommandService {
       await queryRunner.startTransaction();
       const updatedSubscription =
         await this.businessCommandRepository.saveSubscription(subscription);
-      console.log(
-        '🚀 ~ BusinessCommandService ~ updateSubscription ~ updatedSubscription:',
-        updatedSubscription,
-      );
       const savedPayment =
         await this.businessCommandRepository.savePayment(paymentDto);
       await queryRunner.commitTransaction();
@@ -269,6 +261,7 @@ export class BusinessCommandService {
       await queryRunner.release();
     }
   }
+
   async editSubscriptionStatus(
     id: string,
     status: SubscriptionStatus,
