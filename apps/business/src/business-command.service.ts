@@ -210,6 +210,10 @@ export class BusinessCommandService {
   ): Promise<any> {
     const subscription = await this.businessQueryService.getSubscription(id);
     const paymentSubscription = await this.paymentService.getSubscription(id);
+    console.log(
+      '🚀 ~ BusinessCommandService ~ suspendSubscription ~ paymentSubscription:',
+      paymentSubscription,
+    );
     if (!subscription)
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
