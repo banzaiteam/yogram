@@ -52,6 +52,7 @@ export class BusinessController {
   async subscriptionUpdatedEvent(
     @Body() body: { subscriptionId: string; expiresAt: Date },
   ) {
+    console.log('business/subscriptions/updated');
     const { subscriptionId, expiresAt } = body;
     return await this.commandBus.execute(
       new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
@@ -62,8 +63,7 @@ export class BusinessController {
   async subscriptionExpiredEvent(
     @Body('subscriptionId') subscriptionId: string,
   ): Promise<void> {
-    console.log('subscriptionExpredEvent:', subscriptionId);
-
+    console.log('business/subscriptions/expired');
     return await this.commandBus.execute(
       new SubscriptionExpiredCommand(subscriptionId),
     );

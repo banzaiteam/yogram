@@ -47,6 +47,7 @@ export class BusinessController {
   ) {}
 
   @Public()
+  @ApiExcludeEndpoint()
   @Post('subscriptions/sse')
   async postPaypalSse(
     @Body() body: any,
