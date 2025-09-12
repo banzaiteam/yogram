@@ -1,10 +1,10 @@
 import { IBusinessCommandRepository as IBusinessCommandRepository } from '../../../interfaces/business-command-repository.interface';
+import { SaveSubscriptionDto } from '../../../payment/payment-services/paypal/dto/save-subscription.dto';
 import { Payment } from '../../entity/payment.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Subscription } from '../../entity/subscription.entity';
-import { SaveSubscriptionDto } from '../../../payment/payment-services/paypal/dto/save-subscription.dto';
 
 @Injectable()
 export class BusinessCommandRepository

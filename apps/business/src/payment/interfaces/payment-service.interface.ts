@@ -1,7 +1,10 @@
 import { SubscriptionType } from '../../../../../apps/libs/Business/constants/subscription-type.enum';
 
 export abstract class IPaymentService {
-  abstract subscribeToPlan(subscriptionType: SubscriptionType): Promise<any>;
+  abstract subscribeToPlan(
+    subscriptionType: SubscriptionType,
+    startAt?: string,
+  ): Promise<any>;
 
   abstract listPlans();
 

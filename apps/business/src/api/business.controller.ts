@@ -1,32 +1,40 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Param,
-  Patch,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { SubscribeCommand } from '../application/command/subscribe.handler';
-import { Request, Response } from 'express';
-import { PaypalEvents } from '../payment/payment-services/paypal/constants/paypal-events.enum';
-import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
-import axios from 'axios';
-import { Subscription } from '../infrastructure/entity/subscription.entity';
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
 import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
+import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
+import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
+import { Body, Controller, Get, Param, Patch, Post, Sse } from '@nestjs/common';
+import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
+import { SubscribeCommand } from '../application/command/subscribe.handler';
+import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
+import { Subscription } from '../infrastructure/entity/subscription.entity';
+import { GetPaymentsQuery } from '../application/query/get-payments.handler';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { fromEvent, map, Observable } from 'rxjs';
+import {
+  IPagination,
+  PaginationParams,
+} from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import {
+  ISorting,
+  SortingParams,
+} from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
+import {
+  FilteringParams,
+  IFiltering,
+} from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 
 @Controller()
 export class BusinessController {
+  private eventEmitter: EventEmitter2;
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-  ) {}
+  ) {
+    this.eventEmitter = new EventEmitter2();
+  }
 
   @Post('business/subscribe')
   async subscribe(@Body() subscribeDto: SubscribeDto): Promise<any> {
@@ -35,54 +43,47 @@ export class BusinessController {
 
   @Post('business/paypal-proccess')
   async paypalProcess(
-    @Req() req: Request,
-    @Res() res: Response,
+    @Body('subscriptionId') subscriptionId: string,
   ): Promise<void> {
-    try {
-      if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
-        const subscriptionId = req.body.resource.id;
-        await this.commandBus.execute(
-          new SaveSubscriptionCommand(subscriptionId),
-        );
-        res.status(200).json();
-      }
-    } catch (err) {
-      console.log('BusinessController ~ business/paypal-hook ~ error:', err);
-      throw new InternalServerErrorException(
-        'BusinessController error: paypalProcess',
-      );
-    }
+    await this.commandBus.execute(new SaveSubscriptionCommand(subscriptionId));
   }
 
-  @Post('business/postPaypalSse')
-  async postPaypalSse(@Body() body: any) {
-    const email = body.resource.subscriber.email_address;
-    console.log('🚀 ~ BusinessController ~ postPaypalSse ~ email:', email);
-    await axios.get(
-      `http://localhost:3006/api/v1/business/payment-sse?email=${email}`,
+  @Post('business/subscriptions/updated')
+  async subscriptionUpdatedEvent(
+    @Body() body: { subscriptionId: string; expiresAt: Date },
+  ) {
+    console.log('business/subscriptions/updated');
+    const { subscriptionId, expiresAt } = body;
+    return await this.commandBus.execute(
+      new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
     );
   }
 
-  @Get('business/payment-sse')
-  async paymentSse(@Req() req: Request, @Res() res: Response) {
+  @Post('business/subscriptions/expired')
+  async subscriptionExpiredEvent(
+    @Body('subscriptionId') subscriptionId: string,
+  ): Promise<void> {
+    console.log('business/subscriptions/expired');
+    return await this.commandBus.execute(
+      new SubscriptionExpiredCommand(subscriptionId),
+    );
+  }
+
+  @Post('business/subscriptions/sse')
+  async postPaypalSse(@Body() subscriptionsSse: any) {
+    this.eventEmitter.emit('subscriptions.event', subscriptionsSse);
+  }
+
+  @Sse('business/subscriptions/sse')
+  sse(): Observable<any> {
     try {
-      res.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      });
-      res.flushHeaders();
-      const data = req.query?.email;
-      console.log('🚀 ~ BusinessController ~ paymentSse ~ data:', data);
-      if (data) {
-        res.write(`data: ${JSON.stringify(data)}\n\n`);
-      }
-      req.on('close', () => {
-        res.end();
-      });
-    } catch (error) {
-      console.log('PostsController ~ sse-cancel-token ~ error:', error);
-      res.write(`data: ${error}\n\n`);
+      return fromEvent(this.eventEmitter, 'subscriptions.event').pipe(
+        map((payload) => ({
+          data: JSON.stringify(payload),
+        })),
+      );
+    } catch (err) {
+      console.log('🚀 ~ BusinessController ~ sse ~ error:', err);
     }
   }
 
@@ -97,12 +98,23 @@ export class BusinessController {
     return await this.commandBus.execute(new ActivateSubscriptionCommand(id));
   }
 
-  @Get('business/subscriptions/:id')
+  @Get('business/subscriptions/get/:id')
   async getCurrentSubscriptions(
     @Param('id') userId: string,
   ): Promise<Subscription[]> {
     return await this.queryBus.execute(
       new GetCurrentSubscriptionsQuery(userId),
+    );
+  }
+
+  @Get('business/payments')
+  async getPayments(
+    @PaginationParams() pagination: IPagination,
+    @FilteringParams(['userId']) filtering: IFiltering,
+    @SortingParams(['createdAt', 'paymentType']) sorting?: ISorting,
+  ): Promise<PaymentsPaginatedResponseDto> {
+    return await this.queryBus.execute(
+      new GetPaymentsQuery(pagination, sorting, filtering),
     );
   }
 }

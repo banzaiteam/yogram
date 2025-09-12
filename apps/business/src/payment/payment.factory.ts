@@ -6,7 +6,6 @@ import { RequestContext } from 'nestjs-request-context';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PaymentFactory {
-  // private paypalService: PayPalService;
   private readonly stripeService: StripeService;
   constructor() {}
 
@@ -18,6 +17,9 @@ export class PaymentFactory {
     if (
       RequestContext.currentContext.req.url.includes(
         '/api/v1/business/payment-sse',
+      ) ||
+      RequestContext.currentContext.req.url.includes(
+        '/api/v1/business/subscriptions/get',
       )
     )
       return;

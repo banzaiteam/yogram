@@ -55,6 +55,7 @@ import { UpdateCommentSwagger } from './decorators/swagger/update-comment-swagge
 import { User } from '../auth/decorators/user.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ResponsePostsMainPage } from 'apps/libs/Posts/dto/output/response-posts-main-page.dto';
+import { MainSwagger } from './decorators/swagger/main-swagger.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -143,6 +144,7 @@ export class PostsController {
     return await this.postsService.cancelUpload(cancelUploadDto);
   }
 
+  @MainSwagger()
   @Public()
   @Get('main')
   async main(

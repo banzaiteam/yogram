@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SubscribeDto } from '../../libs/Business/dto/input/subscribe.dto';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { IBusinessCommandRepository } from './interfaces/business-command-repository.interface';
@@ -7,8 +12,9 @@ import { IPaymentService } from './payment/interfaces/payment-service.interface'
 import { SaveSubscriptionDto } from './payment/payment-services/paypal/dto/save-subscription.dto';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { BusinessQueryService } from './business-query.service';
+import { SubscriptionUpdateDto } from './dto/subscription-update.dto';
 
 @Injectable()
 export class BusinessCommandService {
@@ -27,13 +33,32 @@ export class BusinessCommandService {
       await this.businessQueryService.getCurrentUserSubscriptions(
         subscribeDto.userId,
       );
-    // if (currentSubscriptions.length > 1) {
-    //   throw new BadRequestException(
-    //     'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
-    //   );
-    // }
+
+    if (currentSubscriptions.length > 1) {
+      throw new BadRequestException(
+        'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
+      );
+    }
+
+    currentSubscriptions.map((subscription) => {
+      if (
+        new Date(subscription.expiresAt) > new Date() &&
+        subscription.subscriptionType === subscribeDto.subscriptionType
+      ) {
+        throw new BadRequestException(
+          'BusinessCommandService error: you cant have 2 subscriptions with the same subscription type',
+        );
+      }
+    });
+    //* if we already have subscription and buy a new one, the new one subscription should start on the day when the first subscription expires
+    const start_date =
+      currentSubscriptions.length === 1
+        ? new Date(currentSubscriptions[0].expiresAt)
+        : new Date();
+
     const response = await this.paymentService.subscribeToPlan(
       subscribeDto.subscriptionType,
+      currentSubscriptions.length === 1 ? start_date.toISOString() : undefined,
     );
 
     const saveSubscriptionDto: SaveSubscriptionDto = {
@@ -50,7 +75,8 @@ export class BusinessCommandService {
   async saveSubscription(id: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction();
+    await queryRunner.startTransaction('READ COMMITTED');
+
     try {
       let [subscription, paypalSubscription] = await Promise.all([
         await this.businessQueryService.getSubscription(id),
@@ -60,6 +86,11 @@ export class BusinessCommandService {
         throw new NotFoundException(
           'BusinessCommandService error: subscription not found',
         );
+      const currentSubscriptionsArr =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+        );
+      //todo* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
       const price = getSubscriptionPrice(subscription.subscriptionType);
       const updatePlanDto = {
         subscriptionType: subscription.subscriptionType,
@@ -72,7 +103,13 @@ export class BusinessCommandService {
         updatePlanDto,
         queryRunner.manager,
       );
-      const startDate = new Date(paypalSubscription.start_time);
+      //* expires+1 when it second subscription
+      const startDate = new Date(
+        currentSubscriptionsArr.length === 1
+          ? currentSubscriptionsArr[0].expiresAt
+          : paypalSubscription.start_time,
+      );
+
       const startDateCopy = structuredClone(startDate);
       const expiresAt = new Date(
         startDateCopy.setDate(
@@ -81,14 +118,33 @@ export class BusinessCommandService {
       );
       subscription.paymentId = payment.id;
       subscription.payments = [payment];
-      subscription.startAt = startDate;
-      subscription.expiresAt = expiresAt;
+      subscription.startAt = new Date(
+        startDate.setHours(startDate.getHours() + 8),
+      );
+
+      subscription.expiresAt = new Date(
+        expiresAt.setHours(expiresAt.getHours() + 8),
+      );
       subscription.status = SubscriptionStatus.Active;
 
       await this.businessCommandRepository.saveSubscription(
         subscription,
         queryRunner.manager,
       );
+
+      //* all next need to toggle first subscription to suspended if we create second subscription
+      const currentSubscriptions =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+          queryRunner.manager,
+        );
+      const firstSubscription: Subscription[] = currentSubscriptions.filter(
+        (subscr) => subscr.id !== subscription.id,
+      );
+      if (currentSubscriptions.length === 2) {
+        firstSubscription[0].status = SubscriptionStatus.Suspended;
+        await this.suspendSubscription(firstSubscription[0].subscriptionId);
+      }
       await queryRunner.commitTransaction();
       return subscription;
     } catch (err) {
@@ -99,25 +155,123 @@ export class BusinessCommandService {
     }
   }
 
-  async activateSubscription(id: string): Promise<any> {
-    const subscription = await this.businessQueryService.getSubscription(id);
-    if (!subscription)
-      throw new NotFoundException(
-        'BusinessCommandService error: subscription does not exist',
+  async activateSubscription(id: string): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
+    try {
+      const subscription = await this.businessQueryService.getSubscription(
+        id,
+        queryRunner.manager,
       );
-    await this.paymentService.activateSubscription(id);
-    subscription.status = SubscriptionStatus.Active;
-    return await this.businessCommandRepository.saveSubscription(subscription);
+      if (!subscription)
+        throw new NotFoundException(
+          'BusinessCommandService error: subscription does not exist',
+        );
+      const currentSubscriptions =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+          queryRunner.manager,
+        );
+      await this.paymentService.activateSubscription(id);
+
+      subscription.status = SubscriptionStatus.Active;
+      const updatedSubscription =
+        await this.businessCommandRepository.saveSubscription(
+          subscription,
+          queryRunner.manager,
+        );
+
+      if (currentSubscriptions.length === 2) {
+        const anotherSubscription: Subscription[] = currentSubscriptions.filter(
+          (subscr) => subscr.id !== subscription.id,
+        );
+        await this.suspendSubscription(
+          anotherSubscription[0].subscriptionId,
+          queryRunner.manager,
+        );
+      }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.log('BusinessCommandService activateSubscription ~ err:', err);
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        err.response,
+        err.response.httpStatusCode || err.httpStatusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async suspendSubscription(id: string): Promise<any> {
+  async suspendSubscription(
+    id: string,
+    entityManager?: EntityManager,
+  ): Promise<void> {
+    const subscription = await this.businessQueryService.getSubscription(id);
+    const paymentSubscription = await this.paymentService.getSubscription(id);
+    if (!subscription)
+      throw new NotFoundException(
+        'BusinessCommandService error: subscription does not exist',
+      );
+    if (paymentSubscription.status !== SubscriptionStatus.Suspended) {
+      await this.paymentService.suspendSubscription(id);
+    }
+    subscription.status = SubscriptionStatus.Suspended;
+    await this.businessCommandRepository.saveSubscription(
+      subscription,
+      entityManager,
+    );
+  }
+
+  async updateSubscription(
+    id: string,
+    subscriptionUpdateDto: SubscriptionUpdateDto,
+  ) {
     const subscription = await this.businessQueryService.getSubscription(id);
     if (!subscription)
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
       );
-    await this.paymentService.suspendSubscription(id);
-    subscription.status = SubscriptionStatus.Suspended;
+    subscription.expiresAt = subscriptionUpdateDto.expiresAt;
+    const price = getSubscriptionPrice(subscription.subscriptionType);
+    const paymentDto = {
+      subscriptionType: subscription.subscriptionType,
+      userId: subscription.userId,
+      paymentType: subscription.paymentType,
+      price,
+    };
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    try {
+      await queryRunner.startTransaction();
+      const updatedSubscription =
+        await this.businessCommandRepository.saveSubscription(subscription);
+      const savedPayment =
+        await this.businessCommandRepository.savePayment(paymentDto);
+      await queryRunner.commitTransaction();
+      return updatedSubscription;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        err.response,
+        err.response.httpStatusCode || err.httpStatusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async editSubscriptionStatus(
+    id: string,
+    status: SubscriptionStatus,
+  ): Promise<Subscription> {
+    const subscription = await this.businessQueryService.getSubscription(id);
+    if (!subscription)
+      throw new NotFoundException(
+        'BusinessCommandService error: subscription does not exist',
+      );
+    subscription.status = status;
     return await this.businessCommandRepository.saveSubscription(subscription);
   }
 }

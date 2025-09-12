@@ -11,9 +11,9 @@ import { SubscriptionType } from '../../../../../../apps/libs/Business/constants
 import { IProduct } from './interfaces/product.interface';
 import { getSubscriptionPrice } from '../../../../../../apps/business/src/helper/get-subscription-price.helper';
 import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
-import axios from 'axios';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
 import { SubscriptionStatus } from './constants/subscription-status.enum';
+import axios from 'axios';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -171,7 +171,10 @@ export class PayPalService implements IPaymentService {
     ).data;
   }
 
-  async subscribeToPlan(subscriptionType: SubscriptionType): Promise<any> {
+  async subscribeToPlan(
+    subscriptionType: SubscriptionType,
+    startAt?: string,
+  ): Promise<any> {
     const plans = await this.listPlans();
     const subscriptionPrice = getSubscriptionPrice(subscriptionType);
     let plan = {};
@@ -190,7 +193,9 @@ export class PayPalService implements IPaymentService {
       throw new BadRequestException('Paypal error: plan does not exist');
     const token = await this.authentication();
     const today = new Date();
-    const nextDay = new Date(today.setDate(today.getDate() + 1)).toISOString();
+    const nextDay = startAt
+      ? startAt
+      : new Date(today.setDate(today.getDate() + 1)).toISOString();
     const subscribe = {
       plan_id: plan['id'],
       quantity: 1,

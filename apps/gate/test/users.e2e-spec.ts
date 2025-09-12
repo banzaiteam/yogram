@@ -1,14 +1,8 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import FormData from 'form-data';
-import fs from 'fs';
-import { blob } from 'stream/consumers';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersModule } from '../../../apps/users/src/users.module';
-
 import { v4 } from 'uuid';
-import { MailerModule } from '../../../apps/mailer/src/mailer.module';
-import { AppModule } from '../../../apps/files/src/app/app.module';
 import { AppModule as AppUsers } from '../../../apps/gate/src/app.module';
 
 describe('Users (e2e)', () => {

@@ -39,6 +39,18 @@ import {
   ActivateSubscriptionCommand,
   ActivateSubscriptionHandler,
 } from './application/command/activate-subscription-command.handler';
+import {
+  SubscriptionUpdatedCommand,
+  SubscriptionUpdatedHandler,
+} from './application/command/subscription-updated.handler';
+import {
+  SubscriptionExpiredCommand,
+  SubscriptionExpiredHandler,
+} from './application/command/subscription-expired.handler';
+import {
+  GetPaymentsHandler,
+  GetPaymentsQuery,
+} from './application/query/get-payments.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -112,6 +124,12 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SuspendSubscriptionHandler,
     ActivateSubscriptionHandler,
     ActivateSubscriptionCommand,
+    SubscriptionUpdatedCommand,
+    SubscriptionUpdatedHandler,
+    SubscriptionExpiredCommand,
+    SubscriptionExpiredHandler,
+    GetPaymentsHandler,
+    GetPaymentsQuery,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,
