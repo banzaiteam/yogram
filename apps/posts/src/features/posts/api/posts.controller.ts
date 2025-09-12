@@ -186,6 +186,7 @@ export class PostsController {
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
     @FilteringParams(['isPublished', 'userId', 'id']) filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
+    console.log('🚀 ~ PostsController ~ get ~ filtering:', filtering);
     return await this.queryBus.execute(
       new GetPostsQuery(pagination, sorting, filtering),
     );
