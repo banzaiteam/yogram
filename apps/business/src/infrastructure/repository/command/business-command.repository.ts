@@ -32,10 +32,6 @@ export class BusinessCommandRepository
     entityManager?: EntityManager,
   ): Promise<Subscription> {
     const subscription = new Subscription(saveSubscriptionDto);
-    console.log(
-      '🚀 ~ BusinessCommandRepository ~ saveSubscription ~ subscription:',
-      subscription,
-    );
     if (entityManager) {
       return await entityManager.save(subscription);
     }
