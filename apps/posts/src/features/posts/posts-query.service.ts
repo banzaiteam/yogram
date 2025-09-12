@@ -20,7 +20,7 @@ export class PostsQueryService {
     sorting?: ISorting,
     filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
-    if (filtering.filterProperty === 'userId') {
+    if (filtering?.filterProperty === 'userId') {
       const usersUrl = `${this.configService.get('USERS_SERVICE_URL')}/${HttpUsersPath.FindUserByCriteria}?id=${filtering.value}`;
       const [user, postsPaginated] = await Promise.all([
         axios.get(usersUrl),
@@ -31,7 +31,7 @@ export class PostsQueryService {
         return post;
       });
       return postsPaginated;
-    } else if (filtering.filterProperty === 'id') {
+    } else if (filtering?.filterProperty === 'id') {
       const postsPaginated = await this.postQueryRepository.get(
         pagination,
         sorting,
@@ -44,7 +44,7 @@ export class PostsQueryService {
         return post;
       });
       return postsPaginated;
-    } else {
+    } else if (filtering === null) {
       const postsPaginated = await this.postQueryRepository.get(
         pagination,
         sorting,
@@ -54,10 +54,6 @@ export class PostsQueryService {
         postsPaginated.items.map(async (post) => {
           const usersUrl = `${this.configService.get('USERS_SERVICE_URL')}/${HttpUsersPath.FindUserByCriteria}?id=${post.userId}`;
           const user = await axios.get(usersUrl);
-          console.log(
-            '🚀 ~ PostsQueryService ~ get ~ usersUrl:',
-            user.data.url,
-          );
           post['avatar'] = user.data.url;
           return post;
         }),

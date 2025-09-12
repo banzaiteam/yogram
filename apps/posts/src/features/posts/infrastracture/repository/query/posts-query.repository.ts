@@ -1,6 +1,6 @@
+import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
 import { IPagination } from '../../../../../../../../apps/libs/common/pagination/decorators/pagination.decorator';
 import { IPostQueryRepository } from '../../../interfaces/posts-query-repository.interface';
-import { Post } from '../../entity/post.entity';
 import {
   getSortingOrder,
   ISorting,
@@ -9,9 +9,9 @@ import {
   getFilteringObject,
   IFiltering,
 } from '../../../../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
-import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { PostPaginatedResponseDto } from '../../../../../../../../apps/libs/Posts/dto/output/post-paginated-reponse.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from '../../entity/post.entity';
 
 export class PostsQueryRepository
   implements IPostQueryRepository<PostPaginatedResponseDto>
