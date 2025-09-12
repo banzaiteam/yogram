@@ -35,8 +35,11 @@ export function ActivateSubscriptionSwagger() {
     }),
     ApiResponse({
       status: 404,
-      description:
-        'BusinessCommandService error: subscription does not exist | PayPalService error: subscription is active already',
+      description: 'BusinessCommandService error: subscription does not exist',
+    }),
+    ApiResponse({
+      status: 409,
+      description: 'PayPalService error: subscription is active already',
     }),
   );
 }

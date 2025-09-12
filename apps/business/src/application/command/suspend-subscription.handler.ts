@@ -13,7 +13,7 @@ export class SuspendSubscriptionHandler
     private readonly businessCommandService: BusinessCommandService,
   ) {}
 
-  async execute({ id }: SuspendSubscriptionCommand): Promise<any> {
+  async execute({ id }: SuspendSubscriptionCommand): Promise<void> {
     return await this.businessCommandService.suspendSubscription(id);
   }
 }

@@ -36,8 +36,11 @@ export function SuspendSubscriptionSwagger() {
     }),
     ApiResponse({
       status: 404,
-      description:
-        'BusinessCommandService error: subscription does not exist | PayPalService error: subscription is suspended already',
+      description: 'BusinessCommandService error: subscription does not exist ',
+    }),
+    ApiResponse({
+      status: 409,
+      description: ' PayPalService error: subscription is suspended already',
     }),
   );
 }

@@ -234,7 +234,6 @@ export class PayPalService implements IPaymentService {
   async suspendSubscription(id: string): Promise<any> {
     const token = await this.authentication();
     const status = (await this.getSubscription(id)).status;
-    console.log('🚀 ~ PayPalService ~ suspendSubscription ~ status:', status);
     if (status === SubscriptionStatus.Suspended)
       throw new ConflictException(
         'PayPalService error: subscription is suspended already',

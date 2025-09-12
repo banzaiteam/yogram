@@ -155,7 +155,7 @@ export class BusinessCommandService {
     }
   }
 
-  async activateSubscription(id: string): Promise<any> {
+  async activateSubscription(id: string): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
@@ -207,13 +207,9 @@ export class BusinessCommandService {
   async suspendSubscription(
     id: string,
     entityManager?: EntityManager,
-  ): Promise<any> {
+  ): Promise<void> {
     const subscription = await this.businessQueryService.getSubscription(id);
     const paymentSubscription = await this.paymentService.getSubscription(id);
-    console.log(
-      '🚀 ~ BusinessCommandService ~ suspendSubscription ~ paymentSubscription:',
-      paymentSubscription,
-    );
     if (!subscription)
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
@@ -222,7 +218,7 @@ export class BusinessCommandService {
       await this.paymentService.suspendSubscription(id);
     }
     subscription.status = SubscriptionStatus.Suspended;
-    return await this.businessCommandRepository.saveSubscription(
+    await this.businessCommandRepository.saveSubscription(
       subscription,
       entityManager,
     );
