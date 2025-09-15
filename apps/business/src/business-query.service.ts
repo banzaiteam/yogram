@@ -9,6 +9,7 @@ import { Subscription } from './infrastructure/entity/subscription.entity';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
 
 @Injectable()
 export class BusinessQueryService {
@@ -48,6 +49,7 @@ export class BusinessQueryService {
         id,
         entityManager,
       );
+
     if (!subscriptions.length)
       throw new NotFoundException(
         'BusinessQueryService error: user`s subscriptions not found',
@@ -64,7 +66,31 @@ export class BusinessQueryService {
         id,
         entityManager,
       );
-
+    // console.log(
+    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ subscriptions:',
+    //   subscriptions,
+    // );
+    // const ppSub = await this.paymentService.getSubscription('I-PNETPXYU9419');
+    // console.log('🚀 ~ BusinessQueryService ~ getSubscription ~ ppSub:', ppSub);
+    // await this.paymentService.deactivatePlan('P-5V783320054914107NDD7FIA');
+    // const plan = await this.paymentService.getPlan(
+    //   'P-0PG868614W687125HNDD7OGY',
+    // );
+    // console.log(
+    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ plan:',
+    //   plan,
+    // );
+    // const planCreated = await this.paymentService.createPlan(
+    //   SubscriptionType.OneDay,
+    //   '9dc8e0a8-bd92-497d-b858-cf70ec7c696f',
+    //   'one day plan',
+    //   'one day plan',
+    // );
+    // console.log(
+    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ planCreated:',
+    //   planCreated,
+    // // );
+    // console.log('plans', await this.paymentService.listPlans());
     const currentSubscriptions = subscriptions.filter((subscription) => {
       if (
         subscription.expiresAt &&

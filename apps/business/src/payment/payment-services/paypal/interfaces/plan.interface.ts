@@ -16,7 +16,7 @@ export interface BillingCycles {
   tenure_type: Tenure;
   sequence: number;
   total_cycles: number; // 0
-  pricing_scheme: PricingScheme;
+  pricing_scheme?: PricingScheme;
 }
 
 type Tenure = 'REGULAR' | 'TRIAL';
@@ -34,8 +34,8 @@ export enum IntervalCount {
 }
 
 interface Frequency {
-  interval_unit: IntervalCount;
-  interval_count: IntervalUnit;
+  interval_unit: IntervalCount | number;
+  interval_count: IntervalUnit | number;
 }
 
 interface PaymentPreferences {

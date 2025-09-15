@@ -44,7 +44,10 @@ export class PostsQueryService {
         return post;
       });
       return postsPaginated;
-    } else if (filtering === null) {
+    } else if (
+      filtering === null ||
+      filtering.filterProperty === 'isPublished'
+    ) {
       const postsPaginated = await this.postQueryRepository.get(
         pagination,
         sorting,
