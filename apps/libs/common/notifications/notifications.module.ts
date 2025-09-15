@@ -3,6 +3,7 @@ import { NotificationsGateway } from './notifications.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DynamicModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({})
 export class NotificationsModule {
@@ -10,6 +11,7 @@ export class NotificationsModule {
     return {
       module: NotificationsModule,
       imports: [
+        RedisModule,
         JwtModule.registerAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -20,6 +22,7 @@ export class NotificationsModule {
         }),
       ],
       providers: [NotificationsService, NotificationsGateway],
+      exports: [NotificationsGateway],
     };
   }
 }

@@ -1,13 +1,12 @@
+import { NotificationRedisKeys } from '../../../../apps/business/src/payment/redis/notfication-redis-keys.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
-import { socketAuthMiddleware } from './helper/socket-auth.helper';
-import { Socket, Server } from 'socket.io';
-import { JwtService } from '@nestjs/jwt';
 import { NotificationsService } from './notifications.service';
+import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway()
-export class NotificationsGateway {
+export class NotificationsGateway implements INotificationsService {
   private connectedClients: Map<string, Socket> = new Map();
   @WebSocketServer()
   private server: Server;
@@ -24,7 +23,11 @@ export class NotificationsGateway {
     this.notificationsService.handleConnection(socket);
   }
 
+  async saveNotification(key: string, notification: INotification) {
+    return await this.notificationsService.saveNotification(key, notification);
+  }
+
   async send(notification: INotification, delay: number): Promise<void> {
-    return;
+    return await this.notificationsService.send(notification, delay);
   }
 }

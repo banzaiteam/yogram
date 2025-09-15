@@ -17,10 +17,10 @@ export class PaymentFactory {
     if (
       RequestContext.currentContext.req.url.includes(
         '/api/v1/business/payment-sse',
-      ) ||
-      RequestContext.currentContext.req.url.includes(
-        '/api/v1/business/subscriptions/get',
       )
+      // RequestContext.currentContext.req.url.includes(
+      //   '/api/v1/business/subscriptions/get',
+      // )
     )
       return;
 

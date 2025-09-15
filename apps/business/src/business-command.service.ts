@@ -40,7 +40,7 @@ export class BusinessCommandService {
       );
     }
 
-    currentSubscriptions.map((subscription) => {
+    currentSubscriptions?.map((subscription) => {
       if (
         new Date(subscription.expiresAt) > new Date() &&
         subscription.subscriptionType === subscribeDto.subscriptionType
@@ -72,7 +72,7 @@ export class BusinessCommandService {
     return response;
   }
 
-  async saveSubscription(id: string) {
+  async saveSubscription(id: string): Promise<Subscription> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
@@ -145,6 +145,13 @@ export class BusinessCommandService {
         firstSubscription[0].status = SubscriptionStatus.Suspended;
         await this.suspendSubscription(firstSubscription[0].subscriptionId);
       }
+      const subscription1 = await this.paymentService.getSubscription(
+        paypalSubscription.id,
+      );
+      console.log(
+        '🚀 ~ BusinessCommandService ~ subscribe ~ subscription1:',
+        subscription1,
+      );
       await queryRunner.commitTransaction();
       return subscription;
     } catch (err) {

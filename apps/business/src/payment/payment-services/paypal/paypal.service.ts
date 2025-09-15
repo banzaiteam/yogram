@@ -126,27 +126,34 @@ export class PayPalService implements IPaymentService {
       description,
     );
 
-    return (
-      await axios.post(
-        'https://api-m.sandbox.paypal.com/v1/billing/plans',
-        JSON.stringify(plan),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Prefer: 'return=minimal',
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
+    try {
+      return (
+        await axios.post(
+          'https://api-m.sandbox.paypal.com/v1/billing/plans',
+          JSON.stringify(plan),
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Prefer: 'return=minimal',
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
           },
-        },
-      )
-    ).data;
+        )
+      ).data;
+    } catch (error) {
+      console.log(
+        '🚀 ~ PayPalService ~ createPlan ~ error:',
+        error.response.data,
+      );
+    }
   }
 
   async listPlans() {
     const token = await this.authentication();
     return (
       await axios.get(
-        'https://api-m.sandbox.paypal.com/v1/billing/plans?sort_by=create_time&sort_order=desc',
+        'https://api-m.sandbox.paypal.com/v1/billing/plans?page_size=15',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -191,6 +198,8 @@ export class PayPalService implements IPaymentService {
     }
     if (!plan)
       throw new BadRequestException('Paypal error: plan does not exist');
+    // console.log('plan', plan);
+
     const token = await this.authentication();
     const today = new Date();
     const nextDay = startAt
@@ -200,7 +209,20 @@ export class PayPalService implements IPaymentService {
       plan_id: plan['id'],
       quantity: 1,
       start_time: nextDay,
+      application_context: {
+        brand_name: 'walmart',
+        locale: 'en-US',
+        shipping_preference: 'SET_PROVIDED_ADDRESS',
+        user_action: 'SUBSCRIBE_NOW',
+        payment_method: {
+          payer_selected: 'PAYPAL',
+          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
+        },
+      },
     };
+    //todo! To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
+    //todo! which effectively bypasses the trial period and initiates the subscription right away. Alternatively, you can set the trial_duration_unit to "month"
+    //todo! but specify trial_duration as 0, which achieves the same result of starting the subscription immediately without a trial.
 
     const response = await axios.post(
       'https://api-m.sandbox.paypal.com/v1/billing/subscriptions',
