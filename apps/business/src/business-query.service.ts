@@ -10,6 +10,7 @@ import { Payment } from './infrastructure/entity/payment.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
+import { NotificationsGateway } from 'apps/libs/common/notifications/notifications.gateway';
 
 @Injectable()
 export class BusinessQueryService {
@@ -19,6 +20,7 @@ export class BusinessQueryService {
       Subscription
     >,
     private readonly paymentService: IPaymentService,
+    private readonly notificationGateway: NotificationsGateway,
   ) {}
 
   async getPaymentServiceSubscription(id: string) {
@@ -70,8 +72,8 @@ export class BusinessQueryService {
     //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ subscriptions:',
     //   subscriptions,
     // );
-    // const ppSub = await this.paymentService.getSubscription('I-PNETPXYU9419');
-    // console.log('🚀 ~ BusinessQueryService ~ getSubscription ~ ppSub:', ppSub);
+    const ppSub = await this.paymentService.getSubscription('I-WSF89LPYX9BG');
+    console.log('🚀 ~ BusinessQueryService ~ getSubscription ~ ppSub:', ppSub);
     // await this.paymentService.deactivatePlan('P-5V783320054914107NDD7FIA');
     // const plan = await this.paymentService.getPlan(
     //   'P-0PG868614W687125HNDD7OGY',
@@ -103,6 +105,11 @@ export class BusinessQueryService {
         return subscription;
       }
     });
+    const result = await this.notificationGateway.getUserNotifications2(id);
+    console.log(
+      '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ result:',
+      result,
+    );
     return currentSubscriptions;
   }
 

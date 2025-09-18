@@ -58,11 +58,7 @@ export class BusinessService {
     );
   }
 
-  async subscriptioUpdatedEvent(
-    subscriptionId: any,
-    payment: PaymentType,
-    expiresAt: Date,
-  ) {
+  async subscriptioUpdatedEvent(subscriptionId: any, payment: PaymentType) {
     const path = [
       HttpBusinessPath.SubscriptionsUpdated,
       `payment=${payment}`,
@@ -70,7 +66,7 @@ export class BusinessService {
     return await this.gateService.requestHttpServicePost(
       HttpServices.Business,
       path,
-      { subscriptionId, expiresAt },
+      { subscriptionId },
       {},
     );
   }

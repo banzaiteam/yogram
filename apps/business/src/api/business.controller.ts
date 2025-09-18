@@ -4,7 +4,17 @@ import { SuspendSubscriptionCommand } from '../application/command/suspend-subsc
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
 import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
-import { Body, Controller, Get, Param, Patch, Post, Sse } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Sse,
+} from '@nestjs/common';
 import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
 import { SubscribeCommand } from '../application/command/subscribe.handler';
 import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
@@ -48,14 +58,15 @@ export class BusinessController {
     await this.commandBus.execute(new SaveSubscriptionCommand(subscriptionId));
   }
 
+  @HttpCode(200)
   @Post('business/subscriptions/updated')
   async subscriptionUpdatedEvent(
     @Body() body: { subscriptionId: string; expiresAt: Date },
   ) {
     console.log('business/subscriptions/updated');
-    const { subscriptionId, expiresAt } = body;
+    const { subscriptionId } = body;
     return await this.commandBus.execute(
-      new SubscriptionUpdatedCommand(subscriptionId, expiresAt),
+      new SubscriptionUpdatedCommand(subscriptionId),
     );
   }
 

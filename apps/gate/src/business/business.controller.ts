@@ -138,27 +138,30 @@ export class BusinessController {
     @Body() body: any,
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
-    const subscriptionId = body.resource.id;
-    return await this.businessService.subscriptioExpiredEvent(
-      subscriptionId,
-      payment,
-    );
+    if (body.event_type === PaypalEvents.BillingSubscriptionExpired) {
+      const subscriptionId = body.resource.id;
+      return await this.businessService.subscriptioExpiredEvent(
+        subscriptionId,
+        payment,
+      );
+    }
   }
 
   @Public()
+  @HttpCode(200)
   @ApiExcludeEndpoint()
   @Post('subscriptions/updated')
   async subscriptionUpdatedEvent(
     @Body() body: any,
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
-    const subscriptionId = body.resource.id;
-    const expiresAt = body.resource.billing_info.next_billing_time;
-    return await this.businessService.subscriptioUpdatedEvent(
-      subscriptionId,
-      payment,
-      expiresAt,
-    );
+    if (body.event_type === PaypalEvents.PaymentSaleCompleted) {
+      const subscriptionId = body.resource.id;
+      return await this.businessService.subscriptioUpdatedEvent(
+        subscriptionId,
+        payment,
+      );
+    }
   }
 
   @SuspendSubscriptionSwagger()

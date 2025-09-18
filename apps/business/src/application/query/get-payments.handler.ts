@@ -4,6 +4,8 @@ import { ISorting } from '../../../../../apps/libs/common/pagination/decorators/
 import { IFiltering } from '../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { BusinessQueryService } from '../../business-query.service';
+import { v4 } from 'uuid';
+import { NotificationsGateway } from 'apps/libs/common/notifications/notifications.gateway';
 
 export class GetPaymentsQuery {
   constructor(
@@ -15,12 +17,28 @@ export class GetPaymentsQuery {
 
 @QueryHandler(GetPaymentsQuery)
 export class GetPaymentsHandler implements IQueryHandler<GetPaymentsQuery> {
-  constructor(private readonly businessQueryService: BusinessQueryService) {}
+  constructor(
+    private readonly businessQueryService: BusinessQueryService,
+    private readonly notificationGateway: NotificationsGateway,
+  ) {}
   async execute({
     pagination,
     sorting,
     filtering,
   }: GetPaymentsQuery): Promise<PaymentsPaginatedResponseDto> {
+    const notification = {
+      id: v4(),
+      subscriptionId: 'I-djsfklsdjfsl',
+      message: `Your subscription is activated and expires by ${'17-09-25'}`,
+      readAt: null,
+      userId: '1',
+      expiresAt: 1000,
+      createdAt: new Date('2025-09-16').getTime(),
+    };
+
+    const key = `notifications:user:${notification.userId}:notification:${notification.id}`;
+    console.log('🚀 ~ GetPaymentsHandler ~ execute ~ key:', key);
+    await this.notificationGateway.saveNotification(key, notification);
     return await this.businessQueryService.getPayments(
       pagination,
       sorting,

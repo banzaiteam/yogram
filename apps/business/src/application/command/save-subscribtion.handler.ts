@@ -31,12 +31,13 @@ export class SaveSubscriptionHandler
       message: `Your subscription is activated and expires by ${subscription.expiresAt}`,
       readAt: null,
       userId: subscription.userId,
-      expiresAt: subscription.expiresAt,
-      createdAt: subscription.createdAt,
+      expiresAt: new Date(subscription.expiresAt).getTime(),
+      createdAt: new Date(subscription.createdAt).getTime(),
     };
 
-    const key = `user:${subscription.userId}:notification:${notification.id}`;
+    const key = `notifications:user:${subscription.userId}:notification:${notification.id}`;
     await this.notificationGateway.saveNotification(key, notification);
+    await this.notificationGateway.send(notification, 30000);
     return subscription;
   }
 }
