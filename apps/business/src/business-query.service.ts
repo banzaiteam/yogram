@@ -8,9 +8,8 @@ import { IPaymentService } from './payment/interfaces/payment-service.interface'
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { Payment } from './infrastructure/entity/payment.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
 import { EntityManager } from 'typeorm';
-import { SubscriptionType } from 'apps/libs/Business/constants/subscription-type.enum';
-import { NotificationsGateway } from 'apps/libs/common/notifications/notifications.gateway';
 
 @Injectable()
 export class BusinessQueryService {

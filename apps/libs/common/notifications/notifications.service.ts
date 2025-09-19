@@ -1,15 +1,11 @@
+import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
 import { REDIS_CLIENT } from '../redis/redis-client.factory';
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import Redis from 'ioredis';
-import { WsException } from '@nestjs/websockets';
-import { ExpiresInDuration } from 'apps/business/src/constants/expires-in-duration.enum';
 
 @Injectable()
 export class NotificationsService implements INotificationsService {
@@ -123,11 +119,11 @@ export class NotificationsService implements INotificationsService {
         'differ', // Search query
         'FILTER',
         expiresInDuration === ExpiresInDuration.Day
-          ? `@differ < ${expiresInDuration}`
+          ? `@differ > 0 @differ < ${expiresInDuration}`
           : expiresInDuration === ExpiresInDuration.Week
-            ? `@differ < ${expiresInDuration}`
+            ? `@differ > ${expiresInDuration} @differ < ${expiresInDuration + 86400 * 1000}`
             : expiresInDuration === ExpiresInDuration.Month
-              ? `@differ < ${expiresInDuration}`
+              ? `@differ > ${expiresInDuration} @differ < ${expiresInDuration + 86400 * 1000}`
               : null,
       );
       console.log('Search results:', results);
