@@ -71,7 +71,7 @@ export class BusinessQueryService {
     //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ subscriptions:',
     //   subscriptions,
     // );
-    const ppSub = await this.paymentService.getSubscription('I-93UDVBT7U6H2');
+    const ppSub = await this.paymentService.getSubscription('I-WSF89LPYX9BG');
     console.log('🚀 ~ BusinessQueryService ~ getSubscription ~ ppSub:', ppSub);
     // await this.paymentService.deactivatePlan('P-5V783320054914107NDD7FIA');
     // const plan = await this.paymentService.getPlan(
