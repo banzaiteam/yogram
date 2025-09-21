@@ -5,6 +5,7 @@ import { Subscription } from '../../infrastructure/entity/subscription.entity';
 import { BusinessCommandService } from '../../business-command.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
+import { EnvironmentMode } from '../../settings/configuration';
 
 export class SaveSubscriptionCommand {
   constructor(public readonly id: string) {}
@@ -35,7 +36,12 @@ export class SaveSubscriptionHandler
       createdAt: new Date(subscription.createdAt).getTime(),
     };
 
-    const key = `notifications:user:${subscription.userId}:notification:${notification.id}`;
+    const key = `${
+      process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      process.env.NODE_ENV !== EnvironmentMode.TESTING
+        ? ''
+        : 'dev:'
+    }notifications:user:${subscription.userId}:notification:${notification.id}`;
     await this.notificationGateway.saveNotification(key, notification);
     await this.notificationGateway.send(notification, 30000);
     return subscription;
