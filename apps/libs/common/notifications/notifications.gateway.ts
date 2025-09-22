@@ -1,3 +1,4 @@
+import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
@@ -33,7 +34,9 @@ export class NotificationsGateway implements INotificationsService {
     return await this.notificationsService.saveNotification(key, notification);
   }
 
-  async getUserNotifications(userId: string): Promise<INotification[]> {
+  async getUserNotifications(
+    userId: string,
+  ): Promise<NotificationResponseDto[]> {
     return await this.notificationsService.getUserNotifications(userId);
   }
 

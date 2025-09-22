@@ -52,6 +52,10 @@ import {
   GetPaymentsQuery,
 } from './application/query/get-payments.handler';
 import { NotificationsModule } from '../../../apps/libs/common/notifications/notifications.module';
+import {
+  GetUserNotificationsHandler,
+  GetUserNotificationsQuery,
+} from './application/query/get-user-notifications.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -130,6 +134,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscriptionUpdatedHandler,
     SubscriptionExpiredCommand,
     SubscriptionExpiredHandler,
+    GetUserNotificationsQuery,
+    GetUserNotificationsHandler,
     GetPaymentsHandler,
     GetPaymentsQuery,
     {

@@ -7,5 +7,6 @@ export const HttpBusinessPath = {
   SubscriptionsExpired: 'business/subscriptions/expired',
   SubscriptionsUpdated: 'business/subscriptions/updated',
   PostPaypalSse: 'business/subscriptions/sse',
+  GetNotifications: 'business/notifications',
   Payments: 'business/payments',
 };

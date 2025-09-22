@@ -1,4 +1,6 @@
+import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
 import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
+import { EnvironmentMode } from '../../../../apps/business/src/settings/configuration';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
 import { REDIS_CLIENT } from '../redis/redis-client.factory';
@@ -6,7 +8,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import Redis from 'ioredis';
-import { EnvironmentMode } from 'apps/business/src/settings/configuration';
 
 @Injectable()
 export class NotificationsService implements INotificationsService {
@@ -37,15 +38,18 @@ export class NotificationsService implements INotificationsService {
     return result;
   }
 
-  async getUserNotifications(userId: string): Promise<INotification[]> {
+  async getUserNotifications(
+    userId: string,
+  ): Promise<NotificationResponseDto[]> {
     let notificationsArray = [];
+    const match = `${
+      process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      process.env.NODE_ENV !== EnvironmentMode.TESTING
+        ? ''
+        : 'dev:'
+    }notifications:user:${userId}:notification:*`;
     const stream = this.redisClient.scanStream({
-      match: `${
-        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT ||
-        process.env.NODE_ENV !== EnvironmentMode.TESTING
-          ? ''
-          : 'dev:'
-      }notifications:user:${userId}:notification:*`,
+      match: match,
     });
     const promise = new Promise((res, rej) => {
       stream.on('data', async (keys) => {
@@ -150,7 +154,7 @@ export class NotificationsService implements INotificationsService {
               : null,
       );
       console.log('Search results:', results);
-      //   return results;
+      return results;
     } catch (error) {
       console.error('Error searching data:', error);
     }

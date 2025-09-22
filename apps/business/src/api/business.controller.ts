@@ -1,28 +1,28 @@
 import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { GetCurrentSubscriptionsQuery } from '../application/query/get-current-subscriptions-query.handler';
-import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { ActivateSubscriptionCommand } from '../application/command/activate-subscription-command.handler';
 import { SubscriptionUpdatedCommand } from '../application/command/subscription-updated.handler';
+import { SuspendSubscriptionCommand } from '../application/command/suspend-subscription.handler';
 import { SubscriptionExpiredCommand } from '../application/command/subscription-expired.handler';
+import { GetUserNotificationsQuery } from '../application/query/get-user-notifications.handler';
+import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
+import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
+import { GetPaymentsQuery } from '../application/query/get-payments.handler';
+import { SubscribeCommand } from '../application/command/subscribe.handler';
+import { Subscription } from '../infrastructure/entity/subscription.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { fromEvent, map, Observable } from 'rxjs';
 import {
   Body,
   Controller,
   Get,
   HttpCode,
-  HttpStatus,
   Param,
   Patch,
   Post,
   Sse,
 } from '@nestjs/common';
-import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
-import { SubscribeCommand } from '../application/command/subscribe.handler';
-import { SaveSubscriptionCommand } from '../application/command/save-subscribtion.handler';
-import { Subscription } from '../infrastructure/entity/subscription.entity';
-import { GetPaymentsQuery } from '../application/query/get-payments.handler';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { fromEvent, map, Observable } from 'rxjs';
 import {
   IPagination,
   PaginationParams,
@@ -35,6 +35,7 @@ import {
   FilteringParams,
   IFiltering,
 } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
+import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
 
 @Controller()
 export class BusinessController {
@@ -63,8 +64,8 @@ export class BusinessController {
   async subscriptionUpdatedEvent(
     @Body() body: { subscriptionId: string; expiresAt: Date },
   ) {
-    console.log('business/subscriptions/updated');
     const { subscriptionId } = body;
+    console.log('business/subscriptions/updated', subscriptionId);
     return await this.commandBus.execute(
       new SubscriptionUpdatedCommand(subscriptionId),
     );
@@ -74,7 +75,7 @@ export class BusinessController {
   async subscriptionExpiredEvent(
     @Body('subscriptionId') subscriptionId: string,
   ): Promise<void> {
-    console.log('business/subscriptions/expired');
+    console.log('business/subscriptions/expired', subscriptionId);
     return await this.commandBus.execute(
       new SubscriptionExpiredCommand(subscriptionId),
     );
@@ -127,5 +128,12 @@ export class BusinessController {
     return await this.queryBus.execute(
       new GetPaymentsQuery(pagination, sorting, filtering),
     );
+  }
+
+  @Get('business/notifications/:id')
+  async getUserNotifications(
+    @Param('id') id: string,
+  ): Promise<NotificationResponseDto[]> {
+    return await this.queryBus.execute(new GetUserNotificationsQuery(id));
   }
 }

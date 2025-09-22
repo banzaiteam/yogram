@@ -10,20 +10,6 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
-import { User } from '../auth/decorators/user.decorator';
-import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
-import { SubscribeSwagger } from '../../../../apps/business/src/decorators/swagger/subscribe-swagger.decorator';
-import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
-import { BusinessService } from './business.service';
-import { GetSubscriptionsSwagger } from './decorators/swagger/get-subscriptions-swagger.decorator';
-import { SuspendSubscriptionSwagger } from './decorators/swagger/suspend-subscription-swagger.decorator';
-import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subscription-swagger.decorator';
-import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
-import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
-import { GetPaymentsSwagger } from './decorators/swagger/get-payments-swagger.decorator';
-import { plainToInstance } from 'class-transformer';
-import { Request, Response } from 'express';
 import {
   IPagination,
   PaginationParams,
@@ -32,11 +18,27 @@ import {
   ISorting,
   SortingParams,
 } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
-import { SubscriptionSseSwagger } from './decorators/swagger/subscription-sse-swagger.decorator';
+import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { PaypalEvents } from '../../../../apps/business/src/payment/payment-services/paypal/constants/paypal-events.enum';
+import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
+import { SubscribeSwagger } from '../../../../apps/business/src/decorators/swagger/subscribe-swagger.decorator';
+import { GetUserNotificationsSwagger } from './decorators/swagger/get-user-notifications-swagger.decorator';
+import { ActivateSubscriptionSwagger } from './decorators/swagger/activate-subscription-swagger.decorator';
+import { SuspendSubscriptionSwagger } from './decorators/swagger/suspend-subscription-swagger.decorator';
+import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
 import { SubscriptionsSse } from '../../../../apps/libs/Business/dto/response/subscriptions-sse.dto';
+import { GetSubscriptionsSwagger } from './decorators/swagger/get-subscriptions-swagger.decorator';
+import { SubscriptionSseSwagger } from './decorators/swagger/subscription-sse-swagger.decorator';
+import { GetPaymentsSwagger } from './decorators/swagger/get-payments-swagger.decorator';
+import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
+import { Public } from '../../../../apps/gate/common/decorators/public.decorator';
+import { SubscribeDto } from '../../../libs/Business/dto/input/subscribe.dto';
+import { User } from '../auth/decorators/user.decorator';
+import { BusinessService } from './business.service';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
+import { Request, Response } from 'express';
 import axios from 'axios';
 
 @Controller('business')
@@ -206,5 +208,13 @@ export class BusinessController {
     @User('id') id: string,
   ): Promise<Subscription[]> {
     return await this.businessService.getCurrentSubscriptions(id);
+  }
+
+  @GetUserNotificationsSwagger()
+  @Get('notifications')
+  async getUserNotifications(
+    @User('id') userId: string,
+  ): Promise<NotificationResponseDto[]> {
+    return await this.businessService.getUserNotifications(userId);
   }
 }
