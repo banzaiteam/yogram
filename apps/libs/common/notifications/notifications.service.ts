@@ -1,5 +1,6 @@
 import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
 import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
+import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { EnvironmentMode } from '../../../../apps/business/src/settings/configuration';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
@@ -73,11 +74,15 @@ export class NotificationsService implements INotificationsService {
     this.connectedClients.set(socket.data.user, socket);
   }
 
-  async send(notification: INotification, delay: number): Promise<void> {
+  async send(
+    notification: INotification,
+    event: WebsocketEvents,
+    delay: number,
+  ): Promise<void> {
     const socket = this.connectedClients.get(notification.userId);
     if (socket) {
       setTimeout(() => {
-        socket.emit('subscription.active', notification.message);
+        socket.emit(event, notification.message);
       }, delay);
     }
   }

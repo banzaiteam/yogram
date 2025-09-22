@@ -3,6 +3,7 @@ import { NotificationsGateway } from '../../../../../apps/libs/common/notificati
 import { Subscription } from '../../infrastructure/entity/subscription.entity';
 import { getNotificationKey } from '../../helper/get-notification-key.helper';
 import { BusinessCommandService } from '../../business-command.service';
+import { WebsocketEvents } from '../../constants/websocket.event.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 export class SaveSubscriptionCommand {
@@ -36,7 +37,11 @@ export class SaveSubscriptionHandler
 
     const key = getNotificationKey(subscription, notification);
     await this.notificationGateway.saveNotification(key, notification);
-    await this.notificationGateway.send(notification, 30000);
+    await this.notificationGateway.send(
+      notification,
+      WebsocketEvents.SubscriptionActive,
+      30000,
+    );
     return subscription;
   }
 }

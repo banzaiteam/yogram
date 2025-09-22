@@ -1,4 +1,5 @@
 import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
+import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
@@ -40,8 +41,12 @@ export class NotificationsGateway implements INotificationsService {
     return await this.notificationsService.getUserNotifications(userId);
   }
 
-  async send(notification: INotification, delay: number): Promise<void> {
-    return await this.notificationsService.send(notification, delay);
+  async send(
+    notification: INotification,
+    event: WebsocketEvents,
+    delay: number,
+  ): Promise<void> {
+    return await this.notificationsService.send(notification, event, delay);
   }
 
   async createIndex() {
