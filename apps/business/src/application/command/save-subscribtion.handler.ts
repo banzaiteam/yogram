@@ -1,11 +1,11 @@
 import { INotification } from '../../../../../apps/libs/common/notifications/interfaces/notification.interface';
 import { NotificationsGateway } from '../../../../../apps/libs/common/notifications/notifications.gateway';
-import { NotificationRedisKeys } from '../../payment/redis/notfication-redis-keys.enum';
 import { Subscription } from '../../infrastructure/entity/subscription.entity';
+import { getNotificationKey } from '../../helper/get-notification-key.helper';
 import { BusinessCommandService } from '../../business-command.service';
+import { WebsocketEvents } from '../../constants/websocket.event.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
-
 export class SaveSubscriptionCommand {
   constructor(public readonly id: string) {}
 }
@@ -31,12 +31,17 @@ export class SaveSubscriptionHandler
       message: `Your subscription is activated and expires by ${subscription.expiresAt}`,
       readAt: null,
       userId: subscription.userId,
-      expiresAt: subscription.expiresAt,
-      createdAt: subscription.createdAt,
+      expiresAt: new Date(subscription.expiresAt).getTime(),
+      createdAt: new Date(subscription.createdAt).getTime(),
     };
 
-    const key = `user:${subscription.userId}:notification:${notification.id}`;
+    const key = getNotificationKey(subscription, notification);
     await this.notificationGateway.saveNotification(key, notification);
+    await this.notificationGateway.send(
+      notification,
+      WebsocketEvents.SubscriptionActive,
+      30000,
+    );
     return subscription;
   }
 }

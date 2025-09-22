@@ -52,6 +52,26 @@ spec:
                 secretKeyRef:
                   name: business-production-config-secret
                   key: USERS_SERVICE_URL
+            - name: REDIS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: business-production-config-secret
+                  key: REDIS_USER
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: business-production-config-secret
+                  key: REDIS_PASSWORD
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: business-production-config-secret
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: business-production-config-secret
+                  key: REDIS_PORT
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:

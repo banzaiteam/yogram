@@ -1,27 +1,24 @@
-import { NotificationRedisKeys } from '../../../../apps/business/src/payment/redis/notfication-redis-keys.enum';
+import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
+import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
+import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
+import { EnvironmentMode } from '../../../../apps/business/src/settings/configuration';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
-import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { REDIS_CLIENT } from '../redis/redis-client.factory';
 import { Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import Redis from 'ioredis';
-import { v4 } from 'uuid';
 
 @Injectable()
 export class NotificationsService implements INotificationsService {
   private connectedClients: Map<string, Socket> = new Map();
   private MONTH = 2629746000;
 
-  constructor(
-    private readonly jwtService: JwtService,
-    @Inject(REDIS_CLIENT) private readonly redisClient: Redis,
-  ) {}
+  constructor(@Inject(REDIS_CLIENT) private readonly redisClient: Redis) {}
 
   afterInit(server: any) {
-    const authMiddleware = socketAuthMiddleware(this.jwtService);
-    server.use(authMiddleware);
+    this.redisClient.call('');
   }
 
   handleDisconnect(socket: Socket) {
@@ -42,10 +39,18 @@ export class NotificationsService implements INotificationsService {
     return result;
   }
 
-  async getUserNotifications(userId: string) {
+  async getUserNotifications(
+    userId: string,
+  ): Promise<NotificationResponseDto[]> {
     let notificationsArray = [];
+    const match = `${
+      process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      process.env.NODE_ENV !== EnvironmentMode.TESTING
+        ? ''
+        : 'dev:'
+    }notifications:user:${userId}:notification:*`;
     const stream = this.redisClient.scanStream({
-      match: `user:${userId}:notification:*`,
+      match: match,
     });
     const promise = new Promise((res, rej) => {
       stream.on('data', async (keys) => {
@@ -69,7 +74,94 @@ export class NotificationsService implements INotificationsService {
     this.connectedClients.set(socket.data.user, socket);
   }
 
-  async send(notification: INotification, delay: number): Promise<void> {
-    return;
+  async send(
+    notification: INotification,
+    event: WebsocketEvents,
+    delay: number,
+  ): Promise<void> {
+    const socket = this.connectedClients.get(notification.userId);
+    if (socket) {
+      setTimeout(() => {
+        socket.emit(event, notification.message);
+      }, delay);
+    }
+  }
+
+  async createIndex() {
+    try {
+      console.log(await this.redisClient.call('FT._LIST'));
+      //   await this.redisClient.call('FT.DROPINDEX', 'dev:notifications:Idx');
+      console.log('nodeenv', process.env.NODE_ENV);
+
+      //   await this.redisClient.call(
+      //     'FT.CREATE',
+      //     process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      //       process.env.NODE_ENV !== EnvironmentMode.TESTING
+      //       ? 'notifications:Idx'
+      //       : 'dev:notifications:Idx',
+      //     'ON',
+      //     'HASH',
+      //     'PREFIX',
+      //     '1',
+      //     process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      //       process.env.NODE_ENV !== EnvironmentMode.TESTING
+      //       ? 'notifications'
+      //       : 'dev:notifications',
+      //     'SCHEMA',
+      //     'subscriptionId',
+      //     'TAG',
+      //     'userId',
+      //     'TAG',
+      //     'expiresAt',
+      //     'NUMERIC',
+      //     'SORTABLE',
+      //   );
+      console.log('Index created successfully.');
+    } catch (err) {
+      console.error('Error creating index:', err.message);
+      throw new WsException(err);
+    }
+  }
+  // todo return expiresAt - now === 7
+  // todo when renew subscription(update) create new notification with the same subscriptionId
+  async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
+    try {
+      console.log(await this.redisClient.call('FT._LIST'));
+      const todayTimestamp = new Date().getTime();
+      console.log(
+        '🚀 ~ NotificationsService ~ getExpiresInNotifications ~ todayTimestamp:',
+        todayTimestamp,
+      );
+      const results = await this.redisClient.call(
+        'FT.AGGREGATE',
+        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+          process.env.NODE_ENV !== EnvironmentMode.TESTING
+          ? 'notifications:Idx'
+          : 'dev:notifications:Idx',
+        '*',
+        'LOAD',
+        '4',
+        '@expiresAt',
+        '@message',
+        '@subscriptionId',
+        'userId',
+        'APPLY',
+        `(@expiresAt - ${todayTimestamp})`,
+        'AS',
+        'differ', // Search query
+        'FILTER',
+        expiresInDuration === ExpiresInDuration.Day
+          ? `@differ > 0 && @differ < ${expiresInDuration}`
+          : expiresInDuration === ExpiresInDuration.Week
+            ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
+            : expiresInDuration === ExpiresInDuration.Month
+              ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
+              : null,
+      );
+      console.log('Search results:', results);
+      return results;
+    } catch (error) {
+      console.error('Error searching data:', error);
+    }
   }
 }

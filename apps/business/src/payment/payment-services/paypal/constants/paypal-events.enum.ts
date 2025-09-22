@@ -4,4 +4,5 @@ export enum PaypalEvents {
   BillingSubscriptionExpired = 'BILLING.SUBSCRIPTION.EXPIRED',
   BillingSubscriptionUpdated = 'BILLING.SUBSCRIPTION.UPDATED',
   BillingSubscriptionPaymentFailed = 'BILLING.SUBSCRIPTION.PAYMENT.FAILED',
+  PaymentSaleCompleted = 'PAYMENT.SALE.COMPLETED',
 }

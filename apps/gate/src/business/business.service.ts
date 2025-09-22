@@ -1,13 +1,14 @@
 import { PaymentsPaginatedResponseDto } from '../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
-import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
+import { INotification } from '../../../../apps/libs/common/notifications/interfaces/notification.interface';
+import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
+import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
+import { SubscriptionsSse } from '../../../../apps/libs/Business/dto/response/subscriptions-sse.dto';
+import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
 import { HttpBusinessPath } from '../../../../apps/libs/Business/constants/path.constant';
+import { HttpServices } from '../../../../apps/gate/common/constants/http-services.enum';
 import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
 import { SubscribeDto } from '../../../../apps/libs/Business/dto/input/subscribe.dto';
 import { GateService } from '../../../../apps/libs/gateService';
-import { Subscription } from '../../../../apps/business/src/infrastructure/entity/subscription.entity';
-import { IPagination } from '../../../../apps/libs/common/pagination/decorators/pagination.decorator';
-import { ISorting } from '../../../../apps/libs/common/pagination/decorators/sorting.decorator';
-import { SubscriptionsSse } from '../../../../apps/libs/Business/dto/response/subscriptions-sse.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -58,11 +59,7 @@ export class BusinessService {
     );
   }
 
-  async subscriptioUpdatedEvent(
-    subscriptionId: any,
-    payment: PaymentType,
-    expiresAt: Date,
-  ) {
+  async subscriptioUpdatedEvent(subscriptionId: any, payment: PaymentType) {
     const path = [
       HttpBusinessPath.SubscriptionsUpdated,
       `payment=${payment}`,
@@ -70,7 +67,7 @@ export class BusinessService {
     return await this.gateService.requestHttpServicePost(
       HttpServices.Business,
       path,
-      { subscriptionId, expiresAt },
+      { subscriptionId },
       {},
     );
   }
@@ -142,6 +139,15 @@ export class BusinessService {
       filter,
     ].join('&');
     const path = [HttpBusinessPath.Payments, query].join('?');
+    return await this.gateService.requestHttpServiceGet(
+      HttpServices.Business,
+      path,
+      {},
+    );
+  }
+
+  async getUserNotifications(userId: string): Promise<INotification[]> {
+    const path = [HttpBusinessPath.GetNotifications, userId].join('/');
     return await this.gateService.requestHttpServiceGet(
       HttpServices.Business,
       path,

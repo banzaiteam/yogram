@@ -1,9 +1,9 @@
 import { PaymentsPaginatedResponseDto } from '../../../../../apps/libs/Business/dto/response/payments-paginated-response.dto';
 import { IPagination } from '../../../../../apps/libs/common/pagination/decorators/pagination.decorator';
-import { ISorting } from '../../../../../apps/libs/common/pagination/decorators/sorting.decorator';
 import { IFiltering } from '../../../../../apps/libs/common/pagination/decorators/filtering.decorator';
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { ISorting } from '../../../../../apps/libs/common/pagination/decorators/sorting.decorator';
 import { BusinessQueryService } from '../../business-query.service';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 export class GetPaymentsQuery {
   constructor(
