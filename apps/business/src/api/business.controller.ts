@@ -36,6 +36,8 @@ import {
   IFiltering,
 } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
+import { ReadNotificationCommand } from '../application/command/read-notification.command';
+import { ReadNotificationDto } from 'apps/libs/Business/dto/input/read-notification.dto';
 
 @Controller()
 export class BusinessController {
@@ -135,5 +137,14 @@ export class BusinessController {
     @Param('id') id: string,
   ): Promise<NotificationResponseDto[]> {
     return await this.queryBus.execute(new GetUserNotificationsQuery(id));
+  }
+
+  @Patch('business/notifications/read')
+  async readNotification(
+    @Body() { notificationId }: ReadNotificationDto,
+  ): Promise<void> {
+    return await this.commandBus.execute(
+      new ReadNotificationCommand(notificationId),
+    );
   }
 }

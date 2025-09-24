@@ -1,7 +1,7 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BusinessCommandService } from '../../business-command.service';
 import { SubscriptionStatus } from '../../payment/payment-services/paypal/constants/subscription-status.enum';
 import { Subscription } from '../../infrastructure/entity/subscription.entity';
+import { BusinessCommandService } from '../../business-command.service';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class SubscriptionExpiredCommand {
   constructor(public readonly subscriptionId: string) {}

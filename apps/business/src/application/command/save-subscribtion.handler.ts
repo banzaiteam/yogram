@@ -36,7 +36,11 @@ export class SaveSubscriptionHandler
     };
 
     const key = getNotificationKey(subscription, notification);
-    await this.notificationGateway.saveNotification(key, notification);
+    await this.notificationGateway.saveNotification(
+      key,
+      notification,
+      2629746000,
+    );
     await this.notificationGateway.send(
       notification,
       WebsocketEvents.SubscriptionActive,

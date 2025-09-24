@@ -56,6 +56,10 @@ import {
   GetUserNotificationsHandler,
   GetUserNotificationsQuery,
 } from './application/query/get-user-notifications.handler';
+import {
+  ReadNotificationCommand,
+  ReadNotificationHandler,
+} from './application/command/read-notification.command';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -135,6 +139,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     SubscriptionExpiredCommand,
     SubscriptionExpiredHandler,
     GetUserNotificationsQuery,
+    ReadNotificationHandler,
+    ReadNotificationCommand,
     GetUserNotificationsHandler,
     GetPaymentsHandler,
     GetPaymentsQuery,

@@ -15,6 +15,7 @@ import { SubscriptionStatus } from './payment/payment-services/paypal/constants/
 import { DataSource, EntityManager } from 'typeorm';
 import { BusinessQueryService } from './business-query.service';
 import { SubscriptionUpdateDto } from './dto/subscription-update.dto';
+import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
 
 @Injectable()
 export class BusinessCommandService {
@@ -25,6 +26,7 @@ export class BusinessCommandService {
     >,
     private readonly paymentService: IPaymentService,
     private readonly businessQueryService: BusinessQueryService,
+    private readonly notificationGateway: NotificationsGateway,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -283,5 +285,9 @@ export class BusinessCommandService {
       );
     subscription.status = status;
     return await this.businessCommandRepository.saveSubscription(subscription);
+  }
+
+  async updateNotification(notificationId: string) {
+    return await this.notificationGateway.updateNotification(notificationId);
   }
 }
