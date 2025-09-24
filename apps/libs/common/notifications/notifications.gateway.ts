@@ -31,8 +31,16 @@ export class NotificationsGateway implements INotificationsService {
     this.notificationsService.createIndex();
   }
 
-  async saveNotification(key: string, notification: INotification) {
-    return await this.notificationsService.saveNotification(key, notification);
+  async saveNotification(
+    key: string,
+    notification: INotification,
+    ttl?: number,
+  ) {
+    return await this.notificationsService.saveNotification(
+      key,
+      notification,
+      ttl,
+    );
   }
 
   async getUserNotifications(
@@ -55,5 +63,9 @@ export class NotificationsGateway implements INotificationsService {
 
   async getUserNotifications2(userId: string) {
     return await this.notificationsService.getExpiresInNotifications(86400000);
+  }
+
+  async updateNotification(notificationId: string) {
+    return await this.notificationsService.updateNotification(notificationId);
   }
 }

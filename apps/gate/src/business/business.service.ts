@@ -154,4 +154,13 @@ export class BusinessService {
       {},
     );
   }
+
+  async readNotification(notificationId: string): Promise<void> {
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Business,
+      HttpBusinessPath.ReadNotification,
+      { notificationId },
+      {},
+    );
+  }
 }

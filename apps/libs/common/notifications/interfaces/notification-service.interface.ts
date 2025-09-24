@@ -16,6 +16,11 @@ export interface INotificationsService
     event: WebsocketEvents,
     delay: number,
   ): Promise<void>;
-  saveNotification(key: string, notification: INotification): Promise<number>;
+  saveNotification(
+    key: string,
+    notification: INotification,
+    ttl?: number,
+  ): Promise<number>;
   getUserNotifications(userId: string): Promise<INotification[]>;
+  updateNotification(notificationId: string): Promise<void>;
 }

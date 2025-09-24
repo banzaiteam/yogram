@@ -5,7 +5,12 @@ import { EnvironmentMode } from '../../../../apps/business/src/settings/configur
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
 import { REDIS_CLIENT } from '../redis/redis-client.factory';
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import Redis from 'ioredis';
@@ -13,7 +18,6 @@ import Redis from 'ioredis';
 @Injectable()
 export class NotificationsService implements INotificationsService {
   private connectedClients: Map<string, Socket> = new Map();
-  private MONTH = 2629746000;
 
   constructor(@Inject(REDIS_CLIENT) private readonly redisClient: Redis) {}
 
@@ -33,9 +37,10 @@ export class NotificationsService implements INotificationsService {
   async saveNotification(
     key: string,
     notification: INotification,
+    ttl?: number,
   ): Promise<number> {
     const result = await this.redisClient.hset(key, notification);
-    await this.redisClient.expire(key, this.MONTH);
+    ttl ? await this.redisClient.expire(key, ttl) : null;
     return result;
   }
 
@@ -90,32 +95,34 @@ export class NotificationsService implements INotificationsService {
   async createIndex() {
     try {
       console.log(await this.redisClient.call('FT._LIST'));
-      //   await this.redisClient.call('FT.DROPINDEX', 'dev:notifications:Idx');
+      await this.redisClient.call('FT.DROPINDEX', 'dev:notifications:Idx');
       console.log('nodeenv', process.env.NODE_ENV);
 
-      //   await this.redisClient.call(
-      //     'FT.CREATE',
-      //     process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
-      //       process.env.NODE_ENV !== EnvironmentMode.TESTING
-      //       ? 'notifications:Idx'
-      //       : 'dev:notifications:Idx',
-      //     'ON',
-      //     'HASH',
-      //     'PREFIX',
-      //     '1',
-      //     process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
-      //       process.env.NODE_ENV !== EnvironmentMode.TESTING
-      //       ? 'notifications'
-      //       : 'dev:notifications',
-      //     'SCHEMA',
-      //     'subscriptionId',
-      //     'TAG',
-      //     'userId',
-      //     'TAG',
-      //     'expiresAt',
-      //     'NUMERIC',
-      //     'SORTABLE',
-      //   );
+      await this.redisClient.call(
+        'FT.CREATE',
+        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+          process.env.NODE_ENV !== EnvironmentMode.TESTING
+          ? 'notifications:Idx'
+          : 'dev:notifications:Idx',
+        'ON',
+        'HASH',
+        'PREFIX',
+        '1',
+        process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+          process.env.NODE_ENV !== EnvironmentMode.TESTING
+          ? 'notifications'
+          : 'dev:notifications',
+        'SCHEMA',
+        'subscriptionId',
+        'TAG',
+        'id',
+        'TAG',
+        'userId',
+        'TAG',
+        'expiresAt',
+        'NUMERIC',
+        'SORTABLE',
+      );
       console.log('Index created successfully.');
     } catch (err) {
       console.error('Error creating index:', err.message);
@@ -163,5 +170,34 @@ export class NotificationsService implements INotificationsService {
     } catch (error) {
       console.error('Error searching data:', error);
     }
+  }
+
+  async getNotificationById(notificationId: string): Promise<any> {
+    const index =
+      process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
+      process.env.NODE_ENV !== EnvironmentMode.TESTING
+        ? 'notifications:Idx'
+        : 'dev:notifications:Idx';
+    notificationId = notificationId.replaceAll('-', '\\-');
+    const notification = await this.redisClient.call(
+      'FT.SEARCH',
+      index,
+      `@id:{${notificationId}}`,
+    );
+    if (!notification)
+      throw new NotFoundException(
+        'NotificationsService error: notification not found',
+      );
+    if (notification[2][7] !== '')
+      throw new ConflictException(
+        'NotificationsService error: notification has already been read',
+      );
+    return notification;
+  }
+
+  async updateNotification(notificationId: string): Promise<void> {
+    const notification = await this.getNotificationById(notificationId);
+    const readedAt = new Date().getTime();
+    await this.redisClient.hset(notification[1], 'readAt', readedAt);
   }
 }

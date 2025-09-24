@@ -40,6 +40,8 @@ import { plainToInstance } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import axios from 'axios';
+import { ReadNotificationDto } from 'apps/libs/Business/dto/input/read-notification.dto';
+import { ReadNotificationSwagger } from './decorators/swagger/read-notification.swagger.decorator';
 
 @Controller('business')
 export class BusinessController {
@@ -216,5 +218,13 @@ export class BusinessController {
     @User('id') userId: string,
   ): Promise<NotificationResponseDto[]> {
     return await this.businessService.getUserNotifications(userId);
+  }
+
+  @ReadNotificationSwagger()
+  @Patch('notifications/read')
+  async readNotification(
+    @Body() { notificationId }: ReadNotificationDto,
+  ): Promise<void> {
+    return await this.businessService.readNotification(notificationId);
   }
 }

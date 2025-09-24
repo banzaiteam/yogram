@@ -9,4 +9,5 @@ export const HttpBusinessPath = {
   PostPaypalSse: 'business/subscriptions/sse',
   GetNotifications: 'business/notifications',
   Payments: 'business/payments',
+  ReadNotification: 'business/notifications/read',
 };
