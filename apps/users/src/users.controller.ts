@@ -269,6 +269,10 @@ export class UsersController {
   ): Promise<void> {
     const criteria = { id: req.headers.id.toString() };
     const updateUserDto = JSON.parse(payload['updateUserDto']);
+    console.log(
+      '🚀 ~ UsersController ~ update ~ updateUserDto:',
+      updateUserDto,
+    );
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
     );
