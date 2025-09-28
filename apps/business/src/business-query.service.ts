@@ -7,9 +7,16 @@ import { ISorting } from '../../../apps/libs/common/pagination/decorators/sortin
 import { IPaymentService } from './payment/interfaces/payment-service.interface';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { Payment } from './infrastructure/entity/payment.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  OnApplicationBootstrap,
+  OnModuleInit,
+} from '@nestjs/common';
 import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
 import { EntityManager } from 'typeorm';
+import { ExpiresInDuration } from './constants/expires-in-duration.enum';
+import { NotificationsProducer } from './notifications-producer.service';
 
 @Injectable()
 export class BusinessQueryService {
@@ -20,6 +27,7 @@ export class BusinessQueryService {
     >,
     private readonly paymentService: IPaymentService,
     private readonly notificationGateway: NotificationsGateway,
+    private readonly notificationsProducer: NotificationsProducer,
   ) {}
 
   async getPaymentServiceSubscription(id: string) {
@@ -104,11 +112,6 @@ export class BusinessQueryService {
         return subscription;
       }
     });
-    const result = await this.notificationGateway.getUserNotifications2(id);
-    console.log(
-      '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ result:',
-      result,
-    );
     return currentSubscriptions;
   }
 
@@ -122,5 +125,9 @@ export class BusinessQueryService {
       sorting,
       filtering,
     );
+  }
+
+  async getExpiresInNotifications(expiresIn: ExpiresInDuration): Promise<any> {
+    return await this.notificationGateway.getExpiresInNotifications(expiresIn);
   }
 }

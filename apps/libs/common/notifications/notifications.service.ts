@@ -133,12 +133,14 @@ export class NotificationsService implements INotificationsService {
   // todo when renew subscription(update) create new notification with the same subscriptionId
   async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
     try {
-      console.log(await this.redisClient.call('FT._LIST'));
+      // console.log(await this.redisClient.call('FT._LIST'));
       const todayTimestamp = new Date().getTime();
       console.log(
         '🚀 ~ NotificationsService ~ getExpiresInNotifications ~ todayTimestamp:',
         todayTimestamp,
       );
+      console.log('true?', 201202206 < 86400000 * 3);
+
       const results = await this.redisClient.call(
         'FT.AGGREGATE',
         process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
@@ -158,7 +160,7 @@ export class NotificationsService implements INotificationsService {
         'differ', // Search query
         'FILTER',
         expiresInDuration === ExpiresInDuration.Day
-          ? `@differ > 0 && @differ < ${expiresInDuration}`
+          ? `@differ > 0 && @differ < ${expiresInDuration + 86400 * 1000 * 3}`
           : expiresInDuration === ExpiresInDuration.Week
             ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
             : expiresInDuration === ExpiresInDuration.Month

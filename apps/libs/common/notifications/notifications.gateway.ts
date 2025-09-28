@@ -7,6 +7,7 @@ import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { NotificationsService } from './notifications.service';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
+import { ExpiresInDuration } from 'apps/business/src/constants/expires-in-duration.enum';
 
 @WebSocketGateway()
 export class NotificationsGateway implements INotificationsService {
@@ -61,8 +62,8 @@ export class NotificationsGateway implements INotificationsService {
     return await this.notificationsService.createIndex();
   }
 
-  async getUserNotifications2(userId: string) {
-    return await this.notificationsService.getExpiresInNotifications(86400000);
+  async getExpiresInNotifications(expiresIn: ExpiresInDuration) {
+    return await this.notificationsService.getExpiresInNotifications(expiresIn);
   }
 
   async updateNotification(notificationId: string) {
