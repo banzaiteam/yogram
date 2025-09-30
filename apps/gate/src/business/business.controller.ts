@@ -40,7 +40,7 @@ import { plainToInstance } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { ReadNotificationDto } from 'apps/libs/Business/dto/input/read-notification.dto';
+import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 import { ReadNotificationSwagger } from './decorators/swagger/read-notification.swagger.decorator';
 
 @Controller('business')
