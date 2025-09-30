@@ -14,6 +14,8 @@ export class ResponseLoginDto {
   @Expose()
   firstname?: string;
   @Expose()
+  url: string;
+  @Expose()
   lastname?: string;
   @Expose()
   birthdate?: Date;

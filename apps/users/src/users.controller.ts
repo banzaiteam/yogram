@@ -225,9 +225,7 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
-                ? 'apps/users/src/uploads/avatars'
-                : '/home/node/dist/users/src/uploads/avatars',
+              '/home/node/dist/users/src/uploads/avatars',
               req,
             ),
           );
@@ -267,15 +265,14 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ update ~ file:', file);
     const criteria = { id: req.headers.id.toString() };
     const updateUserDto = JSON.parse(payload['updateUserDto']);
-    console.log(
-      '🚀 ~ UsersController ~ update ~ updateUserDto:',
-      updateUserDto,
-    );
     return await this.commandBus.execute(
-      new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
+      new UpdateUserByCriteriaCommand(
+        criteria,
+        updateUserDto,
+        file !== null ? file[0] : null,
+      ),
     );
   }
 

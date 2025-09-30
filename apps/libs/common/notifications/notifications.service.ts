@@ -131,8 +131,6 @@ export class NotificationsService implements INotificationsService {
   async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
     try {
       const todayTimestamp = new Date().getTime();
-      console.log('todayTimestamp:', todayTimestamp);
-
       const results = await this.redisClient.call(
         'FT.AGGREGATE',
         process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
