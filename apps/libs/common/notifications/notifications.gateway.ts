@@ -1,4 +1,5 @@
 import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
+import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -28,7 +29,6 @@ export class NotificationsGateway implements INotificationsService {
 
   handleConnection(socket: Socket) {
     this.notificationsService.handleConnection(socket);
-    this.notificationsService.createIndex();
   }
 
   async saveNotification(
@@ -61,8 +61,8 @@ export class NotificationsGateway implements INotificationsService {
     return await this.notificationsService.createIndex();
   }
 
-  async getUserNotifications2(userId: string) {
-    return await this.notificationsService.getExpiresInNotifications(86400000);
+  async getExpiresInNotifications(expiresIn: ExpiresInDuration) {
+    return await this.notificationsService.getExpiresInNotifications(expiresIn);
   }
 
   async updateNotification(notificationId: string) {

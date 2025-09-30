@@ -60,6 +60,9 @@ import {
   ReadNotificationCommand,
   ReadNotificationHandler,
 } from './application/command/read-notification.command';
+import { BullModule } from '@nestjs/bullmq';
+import { NotificationsProducer } from './notifications-producer.service';
+import { NotificationConsumer } from './notifications-consumer.service';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -68,11 +71,27 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
   }
   return defaultEnvFilePath;
 };
-
+export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
 @Module({
   imports: [
     RequestContextModule,
     NotificationsModule.register(),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          username: configService.get('REDIS_USER'),
+          port: configService.get('REDIS_PORT'),
+          host: configService.get('REDIS_HOST'),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+      }),
+    }),
+    BullModule.registerQueue({
+      name: 'NOTIFICATION_SCHEDULER',
+      prefix: 'scheduler:',
+    }),
     CqrsModule,
     PaymentModule,
     ConfigModule.forRoot({
@@ -144,6 +163,8 @@ const getEnvFilePath = (env: EnvironmentsTypes) => {
     GetUserNotificationsHandler,
     GetPaymentsHandler,
     GetPaymentsQuery,
+    NotificationsProducer,
+    NotificationConsumer,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,

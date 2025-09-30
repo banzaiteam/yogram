@@ -40,7 +40,7 @@ import { plainToInstance } from 'class-transformer';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { ReadNotificationDto } from 'apps/libs/Business/dto/input/read-notification.dto';
+import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 import { ReadNotificationSwagger } from './decorators/swagger/read-notification.swagger.decorator';
 
 @Controller('business')
@@ -136,18 +136,21 @@ export class BusinessController {
   }
 
   @Public()
+  @HttpCode(200)
   @ApiExcludeEndpoint()
   @Post('subscriptions/expired')
   async subscriptionExpiredEvent(
     @Body() body: any,
     @Query('payment') payment: PaymentType,
+    @Res() res: Response,
   ): Promise<void> {
     if (body.event_type === PaypalEvents.BillingSubscriptionExpired) {
       const subscriptionId = body.resource.id;
-      return await this.businessService.subscriptioExpiredEvent(
+      await this.businessService.subscriptioExpiredEvent(
         subscriptionId,
         payment,
       );
+      res.sendStatus(200);
     }
   }
 
@@ -158,13 +161,15 @@ export class BusinessController {
   async subscriptionUpdatedEvent(
     @Body() body: any,
     @Query('payment') payment: PaymentType,
+    @Res() res: Response,
   ): Promise<void> {
     if (body.event_type === PaypalEvents.PaymentSaleCompleted) {
       const subscriptionId = body.resource.id;
-      return await this.businessService.subscriptioUpdatedEvent(
+      await this.businessService.subscriptioUpdatedEvent(
         subscriptionId,
         payment,
       );
+      res.sendStatus(200);
     }
   }
 

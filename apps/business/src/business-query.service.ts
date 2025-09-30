@@ -7,9 +7,16 @@ import { ISorting } from '../../../apps/libs/common/pagination/decorators/sortin
 import { IPaymentService } from './payment/interfaces/payment-service.interface';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { Payment } from './infrastructure/entity/payment.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  OnApplicationBootstrap,
+  OnModuleInit,
+} from '@nestjs/common';
 import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
 import { EntityManager } from 'typeorm';
+import { ExpiresInDuration } from './constants/expires-in-duration.enum';
+import { NotificationsProducer } from './notifications-producer.service';
 
 @Injectable()
 export class BusinessQueryService {
@@ -20,6 +27,7 @@ export class BusinessQueryService {
     >,
     private readonly paymentService: IPaymentService,
     private readonly notificationGateway: NotificationsGateway,
+    private readonly notificationsProducer: NotificationsProducer,
   ) {}
 
   async getPaymentServiceSubscription(id: string) {
@@ -67,31 +75,6 @@ export class BusinessQueryService {
         id,
         entityManager,
       );
-    // console.log(
-    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ subscriptions:',
-    //   subscriptions,
-    // );
-    const ppSub = await this.paymentService.getSubscription('I-WSF89LPYX9BG');
-    console.log('🚀 ~ BusinessQueryService ~ getSubscription ~ ppSub:', ppSub);
-    // await this.paymentService.deactivatePlan('P-5V783320054914107NDD7FIA');
-    // const plan = await this.paymentService.getPlan(
-    //   'P-0PG868614W687125HNDD7OGY',
-    // );
-    // console.log(
-    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ plan:',
-    //   plan,
-    // );
-    // const planCreated = await this.paymentService.createPlan(
-    //   SubscriptionType.OneDay,
-    //   '9dc8e0a8-bd92-497d-b858-cf70ec7c696f',
-    //   'one day plan',
-    //   'one day plan',
-    // );
-    // console.log(
-    //   '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ planCreated:',
-    //   planCreated,
-    // // );
-    // console.log('plans', await this.paymentService.listPlans());
     const currentSubscriptions = subscriptions.filter((subscription) => {
       if (
         subscription.expiresAt &&
@@ -104,11 +87,6 @@ export class BusinessQueryService {
         return subscription;
       }
     });
-    const result = await this.notificationGateway.getUserNotifications2(id);
-    console.log(
-      '🚀 ~ BusinessQueryService ~ getCurrentUserSubscriptions ~ result:',
-      result,
-    );
     return currentSubscriptions;
   }
 
@@ -122,5 +100,9 @@ export class BusinessQueryService {
       sorting,
       filtering,
     );
+  }
+
+  async getExpiresInNotifications(expiresIn: ExpiresInDuration): Promise<any> {
+    return await this.notificationGateway.getExpiresInNotifications(expiresIn);
   }
 }

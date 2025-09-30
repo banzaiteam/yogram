@@ -94,9 +94,7 @@ export class NotificationsService implements INotificationsService {
 
   async createIndex() {
     try {
-      console.log(await this.redisClient.call('FT._LIST'));
-      await this.redisClient.call('FT.DROPINDEX', 'dev:notifications:Idx');
-      console.log('nodeenv', process.env.NODE_ENV);
+      // await this.redisClient.call('FT.DROPINDEX', 'dev:notifications:Idx');
 
       await this.redisClient.call(
         'FT.CREATE',
@@ -123,7 +121,6 @@ export class NotificationsService implements INotificationsService {
         'NUMERIC',
         'SORTABLE',
       );
-      console.log('Index created successfully.');
     } catch (err) {
       console.error('Error creating index:', err.message);
       throw new WsException(err);
@@ -133,12 +130,9 @@ export class NotificationsService implements INotificationsService {
   // todo when renew subscription(update) create new notification with the same subscriptionId
   async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
     try {
-      console.log(await this.redisClient.call('FT._LIST'));
       const todayTimestamp = new Date().getTime();
-      console.log(
-        '🚀 ~ NotificationsService ~ getExpiresInNotifications ~ todayTimestamp:',
-        todayTimestamp,
-      );
+      console.log('todayTimestamp:', todayTimestamp);
+
       const results = await this.redisClient.call(
         'FT.AGGREGATE',
         process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
@@ -147,25 +141,27 @@ export class NotificationsService implements INotificationsService {
           : 'dev:notifications:Idx',
         '*',
         'LOAD',
-        '4',
+        '7',
         '@expiresAt',
         '@message',
         '@subscriptionId',
         'userId',
+        '@createdAt',
+        '@readAt',
+        '@id',
         'APPLY',
         `(@expiresAt - ${todayTimestamp})`,
         'AS',
         'differ', // Search query
         'FILTER',
         expiresInDuration === ExpiresInDuration.Day
-          ? `@differ > 0 && @differ < ${expiresInDuration}`
+          ? `@differ > 0 && @differ < ${expiresInDuration + 86400 * 1000}`
           : expiresInDuration === ExpiresInDuration.Week
             ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
             : expiresInDuration === ExpiresInDuration.Month
               ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
               : null,
       );
-      console.log('Search results:', results);
       return results;
     } catch (error) {
       console.error('Error searching data:', error);

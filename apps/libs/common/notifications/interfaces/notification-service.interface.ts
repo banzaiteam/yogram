@@ -6,6 +6,7 @@ import {
   OnGatewayDisconnect,
   OnGatewayInit,
 } from '@nestjs/websockets';
+import { ExpiresInDuration } from 'apps/business/src/constants/expires-in-duration.enum';
 
 export interface INotificationsService
   extends OnGatewayConnection,
@@ -23,4 +24,5 @@ export interface INotificationsService
   ): Promise<number>;
   getUserNotifications(userId: string): Promise<INotification[]>;
   updateNotification(notificationId: string): Promise<void>;
+  getExpiresInNotifications(expiresIn: ExpiresInDuration);
 }

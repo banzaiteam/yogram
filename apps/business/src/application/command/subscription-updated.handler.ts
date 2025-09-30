@@ -5,6 +5,7 @@ import { BusinessCommandService } from '../../business-command.service';
 import { WebsocketEvents } from '../../constants/websocket.event.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
+import { Subscription } from '../../infrastructure/entity/subscription.entity';
 
 export class SubscriptionUpdatedCommand {
   constructor(public readonly subscriptionId: string) {}
@@ -18,7 +19,9 @@ export class SubscriptionUpdatedHandler
     private readonly businessCommandService: BusinessCommandService,
     private readonly notificationGateway: NotificationsGateway,
   ) {}
-  async execute({ subscriptionId }: SubscriptionUpdatedCommand): Promise<any> {
+  async execute({
+    subscriptionId,
+  }: SubscriptionUpdatedCommand): Promise<Subscription> {
     const subscription = await this.businessCommandService.updateSubscription(
       subscriptionId,
       {},

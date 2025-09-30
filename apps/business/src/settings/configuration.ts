@@ -29,5 +29,6 @@ export const getConfiguration = () => {
     synchronize: process.env.SYNCHRONIZE === 'true',
     dropSchema: process.env.DROP_SCHEMA === 'true',
     JWT_SECRET: process.env.JWT_SECRET,
+    TIME_PERIOD: process.env.TIME_PERIOD,
   };
 };

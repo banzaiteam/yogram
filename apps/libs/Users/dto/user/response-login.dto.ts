@@ -12,6 +12,16 @@ export class ResponseLoginDto {
   @Expose()
   verified: boolean;
   @Expose()
+  firstname?: string;
+  @Expose()
+  lastname?: string;
+  @Expose()
+  birthdate?: Date;
+  @Expose()
+  country?: string;
+  @Expose()
+  city?: string;
+  @Expose()
   @Type(() => ResponseProfileDto)
   profile: ResponseProfileDto;
 }
