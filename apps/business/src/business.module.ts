@@ -88,13 +88,9 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
         },
       }),
     }),
-    BullModule.registerQueueAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        name: NOTIFICATION_SCHEDULER,
-        prefix: 'scheduler:',
-      }),
+    BullModule.registerQueue({
+      name: 'NOTIFICATION_SCHEDULER',
+      prefix: 'scheduler:',
     }),
     CqrsModule,
     PaymentModule,

@@ -37,7 +37,7 @@ import {
 } from '../../../../apps/libs/common/pagination/decorators/filtering.decorator';
 import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
 import { ReadNotificationCommand } from '../application/command/read-notification.command';
-import { ReadNotificationDto } from 'apps/libs/Business/dto/input/read-notification.dto';
+import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 
 @Controller()
 export class BusinessController {

@@ -85,6 +85,7 @@ export class NotificationsService implements INotificationsService {
     delay: number,
   ): Promise<void> {
     const socket = this.connectedClients.get(notification.userId);
+    console.log('socketId:', socket.id);
     if (socket) {
       setTimeout(() => {
         socket.emit(event, notification.message);
@@ -139,7 +140,6 @@ export class NotificationsService implements INotificationsService {
         '🚀 ~ NotificationsService ~ getExpiresInNotifications ~ todayTimestamp:',
         todayTimestamp,
       );
-      console.log('true?', 201202206 < 86400000 * 3);
 
       const results = await this.redisClient.call(
         'FT.AGGREGATE',
@@ -149,11 +149,14 @@ export class NotificationsService implements INotificationsService {
           : 'dev:notifications:Idx',
         '*',
         'LOAD',
-        '4',
+        '7',
         '@expiresAt',
         '@message',
         '@subscriptionId',
         'userId',
+        '@createdAt',
+        '@readAt',
+        '@id',
         'APPLY',
         `(@expiresAt - ${todayTimestamp})`,
         'AS',
@@ -162,12 +165,12 @@ export class NotificationsService implements INotificationsService {
         expiresInDuration === ExpiresInDuration.Day
           ? `@differ > 0 && @differ < ${expiresInDuration + 86400 * 1000 * 3}`
           : expiresInDuration === ExpiresInDuration.Week
-            ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
+            ? `@differ > ${expiresInDuration} && @differ < ${ExpiresInDuration.Week + 86400 * 1000 * 5}`
             : expiresInDuration === ExpiresInDuration.Month
-              ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
+              ? `@differ > ${expiresInDuration} && @differ < ${86400 * 30 * 1000 + 86400 * 1000 * 8}`
               : null,
       );
-      console.log('Search results:', results);
+      // console.log('Search results:', results);
       return results;
     } catch (error) {
       console.error('Error searching data:', error);

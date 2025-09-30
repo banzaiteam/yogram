@@ -7,7 +7,6 @@ import {
   OnGatewayInit,
 } from '@nestjs/websockets';
 import { ExpiresInDuration } from 'apps/business/src/constants/expires-in-duration.enum';
-import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
 
 export interface INotificationsService
   extends OnGatewayConnection,
