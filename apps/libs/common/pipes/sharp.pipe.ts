@@ -9,6 +9,7 @@ import { pipeline } from 'node:stream/promises';
 
 export class SharpPipe implements PipeTransform {
   async transform(files: Express.Multer.File[], metadata: ArgumentMetadata) {
+    console.log('before pipe null checking....');
     if (!files.length) return null;
     console.log('after pipe null checking....');
 

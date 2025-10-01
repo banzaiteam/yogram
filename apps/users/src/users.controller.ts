@@ -274,6 +274,8 @@ export class UsersController {
       '🚀 ~ UsersController ~ update ~ updateUserDto:',
       updateUserDto,
     );
+    console.log('before commandBus');
+
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
     );
