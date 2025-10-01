@@ -267,18 +267,14 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
-    console.log('🚀 ~ UsersController ~ update ~ file:', file);
     const criteria = { id: req.headers.id.toString() };
-    console.log('🚀 ~ UsersController ~ update ~ criteria:', criteria);
     const updateUserDto = JSON.parse(payload['updateUserDto']);
-    console.log(
-      '🚀 ~ UsersController ~ update ~ updateUserDto:',
-      updateUserDto,
-    );
-    console.log('before commandBus');
-
     return await this.commandBus.execute(
-      new UpdateUserByCriteriaCommand(criteria, updateUserDto, file[0]),
+      new UpdateUserByCriteriaCommand(
+        criteria,
+        updateUserDto,
+        file !== null ? file[0] : null,
+      ),
     );
   }
 

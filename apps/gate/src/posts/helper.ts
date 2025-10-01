@@ -15,7 +15,6 @@ export async function getUploadPath(
   uploadDir: string,
   req: Request,
 ): Promise<string> {
-  console.log('🚀 ~ getUploadPath ~ entity:', entity);
   if (entity === FileTypes.Posts) {
     const postid = req.headers.postid;
     const userId = req.headers.userid;
@@ -32,7 +31,6 @@ export async function getUploadPath(
 }
 
 export function genFileName(originalname: string) {
-  console.log('🚀 ~ genFileName ~ originalname:', originalname);
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
   const fileExtension = extname(originalname);
   return `${originalname.substring(0, originalname.indexOf('.'))}-${uniqueSuffix}${fileExtension}`;
