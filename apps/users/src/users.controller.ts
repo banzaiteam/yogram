@@ -263,12 +263,13 @@ export class UsersController {
         ],
         fileIsRequired: false,
       }),
-      // SharpPipe,
+      SharpPipe,
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
     console.log('🚀 ~ UsersController ~ update ~ file:', file);
     const criteria = { id: req.headers.id.toString() };
+    console.log('🚀 ~ UsersController ~ update ~ criteria:', criteria);
     const updateUserDto = JSON.parse(payload['updateUserDto']);
     console.log(
       '🚀 ~ UsersController ~ update ~ updateUserDto:',

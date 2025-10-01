@@ -10,13 +10,14 @@ import { pipeline } from 'node:stream/promises';
 export class SharpPipe implements PipeTransform {
   async transform(files: Express.Multer.File[], metadata: ArgumentMetadata) {
     console.log('before pipe null checking....');
-    if (!files.length) return null;
-    console.log('after pipe null checking....');
+    // if (!files.length) return null;
+    // console.log('after pipe null checking....');
 
     if (!Array.isArray(files)) {
       const file = files;
       files = [];
       files.push(file);
+      console.log('🚀 ~ SharpPipe ~ transform ~ files:', files);
     }
     files = await Promise.all(
       files.map(async (file) => {
