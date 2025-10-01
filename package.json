@@ -17,7 +17,7 @@
     "start:gate": "node dist/apps/gate/main",
     "start:dev:gate": "cross-env NODE_ENV=DEVELOPMENT nest start gate --watch",
     "build:users": "nest build users",
-    "start:users": "node dist/apps/users/main",
+    "start:users": "cross-env NODE_ENV=PRODUCTION node dist/apps/users/main",
     "start:dev:users": "cross-env NODE_ENV=DEVELOPMENT nest start users --watch",
     "build:mailer": "nest build mailer",
     "start:mailer": "node dist/apps/mailer/main",
