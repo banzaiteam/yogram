@@ -263,7 +263,7 @@ export class UsersController {
         ],
         fileIsRequired: false,
       }),
-      SharpPipe,
+      // SharpPipe,
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
