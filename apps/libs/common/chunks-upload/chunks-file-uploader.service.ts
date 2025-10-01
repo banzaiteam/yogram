@@ -47,6 +47,8 @@ export class ChunksFileUploader {
       readable.removeAllListeners();
       await openFile.close();
       readable.close();
+      console.log('file at proccessChunksUpload=', file);
+
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
         let chunk = buffer.subarray(startByte, endByte);
