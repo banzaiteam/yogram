@@ -257,6 +257,10 @@ export class UsersCommandService {
     filesServiceUploadFolderWithoutBasePath: string,
     uploadServiceUrl: string,
   ) {
+    console.log(
+      '🚀 ~ UsersCommandService ~ sendFilesToFilesServiceAndDeleteTempFilesAfter ~ files:',
+      files,
+    );
     new Promise((res, rej) => {
       res(
         this.chunksFileUploader.proccessChunksUpload(
@@ -289,11 +293,6 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File,
   ): Promise<ResponseUserDto> {
-    console.log('🚀 ~ UsersCommandService ~ updateUser ~ criteria:', criteria);
-    console.log(
-      '🚀 ~ UsersCommandService ~ updateUser ~ updateUserDto:',
-      updateUserDto,
-    );
     console.log('🚀 ~ UsersCommandService ~ updateUser ~ file:', file);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -316,6 +315,10 @@ export class UsersCommandService {
             bucketName,
           },
         ];
+        console.log(
+          '🚀 ~ UsersCommandService ~ updateUser ~ uploadFile:',
+          uploadFile,
+        );
 
         const uploadServiceUrl = [
           this.configService.get('FILES_SERVICE_URL'),
