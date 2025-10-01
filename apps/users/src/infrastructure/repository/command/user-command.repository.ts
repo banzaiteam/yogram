@@ -32,6 +32,11 @@ export class UserCommandRepository
     updateUserDto: UpdateUserDto,
     entityManager?: EntityManager,
   ): Promise<User> {
+    console.log('🚀 ~ UserCommandRepository ~ update ~ criteria:', criteria);
+    console.log(
+      '🚀 ~ UserCommandRepository ~ update ~ updateUserDto:',
+      updateUserDto,
+    );
     const user = await this.userRepository
       .createQueryBuilder('users')
       .innerJoinAndSelect('users.profile', 'profile')

@@ -289,6 +289,12 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File,
   ): Promise<ResponseUserDto> {
+    console.log('🚀 ~ UsersCommandService ~ updateUser ~ criteria:', criteria);
+    console.log(
+      '🚀 ~ UsersCommandService ~ updateUser ~ updateUserDto:',
+      updateUserDto,
+    );
+    console.log('🚀 ~ UsersCommandService ~ updateUser ~ file:', file);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
