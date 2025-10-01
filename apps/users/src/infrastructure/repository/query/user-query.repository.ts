@@ -50,6 +50,11 @@ export class UserQueryRepository
       username: user.profile.username,
       providers: user.providers,
       profile: user.profile,
+      city: user.city,
+      country: user.country,
+      birthdate: user.birthdate,
+      firstname: user.firstName,
+      lastname: user.lastName,
     };
     return plainToInstance(ResponseUserDto, mappedUser);
   }
