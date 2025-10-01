@@ -221,7 +221,7 @@ export class ChunksFileUploader {
         await readableFile.close();
         await fs.unlink(chunkPath);
       }
-      writer.end();
+      writer.end('assembleChunks ends');
       await fs.rm(chunksDirPath, { recursive: true });
     } catch (error) {
       await fs.rm(chunksDirPath, { recursive: true });
