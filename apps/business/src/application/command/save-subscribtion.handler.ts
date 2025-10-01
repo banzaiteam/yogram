@@ -21,10 +21,6 @@ export class SaveSubscriptionHandler
 
   async execute({ id }: SaveSubscriptionCommand): Promise<Subscription> {
     const subscription = await this.businessCommandService.saveSubscription(id);
-    console.log(
-      '🚀 ~ SaveSubscriptionHandler ~ execute ~ subscription:',
-      subscription,
-    );
     const notification: INotification = {
       id: v4(),
       subscriptionId: subscription.subscriptionId,

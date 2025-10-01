@@ -65,7 +65,7 @@ export class BusinessController {
   @Post('business/subscriptions/updated')
   async subscriptionUpdatedEvent(
     @Body() body: { subscriptionId: string; expiresAt: Date },
-  ) {
+  ): Promise<void> {
     const { subscriptionId } = body;
     console.log('business/subscriptions/updated', subscriptionId);
     return await this.commandBus.execute(

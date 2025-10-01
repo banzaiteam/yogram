@@ -36,11 +36,11 @@ export class BusinessCommandService {
         subscribeDto.userId,
       );
 
-    // if (currentSubscriptions.length > 1) {
-    //   throw new BadRequestException(
-    //     'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
-    //   );
-    // }
+    if (currentSubscriptions.length > 1) {
+      throw new BadRequestException(
+        'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
+      );
+    }
 
     currentSubscriptions?.map((subscription) => {
       if (
@@ -242,9 +242,12 @@ export class BusinessCommandService {
       throw new NotFoundException(
         'BusinessCommandService error: subscription does not exist',
       );
-    const today = new Date();
+    const today = new Date(subscription.expiresAt);
     subscription.expiresAt = new Date(
-      today.setDate(today.getDate() + subscription.subscriptionType),
+      today.setDate(
+        new Date(subscription.expiresAt).getDate() +
+          subscription.subscriptionType,
+      ),
     );
     const price = getSubscriptionPrice(subscription.subscriptionType);
     const paymentDto = {

@@ -46,7 +46,7 @@ export class BusinessService {
   async subscriptioExpiredEvent(
     subscriptionId: string,
     payment: PaymentType,
-  ): Promise<void> {
+  ): Promise<Subscription> {
     const path = [
       HttpBusinessPath.SubscriptionsExpired,
       `payment=${payment}`,

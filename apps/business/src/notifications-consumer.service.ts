@@ -1,4 +1,5 @@
 import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
+import { createObjectFromArrayReduce } from './helper/create-array-from-object.helper';
 import { ExpiresInDuration } from './constants/expires-in-duration.enum';
 import { WebsocketEvents } from './constants/websocket.event.enum';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
@@ -20,46 +21,26 @@ export class NotificationConsumer extends WorkerHost {
               await this.notificationGateway.getExpiresInNotifications(
                 ExpiresInDuration[item],
               );
-            // console.log(
-            //   '🚀 ~ NotificationConsumer ~ process ~ result:',
-            //   result[1],
-            // );
             return result;
           }
         }),
       )
     ).filter((item) => item !== undefined);
-    // console.log(
-    //   '🚀 ~ NotificationConsumer ~ process ~ notificationsArray:',
-    //   notificationsArray,
-    // );
 
     await Promise.all(
       notificationsArray.map(async (item) => {
-        console.log('🚀 ~ NotificationConsumer ~ process ~ item:', item);
-        const obj = this.createObjectFromArrayReduce(item[1]);
-        delete obj.differ;
-        await this.notificationGateway.send(
-          obj,
-          WebsocketEvents.DaysToExpires,
-          0,
-        );
+        const notificationsObjectsAray = createObjectFromArrayReduce(item);
+        delete notificationsObjectsAray.differ;
+        notificationsObjectsAray.shift();
+        notificationsObjectsAray.map(async (item) => {
+          await this.notificationGateway.send(
+            item,
+            WebsocketEvents.DaysToExpires,
+            0,
+          );
+        });
       }),
     );
-
     return {};
-  }
-
-  createObjectFromArrayReduce(arr) {
-    // todo! use for(let i =1; i< arr.length;i++){ arr[1].reduce }
-    return arr.reduce((acc, current, index, array) => {
-      if (index % 2 === 0 && index + 1 < array.length) {
-        acc[current] = array[index + 1];
-      } else if (index % 2 === 0 && index + 1 >= array.length) {
-        // Handle the case of an odd number of elements
-        acc[current] = undefined; // Or some other default value
-      }
-      return acc;
-    }, {});
   }
 }

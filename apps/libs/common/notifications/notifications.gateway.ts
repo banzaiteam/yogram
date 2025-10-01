@@ -1,4 +1,5 @@
 import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
+import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -7,7 +8,6 @@ import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { NotificationsService } from './notifications.service';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { ExpiresInDuration } from 'apps/business/src/constants/expires-in-duration.enum';
 
 @WebSocketGateway()
 export class NotificationsGateway implements INotificationsService {
@@ -29,7 +29,6 @@ export class NotificationsGateway implements INotificationsService {
 
   handleConnection(socket: Socket) {
     this.notificationsService.handleConnection(socket);
-    this.notificationsService.createIndex();
   }
 
   async saveNotification(

@@ -267,6 +267,7 @@ export class UsersController {
     )
     file?: Express.Multer.File[],
   ): Promise<void> {
+    console.log('🚀 ~ UsersController ~ update ~ file:', file);
     const criteria = { id: req.headers.id.toString() };
     const updateUserDto = JSON.parse(payload['updateUserDto']);
     console.log(

@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: business-production-config-secret
                   key: REDIS_PORT
+            - name: TIME_PERIOD
+              valueFrom:
+                secretKeyRef:
+                  name: business-production-config-secret
+                  key: TIME_PERIOD
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:
