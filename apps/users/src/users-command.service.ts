@@ -298,11 +298,18 @@ export class UsersCommandService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      console.log(
+        'FILES_SERVICE_AVATAR_UPLOAD_PATH',
+        this.configService.get('FILES_SERVICE_AVATAR_UPLOAD_PATH'),
+      );
+
       if (file) {
         const uploadFile: UploadFile[] = [
           {
             fileType: FileTypes.Avatars,
-            filesUploadBaseDir: '/home/node/dist/users/src/uploads/avatars',
+            filesUploadBaseDir: this.configService.get(
+              'FILES_SERVICE_AVATAR_UPLOAD_PATH',
+            ),
             fieldname: file.fieldname,
             mimetype: file.mimetype,
             size: file.size,

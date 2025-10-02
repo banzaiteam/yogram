@@ -225,12 +225,14 @@ export class UsersController {
             null,
             await getUploadPath(
               FileTypes.Avatars,
-              '/home/node/dist/users/src/uploads/avatars',
+              process.env.NODE_ENV === 'DEVELOPMENT' || 'TESTING'
+                ? 'apps/users/src/uploads/avatars'
+                : '/home/node/dist/users/src/uploads/avatars',
               req,
             ),
           );
         },
-        //
+
         filename: (req, file, cb) => {
           cb(null, genFileName(file.originalname));
         },
