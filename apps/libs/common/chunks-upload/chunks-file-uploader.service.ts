@@ -178,6 +178,15 @@ export class ChunksFileUploader {
         +chunkedFileDto.metadata.currentChunk ===
         +chunkedFileDto.metadata.totalChunks
       ) {
+        console.log(
+          '+chunkedFileDto.metadata.currentChunk:',
+          +chunkedFileDto.metadata.currentChunk,
+        );
+        console.log(
+          '+chunkedFileDto.metadata.totalChunks:',
+          +chunkedFileDto.metadata.totalChunks,
+        );
+
         await this.assembleChunks(
           chunkedFileDto.originalname,
           +chunkedFileDto.metadata.totalChunks,
@@ -219,6 +228,7 @@ export class ChunksFileUploader {
       });
       // write all chunks to file
       for (let i = 1; i <= totalChunks; i++) {
+        console.log('🚀 ~ ChunksFileUploader ~ assembleChunks ~ i:', i);
         const chunkPath = `${chunksDirPath}/${filename}.${i}`;
         const readableFile = await fs.open(chunkPath, 'r');
         const reader = readableFile.createReadStream();
@@ -241,6 +251,7 @@ export class ChunksFileUploader {
   }
 
   async createFolderIfNotExists(folder: string): Promise<void> {
+    console.log('createFolderIfNotExists');
     await fs
       .access(folder)
       .then(() => undefined)

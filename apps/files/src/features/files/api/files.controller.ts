@@ -17,10 +17,6 @@ export class FilesController {
 
   @Post('files/upload')
   async uploadFile(@Body() chunkedFileDto: ChunkedFileDto) {
-    console.log(
-      '🚀 ~ FilesController ~ uploadFile ~ chunkedFileDto:',
-      chunkedFileDto,
-    );
     await this.chunksFileUploader.proccessComposeFile(chunkedFileDto);
     if (
       chunkedFileDto.metadata.currentChunk ===
