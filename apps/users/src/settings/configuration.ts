@@ -35,8 +35,8 @@ export const getConfiguration = () => {
     RMQ_URL: process.env.RMQ_URL,
     FILES_SERVICE_URL: process.env.FILES_SERVICE_URL,
     BUCKET: process.env.BUCKET,
+    FILES_SERVICE_CHUNKS_DIR: process.env.FILES_SERVICE_CHUNKS_DIR,
     FILES_SERVICE_AVATAR_UPLOAD_PATH:
       process.env.FILES_SERVICE_AVATAR_UPLOAD_PATH,
-    FILES_SERVICE_CHUNKS_DIR: process.env.FILES_SERVICE_CHUNKS_DIR,
   };
 };
