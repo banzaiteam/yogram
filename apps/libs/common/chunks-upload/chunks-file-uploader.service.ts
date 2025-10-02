@@ -138,19 +138,11 @@ export class ChunksFileUploader {
     );
     const CHUNKS_DIR = this.configService.get('FILES_SERVICE_CHUNKS_DIR');
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunksPath:',
-      chunksPath,
-    );
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ fileUpload path:',
-      [
-        chunkedFileDto.filesUploadBaseDir,
-        chunkedFileDto.filesServiceUploadFolderWithoutBasePath,
-      ].join('/'),
-    );
-
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ uploadsPath:',
+      uploadsPath,
+    );
 
     await this.createFolderIfNotExists(chunksPath);
     await this.createFolderIfNotExists(
@@ -263,7 +255,7 @@ export class ChunksFileUploader {
   }
 
   async createFolderIfNotExists(folder: string): Promise<void> {
-    console.log('createFolderIfNotExists');
+    console.log('createFolderIfNotExists', folder);
     await fs
       .access(folder)
       .then(() => undefined)
