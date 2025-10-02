@@ -137,11 +137,7 @@ export class ChunksFileUploader {
       chunkedFileDto,
     );
     const CHUNKS_DIR = this.configService.get('FILES_SERVICE_CHUNKS_DIR');
-    console.log(
-      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ CHUNKS_DIR:',
-      CHUNKS_DIR,
-    );
-    const chunksPath = `home/node/dist/files/src/features/files/chunks/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
+    const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     console.log(
       '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunksPath:',
       chunksPath,
