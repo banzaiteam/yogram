@@ -47,33 +47,37 @@ export class AwsService implements IUploader {
 
     const pathToFile = [file.filesUploadBaseDir, file.pathToFile].join('/');
     console.log('🚀 ~ AwsService ~ uploadFiles ~ pathToFile:', pathToFile);
-    const openFile = await fs.open(pathToFile, 'r');
-    const readable = openFile.createReadStream();
-    const chunks = [];
-    for await (const chunk of readable) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-    const client = new Upload({
-      client: this.s3Client,
-      params: {
-        Body: buffer,
-        ContentLength: file.size,
-        Bucket: bucketName,
-        ContentType: file.mimetype,
-        Key: [file.environment, file.fileType, file.pathToFile].join('/'),
-      },
-    });
+    try {
+      const openFile = await fs.open(pathToFile, 'r');
+      const readable = openFile.createReadStream();
+      const chunks = [];
+      for await (const chunk of readable) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+      const client = new Upload({
+        client: this.s3Client,
+        params: {
+          Body: buffer,
+          ContentLength: file.size,
+          Bucket: bucketName,
+          ContentType: file.mimetype,
+          Key: [file.environment, file.fileType, file.pathToFile].join('/'),
+        },
+      });
 
-    const result = await client.done();
-    console.log('🚀 ~ AwsService ~ uploadFiles ~ result:', result);
-    // throw Error();
-    return {
-      url: result.Location,
-      fileName: file.originalname,
-      fileId: file?.fileId,
-      folderPath: file.filesServiceUploadFolderWithoutBasePath,
-    } satisfies UploadFilesResponse;
+      const result = await client.done();
+      console.log('🚀 ~ AwsService ~ uploadFiles ~ result:', result);
+      // throw Error();
+      return {
+        url: result.Location,
+        fileName: file.originalname,
+        fileId: file?.fileId,
+        folderPath: file.filesServiceUploadFolderWithoutBasePath,
+      } satisfies UploadFilesResponse;
+    } catch (error) {
+      console.log('🚀 ~ AwsService ~ uploadFiles ~ error:', error);
+    }
   }
 
   async createBucket(bucketName: string): Promise<string> {
