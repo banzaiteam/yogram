@@ -33,6 +33,9 @@ RUN yarn
 # Bundle app source code
 COPY --chown=node . .
 
+RUN chown -R node:node /home/node/dist/files/src/features/files/chunks
+RUN chown -R node:node /home/node/dist/files/src/features/files/uploads/posts
+
 RUN yarn build:${SERVICE}
 
 # Bind to all network interfaces so that it can be mapped to the host OS
