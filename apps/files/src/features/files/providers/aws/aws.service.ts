@@ -36,7 +36,7 @@ export class AwsService implements IUploader {
     const bucketName = file.bucketName;
     const isBucketExists = await this.isBucketExists(
       bucketName,
-      this.configService.get('AWS_CCOUNT_ID'),
+      this.configService.get('AWS_ACCOUNT_ID'),
     );
     console.log(
       '🚀 ~ AwsService ~ uploadFiles ~ isBucketExists:',

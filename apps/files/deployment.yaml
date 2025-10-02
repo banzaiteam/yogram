@@ -57,3 +57,13 @@ spec:
                 secretKeyRef:
                   name: files-yogram-production-config-secret
                   key: FILES_SERVICE_AVATAR_UPLOAD_PATH
+            - name: AWS_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: files-yogram-production-config-secret
+                  key: AWS_ACCOUNT_ID
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: files-yogram-production-config-secret
+                  key: AWS_ACCESS_KEY

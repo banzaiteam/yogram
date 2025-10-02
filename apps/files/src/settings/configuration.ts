@@ -26,5 +26,6 @@ export const getConfiguration = () => {
     FILES_SERVICE_CHUNKS_DIR: process.env.FILES_SERVICE_CHUNKS_DIR,
     FILES_SERVICE_AVATAR_UPLOAD_PATH:
       process.env.FILES_SERVICE_AVATAR_UPLOAD_PATH,
+    AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
   };
 };
