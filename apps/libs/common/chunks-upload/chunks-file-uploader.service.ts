@@ -119,6 +119,7 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
+    console.log('before send:', chunkedFileDto);
 
     // await firstValueFrom(
     await axios.post(uploadServiceUrl, chunkedFileDto);
