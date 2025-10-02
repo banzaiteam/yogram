@@ -32,6 +32,7 @@ export class AwsService implements IUploader {
   constructor(private readonly configService: ConfigService) {}
 
   async uploadFiles(file: ChunkedFileDto): Promise<UploadFilesResponse> {
+    console.log('🚀 ~ AwsService ~ uploadFiles ~ file:', file);
     const bucketName = file.bucketName;
     const isBucketExists = await this.isBucketExists(
       bucketName,
