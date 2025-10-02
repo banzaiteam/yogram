@@ -155,7 +155,7 @@ export class ChunksFileUploader {
     await this.createFolderIfNotExists(chunksPath);
     await this.createFolderIfNotExists(
       [
-        chunkedFileDto.filesUploadBaseDir,
+        '/home/node/dist/files/src/features/files/uploads/avatar',
         chunkedFileDto.filesServiceUploadFolderWithoutBasePath,
       ].join('/'),
     );

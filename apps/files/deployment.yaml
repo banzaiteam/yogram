@@ -52,8 +52,8 @@ spec:
                 secretKeyRef:
                   name: files-yogram-production-config-secret
                   key: FILES_SERVICE_CHUNKS_DIR
-            - name: AWS_ACCESS_KEY
+            - name: FILES_SERVICE_AVATAR_UPLOAD_PATH
               valueFrom:
                 secretKeyRef:
                   name: files-yogram-production-config-secret
-                  key: AWS_ACCESS_KEY
+                  key: FILES_SERVICE_AVATAR_UPLOAD_PATH

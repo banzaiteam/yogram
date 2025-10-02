@@ -24,5 +24,7 @@ export const getConfiguration = () => {
     UPLOAD_SERVICE_URL_PREFIX: process.env.UPLOAD_SERVICE_URL_PREFIX,
     BUCKET: process.env.BUCKET,
     FILES_SERVICE_CHUNKS_DIR: process.env.FILES_SERVICE_CHUNKS_DIR,
+    FILES_SERVICE_AVATAR_UPLOAD_PATH:
+      process.env.FILES_SERVICE_AVATAR_UPLOAD_PATH,
   };
 };
