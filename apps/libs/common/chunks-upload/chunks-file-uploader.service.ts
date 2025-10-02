@@ -120,7 +120,7 @@ export class ChunksFileUploader {
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
     console.log('before send:', chunkedFileDto);
-
+    console.log('uploadServiceUrl:', uploadServiceUrl);
     // await firstValueFrom(
     await axios.post(uploadServiceUrl, chunkedFileDto);
     // );
@@ -132,6 +132,10 @@ export class ChunksFileUploader {
    * @returns {Promise<void>}
    */
   async proccessComposeFile(chunkedFileDto: ChunkedFileDto): Promise<void> {
+    console.log(
+      '🚀 ~ ChunksFileUploader ~ proccessComposeFile ~ chunkedFileDto:',
+      chunkedFileDto,
+    );
     const CHUNKS_DIR = this.configService.get('FILES_SERVICE_CHUNKS_DIR');
     const chunksPath = `${CHUNKS_DIR}/${chunkedFileDto.filesServiceUploadFolderWithoutBasePath}`;
     const uploadsPath = `${chunkedFileDto.filesUploadBaseDir}/${chunkedFileDto.pathToFile}`;
