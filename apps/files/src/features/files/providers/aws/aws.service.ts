@@ -136,7 +136,7 @@ export class AwsService implements IUploader {
     const { Contents } = await this.s3Client.send(command);
     return Contents;
   }
-
+  //
   async deleteFolder(bucketName: string, path: string): Promise<boolean> {
     // is it has a file extension
     const pattern = /\.[^\\/:*?"<>|\s.]{1,255}$/;
