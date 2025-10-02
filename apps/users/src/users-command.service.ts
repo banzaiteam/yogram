@@ -59,7 +59,6 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File[],
   ): Promise<ResponseUserDto> {
-    console.log('🚀 ~ UsersCommandService ~ createUserDto:', createUserDto);
     if (!Array.isArray(file)) {
       const files = file;
       file = [];
@@ -112,7 +111,6 @@ export class UsersCommandService {
             bucketName,
           },
         ];
-        console.log('🚀 ~ UsersCommandService ~ uploadFile:', uploadFile);
 
         const uploadServiceUrl = [
           this.configService.get('FILES_SERVICE_URL'),
@@ -289,12 +287,6 @@ export class UsersCommandService {
     bucketName: string,
     file?: Express.Multer.File,
   ): Promise<ResponseUserDto> {
-    console.log('🚀 ~ UsersCommandService ~ updateUser ~ criteria:', criteria);
-    console.log(
-      '🚀 ~ UsersCommandService ~ updateUser ~ updateUserDto:',
-      updateUserDto,
-    );
-    console.log('🚀 ~ UsersCommandService ~ updateUser ~ file:', file);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

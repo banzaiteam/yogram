@@ -23,5 +23,9 @@ export const getConfiguration = () => {
     AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
     UPLOAD_SERVICE_URL_PREFIX: process.env.UPLOAD_SERVICE_URL_PREFIX,
     BUCKET: process.env.BUCKET,
+    FILES_SERVICE_CHUNKS_DIR: process.env.FILES_SERVICE_CHUNKS_DIR,
+    FILES_SERVICE_AVATAR_UPLOAD_PATH:
+      process.env.FILES_SERVICE_AVATAR_UPLOAD_PATH,
+    AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
   };
 };

@@ -47,6 +47,7 @@ export class ChunksFileUploader {
       readable.removeAllListeners();
       await openFile.close();
       readable.close();
+
       for (let i = 1; i <= totalChunks; i++) {
         const endByte = Math.min(startByte + chunkSize, file.size);
         let chunk = buffer.subarray(startByte, endByte);
@@ -117,10 +118,7 @@ export class ChunksFileUploader {
 
       metadata: { currentChunk, totalChunks, filesCount, currentFile },
     };
-
-    // await firstValueFrom(
     await axios.post(uploadServiceUrl, chunkedFileDto);
-    // );
   }
 
   /**

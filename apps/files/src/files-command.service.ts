@@ -3,7 +3,6 @@ import {
   IUploader,
   UploadFilesResponse,
 } from './features/files/providers/interface/uploader.interface';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
 import fs from 'node:fs/promises';
 
 @Injectable()

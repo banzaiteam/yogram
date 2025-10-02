@@ -67,6 +67,16 @@ spec:
                 secretKeyRef:
                   name: users-yogram-production-config-secret
                   key: BUCKET
+            - name: FILES_SERVICE_AVATAR_UPLOAD_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: FILES_SERVICE_AVATAR_UPLOAD_PATH
+            - name: FILES_SERVICE_CHUNKS_DIR
+              valueFrom:
+                secretKeyRef:
+                  name: users-yogram-production-config-secret
+                  key: FILES_SERVICE_CHUNKS_DIR
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:

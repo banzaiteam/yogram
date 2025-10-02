@@ -35,39 +35,42 @@ export class AwsService implements IUploader {
     const bucketName = file.bucketName;
     const isBucketExists = await this.isBucketExists(
       bucketName,
-      this.configService.get('AWS_CCOUNT_ID'),
+      this.configService.get('AWS_ACCOUNT_ID'),
     );
     if (!isBucketExists) {
       await this.createBucket(bucketName);
     }
 
     const pathToFile = [file.filesUploadBaseDir, file.pathToFile].join('/');
-    const openFile = await fs.open(pathToFile, 'r');
-    const readable = openFile.createReadStream();
-    const chunks = [];
-    for await (const chunk of readable) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-    const client = new Upload({
-      client: this.s3Client,
-      params: {
-        Body: buffer,
-        ContentLength: file.size,
-        Bucket: bucketName,
-        ContentType: file.mimetype,
-        Key: [file.environment, file.fileType, file.pathToFile].join('/'),
-      },
-    });
+    try {
+      const openFile = await fs.open(pathToFile, 'r');
+      const readable = openFile.createReadStream();
+      const chunks = [];
+      for await (const chunk of readable) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+      const client = new Upload({
+        client: this.s3Client,
+        params: {
+          Body: buffer,
+          ContentLength: file.size,
+          Bucket: bucketName,
+          ContentType: file.mimetype,
+          Key: [file.environment, file.fileType, file.pathToFile].join('/'),
+        },
+      });
 
-    const result = await client.done();
-    // throw Error();
-    return {
-      url: result.Location,
-      fileName: file.originalname,
-      fileId: file?.fileId,
-      folderPath: file.filesServiceUploadFolderWithoutBasePath,
-    } satisfies UploadFilesResponse;
+      const result = await client.done();
+      return {
+        url: result.Location,
+        fileName: file.originalname,
+        fileId: file?.fileId,
+        folderPath: file.filesServiceUploadFolderWithoutBasePath,
+      } satisfies UploadFilesResponse;
+    } catch (error) {
+      console.log('🚀 ~ AwsService ~ uploadFiles ~ error:', error);
+    }
   }
 
   async createBucket(bucketName: string): Promise<string> {
@@ -126,7 +129,7 @@ export class AwsService implements IUploader {
     const { Contents } = await this.s3Client.send(command);
     return Contents;
   }
-
+  //
   async deleteFolder(bucketName: string, path: string): Promise<boolean> {
     // is it has a file extension
     const pattern = /\.[^\\/:*?"<>|\s.]{1,255}$/;
@@ -136,7 +139,6 @@ export class AwsService implements IUploader {
         if (!isFolderExists) return true;
       }
       let content = await this.listObjects(bucketName, path);
-      console.log('🚀 ~ AwsService ~ deleteFolder ~ content:', content);
       content = undefined;
       try {
         for (let i = 0; i < content.length; i++) {
