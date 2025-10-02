@@ -19,6 +19,9 @@ VOLUME /home/node/dist/files/src/features/files/chunks
 RUN mkdir -p /home/node/dist/files/src/features/files/uploads/posts
 VOLUME /home/node/dist/files/src/features/files/uploads/posts
 
+RUN mkdir -p /home/node/dist/files/src/features/files/uploads/avatar
+VOLUME /home/node/dist/files/src/features/files/uploads/avatar
+
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
@@ -32,9 +35,6 @@ RUN yarn
 
 # Bundle app source code
 COPY --chown=node . .
-
-RUN chown -R node:node /home/node/dist/files/src/features/files/chunks
-RUN chown -R node:node /home/node/dist/files/src/features/files/uploads/posts
 
 RUN yarn build:${SERVICE}
 
