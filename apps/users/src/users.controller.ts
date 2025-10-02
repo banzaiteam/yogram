@@ -268,7 +268,10 @@ export class UsersController {
     file?: Express.Multer.File[],
   ): Promise<void> {
     const criteria = { id: req.headers.id.toString() };
-    const updateUserDto = JSON.parse(payload['updateUserDto']);
+    let updateUserDto;
+    if (payload['updateUserDto']) {
+      updateUserDto = JSON.parse(payload['updateUserDto']);
+    }
     return await this.commandBus.execute(
       new UpdateUserByCriteriaCommand(
         criteria,
