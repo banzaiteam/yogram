@@ -19,10 +19,6 @@ export class UpdateUserByCriteriaHandler
     updateUserDto,
     file,
   }: UpdateUserByCriteriaCommand): Promise<ResponseUserDto> {
-    console.log(
-      '🚀 ~ UpdateUserByCriteriaHandler ~ execute ~ updateUserDto:',
-      updateUserDto,
-    );
     const updatedUser = await this.usersCommandService.updateUser(
       criteria,
       updateUserDto,

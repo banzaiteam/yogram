@@ -32,22 +32,16 @@ export class AwsService implements IUploader {
   constructor(private readonly configService: ConfigService) {}
 
   async uploadFiles(file: ChunkedFileDto): Promise<UploadFilesResponse> {
-    console.log('🚀 ~ AwsService ~ uploadFiles ~ file:', file);
     const bucketName = file.bucketName;
     const isBucketExists = await this.isBucketExists(
       bucketName,
       this.configService.get('AWS_ACCOUNT_ID'),
-    );
-    console.log(
-      '🚀 ~ AwsService ~ uploadFiles ~ isBucketExists:',
-      isBucketExists,
     );
     if (!isBucketExists) {
       await this.createBucket(bucketName);
     }
 
     const pathToFile = [file.filesUploadBaseDir, file.pathToFile].join('/');
-    console.log('🚀 ~ AwsService ~ uploadFiles ~ pathToFile:', pathToFile);
     try {
       const openFile = await fs.open(pathToFile, 'r');
       const readable = openFile.createReadStream();
@@ -68,8 +62,6 @@ export class AwsService implements IUploader {
       });
 
       const result = await client.done();
-      console.log('🚀 ~ AwsService ~ uploadFiles ~ result:', result);
-      // throw Error();
       return {
         url: result.Location,
         fileName: file.originalname,
@@ -147,7 +139,6 @@ export class AwsService implements IUploader {
         if (!isFolderExists) return true;
       }
       let content = await this.listObjects(bucketName, path);
-      console.log('🚀 ~ AwsService ~ deleteFolder ~ content:', content);
       content = undefined;
       try {
         for (let i = 0; i < content.length; i++) {
