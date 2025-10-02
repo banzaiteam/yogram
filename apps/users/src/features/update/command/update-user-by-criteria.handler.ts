@@ -4,7 +4,7 @@ import { UsersCommandService } from '../../../../../../apps/users/src/users-comm
 import { InternalServerErrorException } from '@nestjs/common';
 import { ResponseUserDto } from 'apps/libs/Users/dto/user/response-user.dto';
 import { ConfigService } from '@nestjs/config';
-import { AwsBuckets } from 'apps/libs/Files/constants/aws-buckets.constant';
+import { AwsBuckets } from '../../../../../../apps/libs/Files/constants/aws-buckets.constant';
 
 @CommandHandler(UpdateUserByCriteriaCommand)
 export class UpdateUserByCriteriaHandler
