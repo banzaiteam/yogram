@@ -2,33 +2,75 @@ import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/resp
 import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  OnGatewayConnection,
+  OnGatewayInit,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
 import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { NotificationsService } from './notifications.service';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
+import { OnModuleInit } from '@nestjs/common';
+import { io, Socket as Socket1 } from 'socket.io-client';
 
-@WebSocketGateway()
-export class NotificationsGateway implements INotificationsService {
+export class NotificationsGateway
+  implements
+    INotificationsService,
+    OnModuleInit,
+    OnGatewayConnection,
+    OnGatewayInit
+{
   private connectedClients: Map<string, Socket> = new Map();
-  @WebSocketServer()
-  private server: Server;
+  private socket: Socket1;
   constructor(
     private readonly notificationsService: NotificationsService,
-    private readonly jwtService: JwtService,
+    // private readonly jwtService: JwtService,
   ) {}
 
-  afterInit(server: any) {
-    const authMiddleware = socketAuthMiddleware(this.jwtService);
-    server.use(authMiddleware);
-  }
-  handleDisconnect(socket: Socket) {
-    this.notificationsService.handleDisconnect(socket);
+  async onModuleInit() {
+    const jwtService = new JwtService({ global: true });
+    const token = await jwtService.signAsync(
+      { id: 'd25a77e9-1e92-469f-8e01-c325e8220cc9' },
+      { secret: 'secret_jwt_1234' },
+    );
+    // console.log('🚀 ~ NotificationsGateway ~ onModuleInit ~ token:', token);
+    this.socket = io('http://localhost:3007/notifications', {
+      auth: { authorization: token },
+    });
+    this.socket.on('connect', () => {
+      console.log('Connected to WebSocket Gateway!');
+    });
+    this.socket.on('message_from_gateway', (data: any) => {
+      console.log('Received from gateway:', data);
+    });
+    this.socket.on('connectedSocket', (data: any) => {
+      console.log('connectedSocket', data);
+    });
+    this.socket.emit('send_to_gateway', 'hello');
   }
 
+  sendMessageToGateway(message: string) {
+    this.socket.emit('send_to_gateway', message); // Emit events to the gateway
+  }
+
+  afterInit(server: any) {
+    // const authMiddleware = socketAuthMiddleware(this.jwtService);
+    // server.use(authMiddleware);
+  }
+  // handleDisconnect(socket: Socket) {
+  //   this.notificationsService.handleDisconnect(socket);
+  // }
+
   handleConnection(socket: Socket) {
-    this.notificationsService.handleConnection(socket);
+    console.log(
+      '🚀 ~ NotificationsGateway ~ handleConnection ~ socket:',
+      socket.id,
+    );
+    // this.notificationsService.handleConnection(socket);
+    this.sendMessageToGateway(`connected ${socket.id}`);
   }
 
   async saveNotification(

@@ -92,7 +92,7 @@ export class BusinessCommandService {
         await this.businessQueryService.getCurrentUserSubscriptions(
           subscription.userId,
         );
-      //todo* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
+
       const price = getSubscriptionPrice(subscription.subscriptionType);
       const updatePlanDto = {
         subscriptionType: subscription.subscriptionType,

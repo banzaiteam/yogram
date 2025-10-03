@@ -220,9 +220,9 @@ export class PayPalService implements IPaymentService {
         },
       },
     };
-    //todo! To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
-    //todo! which effectively bypasses the trial period and initiates the subscription right away. Alternatively, you can set the trial_duration_unit to "month"
-    //todo! but specify trial_duration as 0, which achieves the same result of starting the subscription immediately without a trial.
+    // To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
+    // which effectively bypasses the trial period and initiates the subscription right away. Alternatively, you can set the trial_duration_unit to "month"
+    // but specify trial_duration as 0, which achieves the same result of starting the subscription immediately without a trial.
 
     const response = await axios.post(
       'https://api-m.sandbox.paypal.com/v1/billing/subscriptions',
