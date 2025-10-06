@@ -67,6 +67,7 @@ export class BusinessController {
     @Body() body: { subscriptionId: string; expiresAt: Date },
   ): Promise<void> {
     const { subscriptionId } = body;
+    console.log('business/subscriptions/updated ~ body:', body);
     console.log('business/subscriptions/updated', subscriptionId);
     return await this.commandBus.execute(
       new SubscriptionUpdatedCommand(subscriptionId),

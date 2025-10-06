@@ -14,14 +14,20 @@ export class DatabaseModule {
           inject: [ConfigService],
           useFactory: (configService: ConfigService) =>
             <DataSourceOptions>{
-              type: configService.get('type'),
               url: configService.get('url'),
+              type: configService.get('type'),
+              // host: configService.get('host'),
+              // port: configService.get('port'),
+              // username: configService.get('username'),
+              // password: configService.get('password'),
+              // database: configService.get('database'),
               extra: {
                 max: 40,
                 maxPoolClients: 50,
                 reconnect: true,
                 reconnectInterval: 1000,
                 poolPingInterval: 2000,
+                ssl: false,
               },
               poolSize: 40,
               connectionTimeoutMillis: 2000,

@@ -63,6 +63,7 @@ import {
 import { BullModule } from '@nestjs/bullmq';
 import { NotificationsProducer } from './notifications-producer.service';
 import { NotificationConsumer } from './notifications-consumer.service';
+import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -102,42 +103,42 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
         process.env.NODE_ENV !== EnvironmentMode.TESTING,
       envFilePath: getEnvFilePath(process.env.NODE_ENV as EnvironmentsTypes),
     }),
-    // DatabaseModule.register(),
+    DatabaseModule.register(),
     TypeOrmModule.forFeature([Payment, Subscription]),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return <DataSourceOptions>{
-          type: configService.get('type').toString(),
-          replication: {
-            defaultMode: 'master',
-            master: {
-              url: configService.get('url'),
-              migrationsTableName: configService.get('migrationsTableName'),
-              migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-              autoLoadEntities: configService.get('autoLoadEntities'),
-              synchronize: configService.get('synchronize'),
-              dropSchema: configService.get('dropSchema'),
-            },
-            slaves: [
-              {
-                url: configService.get('urlSlave'),
-                migrationsTableName: configService.get('migrationsTableName'),
-                migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-                autoLoadEntities: configService.get('autoLoadEntities'),
-                synchronize: configService.get('synchronize'),
-                dropSchema: configService.get('dropSchema'),
-              },
-            ],
-          },
-          entities: [Payment, Subscription],
-        };
-      },
-      dataSourceFactory: async (options) => {
-        return await new DataSource(options).initialize();
-      },
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => {
+    //     return <DataSourceOptions>{
+    //       type: configService.get('type').toString(),
+    //       replication: {
+    //         defaultMode: 'master',
+    //         master: {
+    //           url: configService.get('url'),
+    //           migrationsTableName: configService.get('migrationsTableName'),
+    //           migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+    //           autoLoadEntities: configService.get('autoLoadEntities'),
+    //           synchronize: configService.get('synchronize'),
+    //           dropSchema: configService.get('dropSchema'),
+    //         },
+    //         slaves: [
+    //           {
+    //             url: configService.get('urlSlave'),
+    //             migrationsTableName: configService.get('migrationsTableName'),
+    //             migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+    //             autoLoadEntities: configService.get('autoLoadEntities'),
+    //             synchronize: configService.get('synchronize'),
+    //             dropSchema: configService.get('dropSchema'),
+    //           },
+    //         ],
+    //       },
+    //       entities: [Payment, Subscription],
+    //     };
+    //   },
+    //   dataSourceFactory: async (options) => {
+    //     return await new DataSource(options).initialize();
+    //   },
+    // }),
   ],
   controllers: [BusinessController],
   providers: [

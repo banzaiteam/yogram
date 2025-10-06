@@ -1,0 +1,3 @@
+FROM elestio/pgadmin:latest
+EXPOSE 80
+
