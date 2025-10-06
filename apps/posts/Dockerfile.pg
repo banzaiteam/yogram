@@ -1,0 +1,6 @@
+FROM postgres:latest
+
+EXPOSE 5432
+ENV POSTGRES_URL=POSTGRES_URL
+ENV POSTGRES_TYPE=postgres
+VOLUME /db-data:var/lib/postgresql/data/posts

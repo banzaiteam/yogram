@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddPostsDeleteOutbox1750860393108 implements MigrationInterface {
+export class InitTable1759504948061 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
     }
