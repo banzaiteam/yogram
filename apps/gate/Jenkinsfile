@@ -5,7 +5,7 @@ pipeline {
         ENV_TYPE = "production"
         PORT = 3869
         NAMESPACE = "yogram-ru"
-        REGISTRY_HOSTNAME = "idogmat"
+        REGISTRY_HOSTNAME = "backtobackend226"
         PROJECT = "gate-yogram"
         SERVICE="gate"
         REGISTRY = "registry.hub.docker.com"
