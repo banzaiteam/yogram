@@ -22,6 +22,11 @@ spec:
             - containerPort: PORT_CONTAINER
 
           env:
+            - name: USERS_PROD_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-production-config-secret
+                  key: USERS_PROD_SERVICE_URL
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -107,6 +112,11 @@ spec:
                 secretKeyRef:
                   name: yogram-production-config-secret
                   key: FORGOT_PASSWORD_TOKEN_EXPIRES
+            - name: POSTS_PROD_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-production-config-secret
+                  key: POSTS_PROD_SERVICE_URL
             - name: REDIS_USER
               valueFrom:
                 secretKeyRef:
@@ -127,11 +137,6 @@ spec:
                 secretKeyRef:
                   name: yogram-production-config-secret
                   key: REDIS_PORT
-            - name: POSTS_PROD_SERVICE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: yogram-production-config-secret
-                  key: POSTS_PROD_SERVICE_URL
             - name: NODE_ENV
               valueFrom:
                 secretKeyRef:
