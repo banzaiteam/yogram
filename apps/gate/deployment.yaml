@@ -107,11 +107,6 @@ spec:
                 secretKeyRef:
                   name: yogram-production-config-secret
                   key: FORGOT_PASSWORD_TOKEN_EXPIRES
-            - name: POSTS_PROD_SERVICE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: yogram-production-config-secret
-                  key: POSTS_PROD_SERVICE_URL
             - name: REDIS_USER
               valueFrom:
                 secretKeyRef:
