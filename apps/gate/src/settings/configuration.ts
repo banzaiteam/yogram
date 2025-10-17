@@ -21,7 +21,7 @@ export const getConfiguration = () => {
           process.env.NODE_ENV === 'DEVELOPMENT' ||
           process.env.NODE_ENV === 'TESTING'
             ? `http://localhost:${process.env[u + '_PORT']}/api/v1`
-            : `${process.env[u + '_PROD_SERVICE_URL']}/api/v1`,
+            : `${process.env[u + '_SERVICE_URL']}/api/v1`,
       });
       return acc;
     },
