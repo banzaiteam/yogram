@@ -152,6 +152,11 @@ spec:
                 secretKeyRef:
                   name: yogram-production-config-secret
                   key: BUSINESS_SERVICE_URL
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-production-config-secret
+                  key: PORT
             - name: NODE_ENV
               valueFrom:
                 secretKeyRef:
