@@ -75,6 +75,7 @@ export class BusinessQueryService {
         id,
         entityManager,
       );
+
     const currentSubscriptions = subscriptions.filter((subscription) => {
       if (
         subscription.expiresAt &&

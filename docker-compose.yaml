@@ -1,0 +1,22 @@
+services:
+  postgres-users:
+    image: postgres
+    env_file:
+      - apps/users/src/.env.development
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - ./db-data:/bitnami/postgresql
+    environment:
+      - POSTGRES_HOST=localhost
+      - POSTGRES_DATABASE=users2
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=796163
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d users']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    # networks:
+    #   - docker-network
