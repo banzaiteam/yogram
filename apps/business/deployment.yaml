@@ -22,63 +22,58 @@ spec:
             - containerPort: PORT_CONTAINER
 
           env:
-            - name: POSTGRES_TYPE
-              valueFrom:
-                secretKeyRef:
-                  name: business-production-config-secret
-                  key: POSTGRES_TYPE
-            - name: BUSINESS_SERVICE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: business-production-config-secret
-                  key: BUSINESS_SERVICE_URL
-            - name: POSTGRES_URL_SLAVE
-              valueFrom:
-                secretKeyRef:
-                  name: business-production-config-secret
-                  key: POSTGRES_URL_SLAVE
-            - name: PAYPAL_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: business-production-config-secret
-                  key: PAYPAL_CLIENT_ID
             - name: PAYPAL_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: PAYPAL_SECRET
             - name: USERS_SERVICE_URL
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: USERS_SERVICE_URL
-            - name: REDIS_USER
-              valueFrom:
-                secretKeyRef:
-                  name: business-production-config-secret
-                  key: REDIS_USER
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: REDIS_PASSWORD
             - name: REDIS_HOST
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: REDIS_HOST
             - name: REDIS_PORT
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: REDIS_PORT
             - name: TIME_PERIOD
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: TIME_PERIOD
+            - name: REDIS_USER
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-business-production-config-secret
+                  key: REDIS_USER
+            - name: BUSINESS_SERVICE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-business-production-config-secret
+                  key: BUSINESS_SERVICE_URL
+            - name: POSTGRES_TYPE
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-business-production-config-secret
+                  key: POSTGRES_TYPE
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:
-                  name: business-production-config-secret
+                  name: yogram-business-production-config-secret
                   key: POSTGRES_URL
+            - name: PAYPAL_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-business-production-config-secret
+                  key: PAYPAL_CLIENT_ID
