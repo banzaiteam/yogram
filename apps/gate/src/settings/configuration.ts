@@ -10,7 +10,7 @@ export const EnvironmentMode = {
   TESTING: 'TESTING',
 };
 export const Environments = Object.keys(EnvironmentMode);
-
+//
 export const getConfiguration = () => {
   const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES', 'BUSINESS'];
 
