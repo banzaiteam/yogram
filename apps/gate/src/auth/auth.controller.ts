@@ -66,8 +66,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    console.log('auth login');
-
     const userAgent = req.headers['user-agent'];
     const [accessToken, refreshToken] = await this.authService.proccessLogin(
       user.id,

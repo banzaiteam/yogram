@@ -10,10 +10,10 @@ export const EnvironmentMode = {
   TESTING: 'TESTING',
 };
 export const Environments = Object.keys(EnvironmentMode);
-//
+
 export const getConfiguration = () => {
   const SERVICES_NAMES = ['USERS', 'POSTS', 'FILES', 'BUSINESS'];
-  //todo! api/v1 problem when call microservices
+
   const SERVICES_URLS = SERVICES_NAMES.reduce<Record<string, string>>(
     (acc, u) => {
       Object.assign(acc, {
@@ -21,13 +21,13 @@ export const getConfiguration = () => {
           process.env.NODE_ENV === 'DEVELOPMENT' ||
           process.env.NODE_ENV === 'TESTING'
             ? `http://localhost:${process.env[u + '_PORT']}/api/v1`
-            : `${process.env[u + '_SERVICE_URL']}`,
+            : `${process.env[u + '_PROD_SERVICE_URL']}/api/v1`,
       });
       return acc;
     },
     {},
   );
-  console.log('SERVICES_URLS', SERVICES_URLS); // http://yogram-users-service.yogram-ru:4049/api/v1
+  console.log('SERVICES_URLS', SERVICES_URLS);
 
   return {
     NODE_ENV: (Environments.includes(process.env.NODE_ENV?.trim())
