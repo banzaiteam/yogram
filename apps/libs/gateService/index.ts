@@ -33,11 +33,6 @@ export class GateService {
 
   async requestHttpServicePost(service, path, payload, headers) {
     try {
-      console.log(
-        'users login url =',
-        [this.services[service], path].join('/'),
-      );
-
       const { data } = await lastValueFrom(
         this.httpService.post(
           [this.services[service], path].join('/'),
@@ -56,6 +51,10 @@ export class GateService {
 
   async requestHttpServiceGet(service, path, headers) {
     try {
+      console.log(
+        'users login url =',
+        [this.services[service], path].join('/'),
+      );
       const { data } = await lastValueFrom(
         this.httpService.get([this.services[service], path].join('/'), {
           headers,
