@@ -105,40 +105,40 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
     }),
     DatabaseModule.register(),
     TypeOrmModule.forFeature([Payment, Subscription]),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return <DataSourceOptions>{
-          type: configService.get('type').toString(),
-          replication: {
-            defaultMode: 'master',
-            master: {
-              url: configService.get('url'),
-              migrationsTableName: configService.get('migrationsTableName'),
-              migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-              autoLoadEntities: true,
-              synchronize: false,
-              dropSchema: false,
-            },
-            slaves: [
-              {
-                url: configService.get('urlSlave'),
-                migrationsTableName: configService.get('migrationsTableName'),
-                migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-                autoLoadEntities: true,
-                synchronize: false,
-                dropSchema: false,
-              },
-            ],
-          },
-          entities: [Payment, Subscription],
-        };
-      },
-      dataSourceFactory: async (options) => {
-        return await new DataSource(options).initialize();
-      },
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => {
+    //     return <DataSourceOptions>{
+    //       type: configService.get('type').toString(),
+    //       replication: {
+    //         defaultMode: 'master',
+    //         master: {
+    //           url: configService.get('url'),
+    //           migrationsTableName: configService.get('migrationsTableName'),
+    //           migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+    //           autoLoadEntities: true,
+    //           synchronize: false,
+    //           dropSchema: false,
+    //         },
+    //         slaves: [
+    //           {
+    //             url: configService.get('urlSlave'),
+    //             migrationsTableName: configService.get('migrationsTableName'),
+    //             migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
+    //             autoLoadEntities: true,
+    //             synchronize: false,
+    //             dropSchema: false,
+    //           },
+    //         ],
+    //       },
+    //       entities: [Payment, Subscription],
+    //     };
+    //   },
+    //   dataSourceFactory: async (options) => {
+    //     return await new DataSource(options).initialize();
+    //   },
+    // }),
   ],
   controllers: [BusinessController],
   providers: [
