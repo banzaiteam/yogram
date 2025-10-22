@@ -17,33 +17,34 @@ async function bootstrap() {
   });
   // todo! try cors origin: * and app.set('trust proxy', true);
   // app.set('trust proxy', true);
-  // app.enableCors({
-  //   allowedHeaders: [
-  //     'Access-Control-Allow-Origin',
-  //     'Access-Control-Allow-Headers',
-  //     'Content-Type',
-  //     'Authorization',
-  //     'Content-Length',
-  //     'Host',
-  //     'Accept',
-  //     'Accept-Encoding',
-  //     'Connection',
-  //     'User-Agent',
-  //     'x-recaptcha-token',
-  //   ],
-  //   exposedHeaders: ['Set-cookie'],
+  app.enableCors({
+    allowedHeaders: [
+      // 'Access-Control-Allow-Origin',
+      // 'Access-Control-Allow-Headers',
+      // 'Content-Type',
+      // 'Authorization',
+      // 'Content-Length',
+      // 'Host',
+      // 'Accept',
+      // 'Accept-Encoding',
+      // 'Connection',
+      // 'User-Agent',
+      // 'x-recaptcha-token',
+      '*',
+    ],
+    exposedHeaders: ['Set-cookie'],
 
-  //   origin: [
-  //     'https://yogram.ru',
-  //     'http://localhost:5173',
-  //     'http://localhost:56938',
-  //     'https://localhost:3000',
-  //     'http://localhost:3000',
-  //     'http://localhost',
-  //     '*',
-  //   ],
-  //   credentials: true,
-  // });
+    origin: [
+      // 'https://yogram.ru',
+      // 'http://localhost:5173',
+      // 'http://localhost:56938',
+      // 'https://localhost:3000',
+      // 'http://localhost:3000',
+      // 'http://localhost',
+      '*',
+    ],
+    credentials: true,
+  });
 
   const { port, env } = applyAppSettings(app);
 
