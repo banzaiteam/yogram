@@ -30,6 +30,7 @@ async function bootstrap() {
       'Connection',
       'User-Agent',
       'x-recaptcha-token',
+      '*',
     ],
     exposedHeaders: ['Set-cookie'],
 
