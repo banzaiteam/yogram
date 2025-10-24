@@ -117,7 +117,8 @@ export class BusinessController {
       payment,
     );
     console.log('link:', response.link);
-    res.status(200).redirect(303, response.link);
+    // res.status(200).redirect(303, response.link);
+    return res.status(307).json({ link: response.link });
   }
 
   @Public()
