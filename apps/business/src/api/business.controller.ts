@@ -21,6 +21,7 @@ import {
   Param,
   Patch,
   Post,
+  Res,
   Sse,
 } from '@nestjs/common';
 import {
@@ -38,6 +39,8 @@ import {
 import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
 import { ReadNotificationCommand } from '../application/command/read-notification.command';
 import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class BusinessController {
@@ -45,6 +48,7 @@ export class BusinessController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {
     this.eventEmitter = new EventEmitter2();
   }
@@ -57,8 +61,14 @@ export class BusinessController {
   @Post('business/paypal-proccess')
   async paypalProcess(
     @Body('subscriptionId') subscriptionId: string,
+    @Res() res: Response,
   ): Promise<void> {
-    await this.commandBus.execute(new SaveSubscriptionCommand(subscriptionId));
+    const subscription = await this.commandBus.execute(
+      new SaveSubscriptionCommand(subscriptionId),
+    );
+    let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
+    page = page.replace('replace', subscription.userId);
+    res.redirect(301, page);
   }
 
   @HttpCode(200)

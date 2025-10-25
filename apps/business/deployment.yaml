@@ -72,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: yogram-business-production-config-secret
                   key: POSTGRES_URL
+            - name: PROFILE_SETTINGS_PAGE
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-business-production-config-secret
+                  key: PROFILE_SETTINGS_PAGE
             - name: PAYPAL_CLIENT_ID
               valueFrom:
                 secretKeyRef:
