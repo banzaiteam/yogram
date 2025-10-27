@@ -63,13 +63,13 @@ export class BusinessController {
     @Body('subscriptionId') subscriptionId: string,
     @Res() res: Response,
   ): Promise<void> {
-    const subscription = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new SaveSubscriptionCommand(subscriptionId),
     );
-    let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
-    page = page.replace('replace', subscription.userId);
-    console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
-    res.redirect('https://www.google.com/');
+    // let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
+    // page = page.replace('replace', subscription.userId);
+    // console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
+    // res.redirect(301, 'https://www.google.com/');
   }
 
   @HttpCode(200)

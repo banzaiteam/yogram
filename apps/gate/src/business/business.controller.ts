@@ -127,12 +127,21 @@ export class BusinessController {
   async paypalProcess(
     @Req() req: Request,
     @Query('payment') payment: PaymentType,
+    @Res() res: Response,
   ): Promise<void> {
     if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
-      return await this.businessService.paypalProccess(
+      const subscription = await this.businessService.paypalProccess(
         req.body.resource.id,
         payment,
       );
+      console.log(
+        '🚀 ~ BusinessController ~ paypalProcess ~ subscription:',
+        subscription['userId'],
+      );
+      let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
+      page = page.replace('replace', subscription['userId']);
+      console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
+      res.redirect(301, page);
     }
   }
 
