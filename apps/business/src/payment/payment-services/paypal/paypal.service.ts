@@ -311,6 +311,36 @@ export class PayPalService implements IPaymentService {
     }
   }
 
+  async cancelSubscription(id: string): Promise<any> {
+    const token = await this.authentication();
+    const status = (await this.getSubscription(id)).status;
+    console.log('🚀 ~ PayPalService ~ cancelSubscription ~ status:', status);
+    if (status === 'CANCELLED')
+      throw new ConflictException(
+        'PayPalService error: subscription is canceled already',
+      );
+
+    try {
+      return await axios.post(
+        `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/cancel`,
+        { reason: 'Activate' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      console.log(
+        '🚀 ~ PayPalService ~ activateSubscription ~ err:',
+        err.response.data.details,
+      );
+      throw new HttpException(err.response.data, err.response.status);
+    }
+  }
+
   async getSubscription(id: string): Promise<any> {
     const token = await this.authentication();
     return (

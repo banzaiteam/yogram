@@ -42,6 +42,7 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 import { ReadNotificationSwagger } from './decorators/swagger/read-notification.swagger.decorator';
+import { CancelSubscriptionSwagger } from './decorators/swagger/cancel-subscription.swagger';
 
 @Controller('business')
 export class BusinessController {
@@ -199,6 +200,15 @@ export class BusinessController {
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
     return await this.businessService.activateSubscription(id, payment);
+  }
+
+  @CancelSubscriptionSwagger()
+  @Patch('subscriptions/:id/cancel')
+  async cancelSubscription(
+    @Param('id') id: string,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    return await this.businessService.cancelSubscription(id, payment);
   }
 
   @GetPaymentsSwagger()

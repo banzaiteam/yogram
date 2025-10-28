@@ -30,4 +30,6 @@ export abstract class IPaymentService {
   abstract suspendSubscription(id: string): Promise<any>;
 
   abstract activateSubscription(id: string): Promise<any>;
+
+  abstract cancelSubscription(id: string): Promise<any>;
 }

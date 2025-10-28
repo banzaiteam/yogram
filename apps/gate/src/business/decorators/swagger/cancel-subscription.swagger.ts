@@ -8,7 +8,7 @@ import {
 import { applyDecorators } from '@nestjs/common';
 import { PaymentType } from '../../../../../../apps/libs/Business/constants/payment-type.enum';
 
-export function ActivateSubscriptionSwagger() {
+export function CancelSubscriptionSwagger() {
   return applyDecorators(
     ApiHeader({
       name: 'Authorization',
@@ -27,8 +27,7 @@ export function ActivateSubscriptionSwagger() {
       enum: PaymentType,
     }),
     ApiOperation({
-      summary:
-        'Activate suspended subscription. If it`s not expired then next scheduled payment will be charged. If yet one subscription exists, it will be switched to suspended',
+      summary: 'Cancel subscription.',
     }),
     ApiResponse({
       status: 200,
@@ -39,7 +38,7 @@ export function ActivateSubscriptionSwagger() {
     }),
     ApiResponse({
       status: 409,
-      description: 'PayPalService error: subscription is active already ',
+      description: 'PayPalService error: subscription is canceled already',
     }),
   );
 }

@@ -41,6 +41,7 @@ import { ReadNotificationCommand } from '../application/command/read-notificatio
 import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { CancelSubscriptionCommand } from '../application/command/cancel-subscription.handler';
 
 @Controller()
 export class BusinessController {
@@ -122,6 +123,12 @@ export class BusinessController {
   async activateSubscription(@Param('id') id: string): Promise<void> {
     console.log('🚀 ~ BusinessController ~ activateSubscription ~ id:', id);
     return await this.commandBus.execute(new ActivateSubscriptionCommand(id));
+  }
+
+  @Patch('business/subscriptions/:id/cancel')
+  async cancelSubscription(@Param('id') id: string): Promise<void> {
+    console.log('🚀 ~ BusinessController ~ cancelSubscription ~ id:', id);
+    return await this.commandBus.execute(new CancelSubscriptionCommand(id));
   }
 
   @Get('business/subscriptions/get/:id')
