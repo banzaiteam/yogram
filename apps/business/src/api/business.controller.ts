@@ -64,9 +64,10 @@ export class BusinessController {
     @Body('subscriptionId') subscriptionId: string,
     @Res() res: Response,
   ): Promise<void> {
-    return await this.commandBus.execute(
+    const subscription = await this.commandBus.execute(
       new SaveSubscriptionCommand(subscriptionId),
     );
+    res.status(200).json(subscription);
     // let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
     // page = page.replace('replace', subscription.userId);
     // console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);

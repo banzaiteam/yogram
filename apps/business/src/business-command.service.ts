@@ -13,10 +13,11 @@ import { IPaymentService } from './payment/interfaces/payment-service.interface'
 import { SaveSubscriptionDto } from './payment/payment-services/paypal/dto/save-subscription.dto';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { BusinessQueryService } from './business-query.service';
 import { SubscriptionUpdateDto } from './dto/subscription-update.dto';
 import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class BusinessCommandService {
@@ -28,6 +29,8 @@ export class BusinessCommandService {
     private readonly paymentService: IPaymentService,
     private readonly businessQueryService: BusinessQueryService,
     private readonly notificationGateway: NotificationsGateway,
+    @InjectRepository(Subscription)
+    private readonly subscriptionCommandRepository: Repository<Subscription>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -37,13 +40,23 @@ export class BusinessCommandService {
         subscribeDto.userId,
       );
 
-    if (currentSubscriptions.length > 1) {
+    const currentSubscriptionsWithoutCancelled = currentSubscriptions.filter(
+      (subscription) => {
+        return subscription.status !== SubscriptionStatus.Canceled;
+      },
+    );
+    console.log(
+      '🚀 ~ BusinessCommandService ~ subscribe ~ currentSubscriptionsWithoutCancelled:',
+      currentSubscriptionsWithoutCancelled,
+    );
+
+    if (currentSubscriptionsWithoutCancelled.length > 1) {
       throw new BadRequestException(
         'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
       );
     }
 
-    currentSubscriptions?.map((subscription) => {
+    currentSubscriptionsWithoutCancelled?.map((subscription) => {
       if (
         new Date(subscription.expiresAt) > new Date() &&
         subscription.subscriptionType === subscribeDto.subscriptionType
@@ -98,6 +111,11 @@ export class BusinessCommandService {
           subscription.userId,
         );
 
+      const currentSubscriptionsWithoutCancelled =
+        currentSubscriptionsArr.filter((subscription) => {
+          return subscription.status !== SubscriptionStatus.Canceled;
+        });
+
       const price = getSubscriptionPrice(subscription.subscriptionType);
       const updatePlanDto = {
         subscriptionType: subscription.subscriptionType,
@@ -112,8 +130,8 @@ export class BusinessCommandService {
       );
       //* expires+1 when it second subscription
       const startDate = new Date(
-        currentSubscriptionsArr.length === 1
-          ? currentSubscriptionsArr[0].expiresAt
+        currentSubscriptionsWithoutCancelled.length === 1
+          ? currentSubscriptionsWithoutCancelled[0].expiresAt
           : paypalSubscription.start_time,
       );
 
@@ -145,11 +163,31 @@ export class BusinessCommandService {
           subscription.userId,
           queryRunner.manager,
         );
-      const firstSubscription: Subscription[] = currentSubscriptions.filter(
-        (subscr) => subscr.id !== subscription.id,
+
+      const currentSubscriptionsWithoutCancelled1 = currentSubscriptions.filter(
+        (subscription) => {
+          return subscription.status !== SubscriptionStatus.Canceled;
+        },
       );
-      if (currentSubscriptions.length === 2) {
+      console.log(
+        '🚀 ~ BusinessCommandService ~ saveSubscription ~ currentSubscriptionsWithoutCancelled1:',
+        currentSubscriptionsWithoutCancelled1,
+      );
+      // get suspended
+      const firstSubscription: Subscription[] =
+        currentSubscriptionsWithoutCancelled1.filter(
+          (subscr) => subscr.id !== subscription.id,
+        );
+      console.log(
+        '🚀 ~ BusinessCommandService ~ saveSubscription ~ firstSubscription:',
+        firstSubscription,
+      );
+      if (currentSubscriptionsWithoutCancelled1.length === 2) {
         firstSubscription[0].status = SubscriptionStatus.Suspended;
+        console.log(
+          '🚀 ~ BusinessCommandService ~ saveSubscription ~ firstSubscription[0]:',
+          firstSubscription[0],
+        );
         await this.suspendSubscription(firstSubscription[0].subscriptionId);
       }
       const subscription1 = await this.paymentService.getSubscription(
@@ -274,11 +312,13 @@ export class BusinessCommandService {
       await this.paymentService.cancelSubscription(id);
 
       subscription.status = SubscriptionStatus.Canceled;
-      const updatedSubscription =
-        await this.businessCommandRepository.saveSubscription(
-          subscription,
-          queryRunner.manager,
-        );
+      console.log(
+        '🚀 ~ BusinessCommandService ~ cancelSubscription ~ subscription:',
+        subscription,
+      );
+      await queryRunner.manager.save(subscription);
+      // await this.subscriptionCommandRepository.save(subscription);
+
       // todo! problem if second is suspended
       // if (currentSubscriptions.length === 2) {
       //   const anotherSubscription: Subscription[] = currentSubscriptions.filter(

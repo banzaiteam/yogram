@@ -142,7 +142,9 @@ export class BusinessController {
       let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
       page = page.replace('replace', subscription['userId']);
       console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
-      res.redirect(301, page);
+      // res.redirect(301, page);
+      // res.sendStatus(200);
+      return subscription;
     }
   }
 
