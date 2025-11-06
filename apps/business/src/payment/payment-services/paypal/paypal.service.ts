@@ -14,6 +14,7 @@ import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
 import { SubscriptionStatus } from './constants/subscription-status.enum';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -21,6 +22,7 @@ export class PayPalService implements IPaymentService {
     private readonly client_id: string,
     private readonly client_secret: string,
     private readonly businessServiceUrl: string,
+    private readonly configService: ConfigService,
   ) {
     this.client = new Client({
       clientCredentialsAuthCredentials: {
@@ -179,6 +181,7 @@ export class PayPalService implements IPaymentService {
   }
 
   async subscribeToPlan(
+    userId: string,
     subscriptionType: SubscriptionType,
     startAt?: string,
   ): Promise<any> {
@@ -205,6 +208,11 @@ export class PayPalService implements IPaymentService {
     const nextDay = startAt
       ? startAt
       : new Date(today.setDate(today.getDate() + 1)).toISOString();
+
+    let returnUrl = this.configService.get('PROFILE_SETTINGS_PAGE');
+    returnUrl = returnUrl.replace('replace', userId);
+    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ returnUrl:', returnUrl);
+
     const subscribe = {
       plan_id: plan['id'],
       quantity: 1,
@@ -218,6 +226,8 @@ export class PayPalService implements IPaymentService {
           payer_selected: 'PAYPAL',
           payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
         },
+        return_url: returnUrl,
+        cancel_url: '',
       },
     };
     // To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,

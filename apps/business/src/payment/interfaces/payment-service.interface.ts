@@ -2,6 +2,7 @@ import { SubscriptionType } from '../../../../../apps/libs/Business/constants/su
 
 export abstract class IPaymentService {
   abstract subscribeToPlan(
+    userId: string,
     subscriptionType: SubscriptionType,
     startAt?: string,
   ): Promise<any>;

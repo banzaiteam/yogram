@@ -3,6 +3,7 @@ import { PayPalService } from './payment-services/paypal/paypal.service';
 import { StripeService } from './payment-services/stripe/stripe.service';
 import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';
 import { RequestContext } from 'nestjs-request-context';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PaymentFactory {
@@ -32,7 +33,12 @@ export class PaymentFactory {
 
     switch (service) {
       case PaymentType.PAYPAL: {
-        return new PayPalService(clientId, secret, businessServiceUrl);
+        return new PayPalService(
+          clientId,
+          secret,
+          businessServiceUrl,
+          new ConfigService(),
+        );
       }
       case PaymentType.STRIPE: {
         return this.stripeService;

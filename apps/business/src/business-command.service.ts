@@ -45,10 +45,6 @@ export class BusinessCommandService {
         return subscription.status !== SubscriptionStatus.Canceled;
       },
     );
-    console.log(
-      '🚀 ~ BusinessCommandService ~ subscribe ~ currentSubscriptionsWithoutCancelled:',
-      currentSubscriptionsWithoutCancelled,
-    );
 
     if (currentSubscriptionsWithoutCancelled.length > 1) {
       throw new BadRequestException(
@@ -77,6 +73,7 @@ export class BusinessCommandService {
     );
 
     const response = await this.paymentService.subscribeToPlan(
+      subscribeDto.userId,
       subscribeDto.subscriptionType,
       currentSubscriptions.length === 1 ? start_date.toISOString() : undefined,
     );
