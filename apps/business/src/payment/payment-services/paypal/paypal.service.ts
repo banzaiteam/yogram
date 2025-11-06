@@ -210,9 +210,11 @@ export class PayPalService implements IPaymentService {
       : new Date(today.setDate(today.getDate() + 1)).toISOString();
 
     let returnUrl = this.configService.get('PROFILE_SETTINGS_PAGE');
-    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ returnUrl:', returnUrl);
     returnUrl = returnUrl.replace('replace', userId);
-    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ returnUrl:', returnUrl);
+    const successUrl = [returnUrl, 'success=1'].join('?');
+    const cancelUrl = [returnUrl, 'success=0'].join('?');
+    console.log('🚀 ~ PayPalService successUrl:', successUrl);
+    console.log('🚀 ~ PayPalService cancelUrl:', cancelUrl);
 
     const subscribe = {
       plan_id: plan['id'],
@@ -228,7 +230,7 @@ export class PayPalService implements IPaymentService {
           payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
         },
         return_url: returnUrl,
-        cancel_url: '',
+        cancel_url: cancelUrl,
       },
     };
     // To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
