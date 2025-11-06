@@ -202,7 +202,7 @@ export class PayPalService implements IPaymentService {
     if (!plan)
       throw new BadRequestException('Paypal error: plan does not exist');
     // console.log('plan', plan);
-
+    //
     const token = await this.authentication();
     const today = new Date();
     const nextDay = startAt
@@ -210,6 +210,7 @@ export class PayPalService implements IPaymentService {
       : new Date(today.setDate(today.getDate() + 1)).toISOString();
 
     let returnUrl = this.configService.get('PROFILE_SETTINGS_PAGE');
+    console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ returnUrl:', returnUrl);
     returnUrl = returnUrl.replace('replace', userId);
     console.log('🚀 ~ PayPalService ~ subscribeToPlan ~ returnUrl:', returnUrl);
 
