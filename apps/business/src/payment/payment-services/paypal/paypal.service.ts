@@ -229,7 +229,7 @@ export class PayPalService implements IPaymentService {
           payer_selected: 'PAYPAL',
           payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
         },
-        return_url: returnUrl,
+        return_url: successUrl,
         cancel_url: cancelUrl,
       },
     };
