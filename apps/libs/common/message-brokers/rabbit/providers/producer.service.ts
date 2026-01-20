@@ -38,6 +38,7 @@ export class ProducerService {
 
   async connect() {
     const url = this.configService.get<string>('RMQ_URL');
+    console.log('🚀 ~ ProducerService ~ connect ~ url:', url);
     const connection = connect(url);
     await connection.connect();
     connection.on('connect', () => console.log('rabbit provider Connected!'));

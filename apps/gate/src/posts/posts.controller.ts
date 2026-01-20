@@ -253,6 +253,7 @@ export class PostsController {
     @SortingParams(['createdAt', 'isPublished']) sorting?: ISorting,
     @FilteringParams(['id', 'isPublished', 'userId']) filtering?: IFiltering,
   ): Promise<PostPaginatedResponseDto> {
+    console.log('🚀 ~ PostsController ~ get ~ filtering:', filtering);
     const posts = await this.postsService.get(pagination, sorting, filtering);
     return plainToInstance(PostPaginatedResponseDto, posts);
   }
