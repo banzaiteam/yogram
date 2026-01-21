@@ -8,6 +8,15 @@ import {
 import { applyDecorators, HttpStatus } from '@nestjs/common';
 import { SubscribeDto } from '../../../../../apps/libs/Business/dto/input/subscribe.dto';
 import { PaymentType } from '../../../../../apps/libs/Business/constants/payment-type.enum';
+import { IsString } from 'class-validator';
+import { Expose } from 'class-transformer';
+
+@Expose()
+class SubscribeResponseDto {
+  @Expose()
+  @IsString()
+  link: string;
+}
 
 export const SubscribeSwagger = () =>
   applyDecorators(
@@ -29,8 +38,9 @@ export const SubscribeSwagger = () =>
     }),
     ApiBody({ type: SubscribeDto }),
     ApiResponse({
-      status: HttpStatus.OK,
-      description: 'Success and redirected',
+      status: HttpStatus.TEMPORARY_REDIRECT,
+      type: SubscribeResponseDto,
+      description: 'Need to open this link in browser',
     }),
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,

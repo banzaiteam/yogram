@@ -25,6 +25,11 @@ export class NotificationsService implements INotificationsService {
     this.redisClient.call('');
   }
 
+  //todo* add addClient / removeClient
+  addClient(socket: Socket) {}
+
+  removeClient(socket: Socket) {}
+
   handleDisconnect(socket: Socket) {
     this.connectedClients.delete(socket.id);
 
@@ -54,6 +59,7 @@ export class NotificationsService implements INotificationsService {
         ? ''
         : 'dev:'
     }notifications:user:${userId}:notification:*`;
+
     const stream = this.redisClient.scanStream({
       match: match,
     });

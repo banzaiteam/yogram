@@ -30,10 +30,13 @@ async function bootstrap() {
       'Connection',
       'User-Agent',
       'x-recaptcha-token',
+      '*',
     ],
     exposedHeaders: ['Set-cookie'],
 
     origin: [
+      'https://developer.paypal.com',
+      'https://www.sandbox.paypal.com',
       'https://yogram.ru',
       'http://localhost:5173',
       'http://localhost:56938',

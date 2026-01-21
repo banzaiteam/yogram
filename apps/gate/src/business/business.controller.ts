@@ -42,6 +42,7 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
 import { ReadNotificationSwagger } from './decorators/swagger/read-notification.swagger.decorator';
+import { CancelSubscriptionSwagger } from './decorators/swagger/cancel-subscription.swagger';
 
 @Controller('business')
 export class BusinessController {
@@ -117,7 +118,8 @@ export class BusinessController {
       payment,
     );
     console.log('link:', response.link);
-    res.status(200).redirect(303, response.link);
+    // res.status(200).redirect(303, response.link);
+    return res.status(307).json({ link: response.link });
   }
 
   @Public()
@@ -126,12 +128,23 @@ export class BusinessController {
   async paypalProcess(
     @Req() req: Request,
     @Query('payment') payment: PaymentType,
+    @Res() res: Response,
   ): Promise<void> {
     if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
-      return await this.businessService.paypalProccess(
+      const subscription = await this.businessService.paypalProccess(
         req.body.resource.id,
         payment,
       );
+      console.log(
+        '🚀 ~ BusinessController ~ paypalProcess ~ subscription:',
+        subscription['userId'],
+      );
+      let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
+      page = page.replace('replace', subscription['userId']);
+      console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
+      // res.redirect(301, page);
+      // res.sendStatus(200);
+      return subscription;
     }
   }
 
@@ -189,6 +202,15 @@ export class BusinessController {
     @Query('payment') payment: PaymentType,
   ): Promise<void> {
     return await this.businessService.activateSubscription(id, payment);
+  }
+
+  @CancelSubscriptionSwagger()
+  @Patch('subscriptions/:id/cancel')
+  async cancelSubscription(
+    @Param('id') id: string,
+    @Query('payment') payment: PaymentType,
+  ): Promise<void> {
+    return await this.businessService.cancelSubscription(id, payment);
   }
 
   @GetPaymentsSwagger()

@@ -33,6 +33,7 @@ export class NotificationConsumer extends WorkerHost {
         delete notificationsObjectsAray.differ;
         notificationsObjectsAray.shift();
         notificationsObjectsAray.map(async (item) => {
+          console.log('🚀 ~ NotificationConsumer ~ process ~ item:', item);
           await this.notificationGateway.send(
             item,
             WebsocketEvents.DaysToExpires,

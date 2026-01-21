@@ -126,6 +126,19 @@ export class BusinessService {
     );
   }
 
+  async cancelSubscription(id: string, payment: PaymentType): Promise<void> {
+    const path = [
+      [HttpBusinessPath.CancelSubscription.replace(':id', id)].join('/'),
+      `payment=${payment}`,
+    ].join('?');
+    return await this.gateService.requestHttpServicePatch(
+      HttpServices.Business,
+      path,
+      {},
+      {},
+    );
+  }
+
   async getPayments(
     payment: PaymentType,
     pagination: IPagination,

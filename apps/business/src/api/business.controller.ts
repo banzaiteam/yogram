@@ -21,6 +21,7 @@ import {
   Param,
   Patch,
   Post,
+  Res,
   Sse,
 } from '@nestjs/common';
 import {
@@ -38,6 +39,9 @@ import {
 import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
 import { ReadNotificationCommand } from '../application/command/read-notification.command';
 import { ReadNotificationDto } from '../../../../apps/libs/Business/dto/input/read-notification.dto';
+import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
+import { CancelSubscriptionCommand } from '../application/command/cancel-subscription.handler';
 
 @Controller()
 export class BusinessController {
@@ -45,6 +49,7 @@ export class BusinessController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly configService: ConfigService,
   ) {
     this.eventEmitter = new EventEmitter2();
   }
@@ -57,8 +62,16 @@ export class BusinessController {
   @Post('business/paypal-proccess')
   async paypalProcess(
     @Body('subscriptionId') subscriptionId: string,
+    @Res() res: Response,
   ): Promise<void> {
-    await this.commandBus.execute(new SaveSubscriptionCommand(subscriptionId));
+    const subscription = await this.commandBus.execute(
+      new SaveSubscriptionCommand(subscriptionId),
+    );
+    res.status(200).json(subscription);
+    // let page = this.configService.get<string>('PROFILE_SETTINGS_PAGE');
+    // page = page.replace('replace', subscription.userId);
+    // console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
+    // res.redirect(301, 'https://www.google.com/');
   }
 
   @HttpCode(200)
@@ -111,6 +124,12 @@ export class BusinessController {
   async activateSubscription(@Param('id') id: string): Promise<void> {
     console.log('🚀 ~ BusinessController ~ activateSubscription ~ id:', id);
     return await this.commandBus.execute(new ActivateSubscriptionCommand(id));
+  }
+
+  @Patch('business/subscriptions/:id/cancel')
+  async cancelSubscription(@Param('id') id: string): Promise<void> {
+    console.log('🚀 ~ BusinessController ~ cancelSubscription ~ id:', id);
+    return await this.commandBus.execute(new CancelSubscriptionCommand(id));
   }
 
   @Get('business/subscriptions/get/:id')

@@ -14,6 +14,7 @@ import { Client, Environment, LogLevel } from '@paypal/paypal-server-sdk';
 import { createBusinessPlan } from './helpers/create-business-plan.helper';
 import { SubscriptionStatus } from './constants/subscription-status.enum';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
 
 export class PayPalService implements IPaymentService {
   private client: Client;
@@ -21,6 +22,7 @@ export class PayPalService implements IPaymentService {
     private readonly client_id: string,
     private readonly client_secret: string,
     private readonly businessServiceUrl: string,
+    private readonly configService: ConfigService,
   ) {
     this.client = new Client({
       clientCredentialsAuthCredentials: {
@@ -179,6 +181,7 @@ export class PayPalService implements IPaymentService {
   }
 
   async subscribeToPlan(
+    userId: string,
     subscriptionType: SubscriptionType,
     startAt?: string,
   ): Promise<any> {
@@ -199,12 +202,20 @@ export class PayPalService implements IPaymentService {
     if (!plan)
       throw new BadRequestException('Paypal error: plan does not exist');
     // console.log('plan', plan);
-
+    //
     const token = await this.authentication();
     const today = new Date();
     const nextDay = startAt
       ? startAt
       : new Date(today.setDate(today.getDate() + 1)).toISOString();
+
+    let returnUrl = this.configService.get('PROFILE_SETTINGS_PAGE');
+    returnUrl = returnUrl.replace('replace', userId);
+    const successUrl = [returnUrl, 'success=1'].join('?');
+    const cancelUrl = [returnUrl, 'success=0'].join('?');
+    console.log('🚀 ~ PayPalService successUrl:', successUrl);
+    console.log('🚀 ~ PayPalService cancelUrl:', cancelUrl);
+
     const subscribe = {
       plan_id: plan['id'],
       quantity: 1,
@@ -218,11 +229,13 @@ export class PayPalService implements IPaymentService {
           payer_selected: 'PAYPAL',
           payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
         },
+        return_url: successUrl,
+        cancel_url: cancelUrl,
       },
     };
-    //todo! To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
-    //todo! which effectively bypasses the trial period and initiates the subscription right away. Alternatively, you can set the trial_duration_unit to "month"
-    //todo! but specify trial_duration as 0, which achieves the same result of starting the subscription immediately without a trial.
+    // To start a PayPal subscription plan immediately, set the trial_duration to 0 days when creating the subscription plan in the PayPal Developer portal or via the API,
+    // which effectively bypasses the trial period and initiates the subscription right away. Alternatively, you can set the trial_duration_unit to "month"
+    // but specify trial_duration as 0, which achieves the same result of starting the subscription immediately without a trial.
 
     const response = await axios.post(
       'https://api-m.sandbox.paypal.com/v1/billing/subscriptions',
@@ -293,6 +306,36 @@ export class PayPalService implements IPaymentService {
     try {
       return await axios.post(
         `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/activate`,
+        { reason: 'Activate' },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      );
+    } catch (err) {
+      console.log(
+        '🚀 ~ PayPalService ~ activateSubscription ~ err:',
+        err.response.data.details,
+      );
+      throw new HttpException(err.response.data, err.response.status);
+    }
+  }
+
+  async cancelSubscription(id: string): Promise<any> {
+    const token = await this.authentication();
+    const status = (await this.getSubscription(id)).status;
+    console.log('🚀 ~ PayPalService ~ cancelSubscription ~ status:', status);
+    if (status === 'CANCELLED')
+      throw new ConflictException(
+        'PayPalService error: subscription is canceled already',
+      );
+
+    try {
+      return await axios.post(
+        `https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${id}/cancel`,
         { reason: 'Activate' },
         {
           headers: {

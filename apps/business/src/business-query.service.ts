@@ -80,7 +80,8 @@ export class BusinessQueryService {
       if (
         subscription.expiresAt &&
         new Date(subscription.expiresAt) > new Date() &&
-        subscription.status !== SubscriptionStatus.Approval_Pending
+        subscription.status !== SubscriptionStatus.Approval_Pending &&
+        subscription.status !== SubscriptionStatus.Canceled
       ) {
         if (subscription.status === SubscriptionStatus.Active) {
           subscription['nextPayment'] = subscription.expiresAt;

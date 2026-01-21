@@ -102,6 +102,7 @@ export class UsersController {
 
   @Get('users/login/:email')
   async userLogin(@Param() email: string): Promise<ResponseLoginDto | null> {
+    console.log('🚀 ~ UsersController ~ userLogin ~ email:', email);
     return await this.queryBus.execute(new UserLoginQuery(email['email']));
   }
 
