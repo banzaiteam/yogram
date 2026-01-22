@@ -156,6 +156,7 @@ export class BusinessController {
   async getUserNotifications(
     @Param('id') id: string,
   ): Promise<NotificationResponseDto[]> {
+    console.log('🚀 ~ BusinessController ~ getUserNotifications ~ id:', id);
     return await this.queryBus.execute(new GetUserNotificationsQuery(id));
   }
 

@@ -23,12 +23,17 @@ export class GateService {
     //   : `${this.configService.get('USERS_PROD_SERVICE_URL')}/api/v1`;
     // remove all constructor before this line
     // example for normal switch service throw config in micro
+
     Object.assign(this.services, {
       POSTS: this.configService.get('POSTS_SERVICE_URL'),
       USERS: this.configService.get('USERS_SERVICE_URL'),
       FILES: this.configService.get('FILES_SERVICE_URL'),
       BUSINESS: this.configService.get('BUSINESS_SERVICE_URL'),
     });
+    console.log(
+      'BUSINESS_SERVICE_URL index',
+      this.configService.get('BUSINESS_SERVICE_URL'),
+    );
   }
 
   async requestHttpServicePost(service, path, payload, headers) {
@@ -51,6 +56,11 @@ export class GateService {
 
   async requestHttpServiceGet(service, path, headers) {
     try {
+      console.log(
+        'requestHttpServiceGet',
+        [this.services[service], path].join('/'),
+      );
+
       const { data } = await lastValueFrom(
         this.httpService.get([this.services[service], path].join('/'), {
           headers,
