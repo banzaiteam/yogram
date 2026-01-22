@@ -59,6 +59,7 @@ export class NotificationsService implements INotificationsService {
         ? ''
         : 'dev:'
     }notifications:user:${userId}:notification:*`;
+
     const stream = this.redisClient.scanStream({
       match: match,
     });

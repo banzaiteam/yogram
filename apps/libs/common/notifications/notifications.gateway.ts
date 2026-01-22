@@ -2,20 +2,16 @@ import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/resp
 import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
-import {
-  OnGatewayConnection,
-  OnGatewayInit,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayInit } from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
-import { socketAuthMiddleware } from './helper/socket-auth.helper';
+
 import { NotificationsService } from './notifications.service';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { io, Socket as Socket1 } from 'socket.io-client';
 
+@Injectable()
 export class NotificationsGateway
   implements
     INotificationsService,
@@ -65,10 +61,6 @@ export class NotificationsGateway
   // }
 
   handleConnection(socket: Socket) {
-    console.log(
-      '🚀 ~ NotificationsGateway ~ handleConnection ~ socket:',
-      socket.id,
-    );
     // this.notificationsService.handleConnection(socket);
     this.sendMessageToGateway(`connected ${socket.id}`);
   }
