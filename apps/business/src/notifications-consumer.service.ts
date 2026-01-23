@@ -21,6 +21,10 @@ export class NotificationConsumer extends WorkerHost {
               await this.notificationGateway.getExpiresInNotifications(
                 ExpiresInDuration[item],
               );
+            console.log(
+              '🚀 ~ NotificationConsumer ~ process ~ result:',
+              result,
+            );
             return result;
           }
         }),

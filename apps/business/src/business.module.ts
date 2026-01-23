@@ -64,10 +64,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { NotificationsProducer } from './notifications-producer.service';
 import { NotificationConsumer } from './notifications-consumer.service';
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
-import {
-  CancelSubscriptionCommand,
-  CancelSubscriptionHandler,
-} from './application/command/cancel-subscription.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -121,18 +117,18 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
     //           url: configService.get('url'),
     //           migrationsTableName: configService.get('migrationsTableName'),
     //           migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-    //           autoLoadEntities: true,
-    //           synchronize: false,
-    //           dropSchema: false,
+    //           autoLoadEntities: configService.get('autoLoadEntities'),
+    //           synchronize: configService.get('synchronize'),
+    //           dropSchema: configService.get('dropSchema'),
     //         },
     //         slaves: [
     //           {
     //             url: configService.get('urlSlave'),
     //             migrationsTableName: configService.get('migrationsTableName'),
     //             migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-    //             autoLoadEntities: true,
-    //             synchronize: false,
-    //             dropSchema: false,
+    //             autoLoadEntities: configService.get('autoLoadEntities'),
+    //             synchronize: configService.get('synchronize'),
+    //             dropSchema: configService.get('dropSchema'),
     //           },
     //         ],
     //       },
@@ -158,8 +154,6 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
     SuspendSubscriptionHandler,
     ActivateSubscriptionHandler,
     ActivateSubscriptionCommand,
-    CancelSubscriptionCommand,
-    CancelSubscriptionHandler,
     SubscriptionUpdatedCommand,
     SubscriptionUpdatedHandler,
     SubscriptionExpiredCommand,
