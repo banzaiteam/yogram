@@ -12,6 +12,8 @@ export class NotificationConsumer extends WorkerHost {
   }
 
   async process(job: Job, token?: string): Promise<any> {
+    console.log('@Processor(NOTIFICATION_SCHEDULER)');
+
     const values = Object.values(ExpiresInDuration);
     let notificationsArray = (
       await Promise.all(
