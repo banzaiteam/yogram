@@ -74,10 +74,10 @@ export class BusinessQueryRepository
       items: plainToInstance(
         ResponsePaymentDto,
         payments[0].map((payment) => {
-          if (payment.subscription) {
-            payment['expiresAt'] = payment.subscription.expiresAt;
-            delete payment.subscription;
-          }
+          // if (payment.subscription) {
+          //   payment['expiresAt'] = payment.subscription.expiresAt;
+          //   delete payment.subscription;
+          // }
           return payment;
         }),
       ),
