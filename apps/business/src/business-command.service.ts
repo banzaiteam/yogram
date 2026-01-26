@@ -398,6 +398,8 @@ export class BusinessCommandService {
   }
 
   async updateNotification(notificationId: string) {
+    console.log('updateNotification ~ updateNotification:');
+    await this.notificationGateway.createIndex();
     return await this.notificationGateway.updateNotification(notificationId);
   }
 }

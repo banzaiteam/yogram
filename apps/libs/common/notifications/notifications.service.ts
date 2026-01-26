@@ -178,7 +178,9 @@ export class NotificationsService implements INotificationsService {
       process.env.NODE_ENV !== EnvironmentMode.TESTING
         ? 'notifications:Idx'
         : 'dev:notifications:Idx';
+    console.log('getNotificationById ~ index:', index);
     notificationId = notificationId.replaceAll('-', '\\-');
+    console.log('getNotificationById ~ notificationId:', notificationId);
     const notification = await this.redisClient.call(
       'FT.SEARCH',
       index,
@@ -197,6 +199,7 @@ export class NotificationsService implements INotificationsService {
 
   async updateNotification(notificationId: string): Promise<void> {
     const notification = await this.getNotificationById(notificationId);
+    console.log('updateNotification ~ notification:', notification);
     const readedAt = new Date().getTime();
     await this.redisClient.hset(notification[1], 'readAt', readedAt);
   }
