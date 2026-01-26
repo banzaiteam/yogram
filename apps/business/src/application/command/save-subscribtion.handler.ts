@@ -33,16 +33,16 @@ export class SaveSubscriptionHandler
 
     const key = getNotificationKey(subscription, notification);
     // todo uncomment notif
-    // await this.notificationGateway.saveNotification(
-    //   key,
-    //   notification,
-    //   2629746000,
-    // );
-    // await this.notificationGateway.send(
-    //   notification,
-    //   WebsocketEvents.SubscriptionActive,
-    //   30000,
-    // );
+    await this.notificationGateway.saveNotification(
+      key,
+      notification,
+      2629746000,
+    );
+    await this.notificationGateway.send(
+      notification,
+      WebsocketEvents.SubscriptionActive,
+      30000,
+    );
     return subscription;
   }
 }

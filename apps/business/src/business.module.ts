@@ -64,6 +64,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { NotificationsProducer } from './notifications-producer.service';
 import { NotificationConsumer } from './notifications-consumer.service';
 import { DatabaseModule } from '../../../apps/libs/common/database/database.module';
+import { CancelSubscriptionCommand } from './application/command/cancel-subscription.handler';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -157,6 +158,7 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
     SubscriptionUpdatedCommand,
     SubscriptionUpdatedHandler,
     SubscriptionExpiredCommand,
+    CancelSubscriptionCommand,
     SubscriptionExpiredHandler,
     GetUserNotificationsQuery,
     ReadNotificationHandler,
