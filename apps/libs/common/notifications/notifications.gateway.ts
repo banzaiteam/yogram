@@ -18,7 +18,7 @@ import { Socket, Server } from 'socket.io';
 import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway(0, { namespace: 'notification-event' })
+@WebSocketGateway(0, { namespace: 'event/notification' })
 export class NotificationsGateway
   implements
     INotificationsService,
