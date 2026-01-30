@@ -6,4 +6,5 @@ export interface INotification {
   createdAt: number;
   readAt: number;
   expiresAt: number;
+  delivered: boolean;
 }

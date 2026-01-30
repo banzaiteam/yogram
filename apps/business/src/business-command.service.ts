@@ -28,7 +28,7 @@ export class BusinessCommandService {
     >,
     private readonly paymentService: IPaymentService,
     private readonly businessQueryService: BusinessQueryService,
-    private readonly notificationGateway: NotificationsGateway,
+    // private readonly notificationGateway: NotificationsGateway,
     @InjectRepository(Subscription)
     private readonly subscriptionCommandRepository: Repository<Subscription>,
     private readonly dataSource: DataSource,
@@ -397,7 +397,7 @@ export class BusinessCommandService {
     return await this.businessCommandRepository.saveSubscription(subscription);
   }
 
-  async updateNotification(notificationId: string) {
-    return await this.notificationGateway.updateNotification(notificationId);
-  }
+  // async updateNotification(notificationId: string) {
+  //   return await this.notificationGateway.updateNotification(notificationId);
+  // }
 }

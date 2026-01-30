@@ -22,8 +22,8 @@ export class NotificationsModule {
           }),
         }),
       ],
-      providers: [WsAuthAdapter, NotificationsService, NotificationsGateway],
-      exports: [NotificationsGateway, WsAuthAdapter],
+      providers: [NotificationsService, NotificationsGateway],
+      exports: [NotificationsGateway, NotificationsService],
     };
   }
 }

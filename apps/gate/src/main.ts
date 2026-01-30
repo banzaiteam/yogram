@@ -51,7 +51,7 @@ async function bootstrap() {
   const { port, env } = applyAppSettings(app);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  await app.init();
+  // await app.init();
   await app.listen(port, () => {
     console.log('App starting service GATE listen port: ', port, 'ENV: ', env);
   });

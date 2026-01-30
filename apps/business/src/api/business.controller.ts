@@ -64,6 +64,10 @@ export class BusinessController {
     @Body('subscriptionId') subscriptionId: string,
     @Res() res: Response,
   ): Promise<void> {
+    console.log(
+      '🚀 ~ BusinessController ~ paypalProcess ~ subscriptionId:',
+      subscriptionId,
+    );
     const subscription = await this.commandBus.execute(
       new SaveSubscriptionCommand(subscriptionId),
     );

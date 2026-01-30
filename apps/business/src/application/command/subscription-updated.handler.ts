@@ -6,6 +6,7 @@ import { WebsocketEvents } from '../../constants/websocket.event.enum';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 } from 'uuid';
 import { Subscription } from '../../infrastructure/entity/subscription.entity';
+import { NotificationsService } from '../../notifications.service';
 
 export class SubscriptionUpdatedCommand {
   constructor(public readonly subscriptionId: string) {}
@@ -17,7 +18,7 @@ export class SubscriptionUpdatedHandler
 {
   constructor(
     private readonly businessCommandService: BusinessCommandService,
-    private readonly notificationGateway: NotificationsGateway,
+    private readonly notificationsService: NotificationsService,
   ) {}
   async execute({
     subscriptionId,
@@ -34,14 +35,15 @@ export class SubscriptionUpdatedHandler
       userId: subscription.userId,
       expiresAt: new Date(subscription.expiresAt).getTime(),
       createdAt: new Date(subscription.createdAt).getTime(),
+      delivered: false,
     };
     const key = getNotificationKey(subscription, notification);
-    await this.notificationGateway.saveNotification(
+    await this.notificationsService.saveNotification(
       key,
       notification,
       2629746000,
     );
-    await this.notificationGateway.send(
+    await this.notificationsService.send(
       notification,
       WebsocketEvents.SubscriptionActive,
       30000,

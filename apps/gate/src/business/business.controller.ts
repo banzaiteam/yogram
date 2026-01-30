@@ -129,7 +129,7 @@ export class BusinessController {
     @Req() req: Request,
     @Query('payment') payment: PaymentType,
     @Res() res: Response,
-  ): Promise<void> {
+  ): Promise<number> {
     if (req.body.event_type === PaypalEvents.BillingSubscriptionActivated) {
       const subscription = await this.businessService.paypalProccess(
         req.body.resource.id,
@@ -144,7 +144,7 @@ export class BusinessController {
       console.log('🚀 ~ BusinessController ~ paypalProcess ~ page:', page);
       // res.redirect(301, page);
       // res.sendStatus(200);
-      return subscription;
+      return 200;
     }
   }
 

@@ -13,11 +13,12 @@ import { WebsocketEvents } from '../../../../apps/business/src/constants/websock
 import { INotificationsService } from './interfaces/notification-service.interface';
 import { INotification } from './interfaces/notification.interface';
 import { NotificationsService } from './notifications.service';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { socketAuthMiddleware } from './helper/socket-auth.helper';
+import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway()
-@Injectable()
+@WebSocketGateway(3007, { namespace: 'notifications' })
 export class NotificationsGateway
   implements
     INotificationsService,
@@ -25,11 +26,16 @@ export class NotificationsGateway
     OnGatewayConnection,
     OnGatewayInit
 {
-  private connectedClients: Map<string, Socket> = new Map();
-  private socket: Socket;
+  private connectedSockets: string[] = [];
+
   @WebSocketServer()
   server: Server; // The Socket.IO server instance
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly notificationsService: NotificationsService,
+    private readonly jwtService: JwtService,
+  ) {
+    console.log('WebSocketServer');
+  }
 
   @SubscribeMessage('message')
   handleMessage(
@@ -48,10 +54,20 @@ export class NotificationsGateway
   }
 
   afterInit(server: Server) {
-    console.log('sfterInit', server.sockets);
+    const authMiddleware = socketAuthMiddleware(this.jwtService);
+    server.use(authMiddleware);
   }
 
-  handleConnection(socket: Socket) {}
+  handleConnection(socket: Socket) {
+    console.log(`${socket.id} connected`);
+    //todo* make auth -> connectedSockets.push({socket.id, userId}) -> send to notifications -> add there to array
+    this.connectedSockets.push(socket.id);
+    this.notificationsService.addClient(socket);
+    this.server.emit('connectedSocket', {
+      userId: socket.data.user,
+      socketId: socket.id,
+    });
+  }
 
   async saveNotification(
     key: string,

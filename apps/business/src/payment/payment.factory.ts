@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Scope } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Scope } from '@nestjs/common';
 import { PayPalService } from './payment-services/paypal/paypal.service';
 import { StripeService } from './payment-services/stripe/stripe.service';
 import { PaymentType } from '../../../../apps/libs/Business/constants/payment-type.enum';

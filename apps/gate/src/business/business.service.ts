@@ -10,10 +10,14 @@ import { PaymentType } from '../../../../apps/libs/Business/constants/payment-ty
 import { SubscribeDto } from '../../../../apps/libs/Business/dto/input/subscribe.dto';
 import { GateService } from '../../../../apps/libs/gateService';
 import { Injectable } from '@nestjs/common';
+import { NotificationsService } from 'apps/libs/common/notifications/notifications.service';
 
 @Injectable()
 export class BusinessService {
-  constructor(private readonly gateService: GateService) {}
+  constructor(
+    private readonly gateService: GateService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async subscribe(
     subscribeDto: SubscribeDto,
@@ -32,9 +36,15 @@ export class BusinessService {
     subscriptionId: string,
     payment: PaymentType,
   ): Promise<void> {
+    console.log('🚀 ~ BusinessService ~ paypalProccess ~ payment:', payment);
+    console.log(
+      '🚀 ~ BusinessService ~ paypalProccess ~ subscriptionId:',
+      subscriptionId,
+    );
     const path = [HttpBusinessPath.PaypalProcess, `payment=${payment}`].join(
       '?',
     );
+    console.log('🚀 ~ BusinessService ~ paypalProccess ~ path:', path);
     return await this.gateService.requestHttpServicePost(
       HttpServices.Business,
       path,
@@ -160,20 +170,22 @@ export class BusinessService {
   }
 
   async getUserNotifications(userId: string): Promise<INotification[]> {
-    const path = [HttpBusinessPath.GetNotifications, userId].join('/');
-    return await this.gateService.requestHttpServiceGet(
-      HttpServices.Business,
-      path,
-      {},
-    );
+    // const path = [HttpBusinessPath.GetNotifications, userId].join('/');
+    // return await this.gateService.requestHttpServiceGet(
+    //   HttpServices.Business,
+    //   path,
+    //   {},
+    // );
+    return await this.notificationsService.getUserNotifications(userId);
   }
 
   async readNotification(notificationId: string): Promise<void> {
-    return await this.gateService.requestHttpServicePatch(
-      HttpServices.Business,
-      HttpBusinessPath.ReadNotification,
-      { notificationId },
-      {},
-    );
+    // return await this.gateService.requestHttpServicePatch(
+    //   HttpServices.Business,
+    //   HttpBusinessPath.ReadNotification,
+    //   { notificationId },
+    //   {},
+    // );
+    return await this.notificationsService.updateNotification(notificationId);
   }
 }

@@ -68,6 +68,9 @@ import {
   CancelSubscriptionCommand,
   CancelSubscriptionHandler,
 } from './application/command/cancel-subscription.handler';
+import { NotificationsService } from './notifications.service';
+import { RedisModule } from 'apps/libs/common/redis/redis.module';
+import { JwtModule } from '@nestjs/jwt';
 
 const getEnvFilePath = (env: EnvironmentsTypes) => {
   const defaultEnvFilePath = ['apps/business/src/.env.development'];
@@ -80,23 +83,32 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
 @Module({
   imports: [
     RequestContextModule,
-    NotificationsModule.register(),
-    BullModule.forRootAsync({
+    // NotificationsModule.register(),
+    // BullModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     connection: {
+    //       username: configService.get('REDIS_USER'),
+    //       port: configService.get('REDIS_PORT'),
+    //       host: configService.get('REDIS_HOST'),
+    //       password: configService.get('REDIS_PASSWORD'),
+    //     },
+    //   }),
+    // }),
+    // BullModule.registerQueue({
+    //   name: 'NOTIFICATION_SCHEDULER',
+    //   prefix: 'scheduler:',
+    // }),
+    JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          username: configService.get('REDIS_USER'),
-          port: configService.get('REDIS_PORT'),
-          host: configService.get('REDIS_HOST'),
-          password: configService.get('REDIS_PASSWORD'),
-        },
+      useFactory: async (configService: ConfigService) => ({
+        global: true,
+        secret: configService.get('JWT_SECRET'),
       }),
     }),
-    BullModule.registerQueue({
-      name: 'NOTIFICATION_SCHEDULER',
-      prefix: 'scheduler:',
-    }),
+    RedisModule,
     CqrsModule,
     PaymentModule,
     ConfigModule.forRoot({
@@ -169,8 +181,9 @@ export const NOTIFICATION_SCHEDULER = 'NOTIFICATION_SCHEDULER';
     GetUserNotificationsHandler,
     GetPaymentsHandler,
     GetPaymentsQuery,
-    NotificationsProducer,
-    NotificationConsumer,
+    NotificationsService,
+    // NotificationsProducer,
+    // NotificationConsumer,
     {
       provide: IBusinessCommandRepository,
       useClass: BusinessCommandRepository,

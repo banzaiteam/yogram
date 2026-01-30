@@ -26,8 +26,8 @@ export class BusinessQueryService {
       Subscription
     >,
     private readonly paymentService: IPaymentService,
-    private readonly notificationGateway: NotificationsGateway,
-    private readonly notificationsProducer: NotificationsProducer,
+    // private readonly notificationGateway: NotificationsGateway,
+    // private readonly notificationsProducer: NotificationsProducer,
   ) {}
 
   async getPaymentServiceSubscription(id: string) {
@@ -105,6 +105,6 @@ export class BusinessQueryService {
   }
 
   async getExpiresInNotifications(expiresIn: ExpiresInDuration): Promise<any> {
-    return await this.notificationGateway.getExpiresInNotifications(expiresIn);
+    // return await this.notificationGateway.getExpiresInNotifications(expiresIn);
   }
 }

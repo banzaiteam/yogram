@@ -1,10 +1,3 @@
-import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
-import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
-import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
-import { EnvironmentMode } from '../../../../apps/business/src/settings/configuration';
-import { INotificationsService } from './interfaces/notification-service.interface';
-import { INotification } from './interfaces/notification.interface';
-import { REDIS_CLIENT } from '../redis/redis-client.factory';
 import {
   ConflictException,
   Inject,
@@ -14,6 +7,13 @@ import {
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import Redis from 'ioredis';
+import { NotificationResponseDto } from 'apps/libs/Business/dto/response/response-notification.dto';
+import { ExpiresInDuration } from './constants/expires-in-duration.enum';
+import { WebsocketEvents } from './constants/websocket.event.enum';
+import { EnvironmentMode } from './settings/configuration';
+import { INotificationsService } from 'apps/libs/common/notifications/interfaces/notification-service.interface';
+import { INotification } from 'apps/libs/common/notifications/interfaces/notification.interface';
+import { REDIS_CLIENT } from 'apps/libs/common/redis/redis-client.factory';
 
 @Injectable()
 export class NotificationsService implements INotificationsService {
@@ -26,13 +26,9 @@ export class NotificationsService implements INotificationsService {
   }
 
   //todo* add addClient / removeClient
-  addClient(socket: Socket) {
-    this.connectedClients.set(socket.data.user, socket);
-  }
+  addClient(socket: Socket) {}
 
-  removeClient(socket: Socket) {
-    this.connectedClients.delete(socket.data.user);
-  }
+  removeClient(socket: Socket) {}
 
   handleDisconnect(socket: Socket) {
     this.connectedClients.delete(socket.id);
@@ -87,7 +83,6 @@ export class NotificationsService implements INotificationsService {
 
   async handleConnection(socket: Socket) {
     this.connectedClients.set(socket.data.user, socket);
-    console.log('connectedClients', this.connectedClients);
   }
 
   async send(
@@ -96,12 +91,10 @@ export class NotificationsService implements INotificationsService {
     delay: number,
   ): Promise<void> {
     const socket = this.connectedClients.get(notification.userId);
-    console.log('🚀 ~ NotificationsService ~ send ~ socket:', socket.id);
     if (socket) {
       setTimeout(() => {
         socket.emit(event, notification.message);
       }, delay);
-      await this.updateNotificationDelivery(notification.id);
     }
   }
 
@@ -142,10 +135,9 @@ export class NotificationsService implements INotificationsService {
   // todo return expiresAt - now === 7
   // todo when renew subscription(update) create new notification with the same subscriptionId
   async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
-    // await this.createIndex();
     try {
       const todayTimestamp = new Date().getTime();
-      let results = await this.redisClient.call(
+      const results = await this.redisClient.call(
         'FT.AGGREGATE',
         process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
           process.env.NODE_ENV !== EnvironmentMode.TESTING
@@ -153,31 +145,27 @@ export class NotificationsService implements INotificationsService {
           : 'dev:notifications:Idx',
         '*',
         'LOAD',
-        '8',
+        '7',
         '@expiresAt',
         '@message',
         '@subscriptionId',
-        '@userId',
+        'userId',
         '@createdAt',
         '@readAt',
         '@id',
-        '@delivered',
         'APPLY',
-        //todo! end of month has problems, usually use 86400
         `(@expiresAt - ${todayTimestamp})`,
         'AS',
         'differ', // Search query
         'FILTER',
         expiresInDuration === ExpiresInDuration.Day
-          ? //todo! end of month has problems, usually use 86400
-            `@differ > 0 && @differ < ${expiresInDuration + 1164400 * 1000}`
+          ? `@differ > 0 && @differ < ${expiresInDuration + 86400 * 1000}`
           : expiresInDuration === ExpiresInDuration.Week
             ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
             : expiresInDuration === ExpiresInDuration.Month
               ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
               : null,
       );
-
       return results;
     } catch (error) {
       console.error('Error searching data:', error);
@@ -190,23 +178,22 @@ export class NotificationsService implements INotificationsService {
       process.env.NODE_ENV !== EnvironmentMode.TESTING
         ? 'notifications:Idx'
         : 'dev:notifications:Idx';
-
+    console.log('getNotificationById ~ index:', index);
     notificationId = notificationId.replaceAll('-', '\\-');
-
+    console.log('getNotificationById ~ notificationId:', notificationId);
     const notification = await this.redisClient.call(
       'FT.SEARCH',
       index,
       `@id:{${notificationId}}`,
     );
-
-    // if (!notification)
-    //   throw new NotFoundException(
-    //     'NotificationsService error: notification not found',
-    //   );
-    // if (notification[2][8] !== '')
-    //   throw new ConflictException(
-    //     'NotificationsService error: notification has already been read',
-    //   );
+    if (!notification)
+      throw new NotFoundException(
+        'NotificationsService error: notification not found',
+      );
+    if (notification[2][7] !== '')
+      throw new ConflictException(
+        'NotificationsService error: notification has already been read',
+      );
     return notification;
   }
 
@@ -215,11 +202,5 @@ export class NotificationsService implements INotificationsService {
     console.log('updateNotification ~ notification:', notification);
     const readedAt = new Date().getTime();
     await this.redisClient.hset(notification[1], 'readAt', readedAt);
-  }
-
-  async updateNotificationDelivery(notificationId: string): Promise<void> {
-    const notification = await this.getNotificationById(notificationId);
-
-    await this.redisClient.hset(notification[1], 'delivered', 'true');
   }
 }
