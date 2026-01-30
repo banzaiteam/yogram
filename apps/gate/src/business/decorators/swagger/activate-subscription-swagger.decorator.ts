@@ -39,7 +39,7 @@ export function ActivateSubscriptionSwagger() {
     }),
     ApiResponse({
       status: 409,
-      description: 'PayPalService error: subscription is active already',
+      description: 'PayPalService error: subscription is active already ',
     }),
   );
 }

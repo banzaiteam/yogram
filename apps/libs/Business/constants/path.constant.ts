@@ -3,6 +3,7 @@ export const HttpBusinessPath = {
   CurrentSubscriptions: 'business/subscriptions/get',
   SuspendSubscription: 'business/subscriptions/:id/suspend',
   ActivateSubscription: 'business/subscriptions/:id/activate',
+  CancelSubscription: 'business/subscriptions/:id/cancel',
   PaypalProcess: 'business/paypal-proccess',
   SubscriptionsExpired: 'business/subscriptions/expired',
   SubscriptionsUpdated: 'business/subscriptions/updated',

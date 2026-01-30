@@ -15,4 +15,6 @@ export class NotificationResponseDto implements INotification {
   expiresAt: number;
   @ApiProperty({ description: 'timestamp' })
   createdAt: number;
+  @ApiProperty({ description: 'boolean' })
+  delivered: boolean;
 }

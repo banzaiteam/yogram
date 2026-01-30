@@ -27,7 +27,7 @@ export const getConfiguration = () => {
     },
     {},
   );
-  console.log('SERVICES_URLS', SERVICES_URLS);
+  console.log('SERVICES_URLS:', SERVICES_URLS);
 
   return {
     NODE_ENV: (Environments.includes(process.env.NODE_ENV?.trim())

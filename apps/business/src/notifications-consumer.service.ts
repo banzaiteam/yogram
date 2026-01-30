@@ -12,6 +12,8 @@ export class NotificationConsumer extends WorkerHost {
   }
 
   async process(job: Job, token?: string): Promise<any> {
+    console.log('@Processor(NOTIFICATION_SCHEDULER)');
+
     const values = Object.values(ExpiresInDuration);
     let notificationsArray = (
       await Promise.all(
@@ -21,6 +23,10 @@ export class NotificationConsumer extends WorkerHost {
               await this.notificationGateway.getExpiresInNotifications(
                 ExpiresInDuration[item],
               );
+            console.log(
+              '🚀 ~ NotificationConsumer ~ process ~ result:',
+              result,
+            );
             return result;
           }
         }),
@@ -33,6 +39,7 @@ export class NotificationConsumer extends WorkerHost {
         delete notificationsObjectsAray.differ;
         notificationsObjectsAray.shift();
         notificationsObjectsAray.map(async (item) => {
+          console.log('🚀 ~ NotificationConsumer ~ process ~ item:', item);
           await this.notificationGateway.send(
             item,
             WebsocketEvents.DaysToExpires,

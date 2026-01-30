@@ -25,6 +25,15 @@ export class NotificationsService implements INotificationsService {
     this.redisClient.call('');
   }
 
+  //todo* add addClient / removeClient
+  addClient(socket: Socket) {
+    this.connectedClients.set(socket.data.user, socket);
+  }
+
+  removeClient(socket: Socket) {
+    this.connectedClients.delete(socket.data.user);
+  }
+
   handleDisconnect(socket: Socket) {
     this.connectedClients.delete(socket.id);
 
@@ -54,6 +63,7 @@ export class NotificationsService implements INotificationsService {
         ? ''
         : 'dev:'
     }notifications:user:${userId}:notification:*`;
+
     const stream = this.redisClient.scanStream({
       match: match,
     });
@@ -77,6 +87,7 @@ export class NotificationsService implements INotificationsService {
 
   async handleConnection(socket: Socket) {
     this.connectedClients.set(socket.data.user, socket);
+    console.log('connectedClients', this.connectedClients);
   }
 
   async send(
@@ -85,10 +96,12 @@ export class NotificationsService implements INotificationsService {
     delay: number,
   ): Promise<void> {
     const socket = this.connectedClients.get(notification.userId);
+    console.log('🚀 ~ NotificationsService ~ send ~ socket:', socket.id);
     if (socket) {
       setTimeout(() => {
         socket.emit(event, notification.message);
       }, delay);
+      await this.updateNotificationDelivery(notification.id);
     }
   }
 
@@ -129,9 +142,10 @@ export class NotificationsService implements INotificationsService {
   // todo return expiresAt - now === 7
   // todo when renew subscription(update) create new notification with the same subscriptionId
   async getExpiresInNotifications(expiresInDuration: ExpiresInDuration) {
+    // await this.createIndex();
     try {
       const todayTimestamp = new Date().getTime();
-      const results = await this.redisClient.call(
+      let results = await this.redisClient.call(
         'FT.AGGREGATE',
         process.env.NODE_ENV !== EnvironmentMode.DEVELOPMENT &&
           process.env.NODE_ENV !== EnvironmentMode.TESTING
@@ -139,27 +153,31 @@ export class NotificationsService implements INotificationsService {
           : 'dev:notifications:Idx',
         '*',
         'LOAD',
-        '7',
+        '8',
         '@expiresAt',
         '@message',
         '@subscriptionId',
-        'userId',
+        '@userId',
         '@createdAt',
         '@readAt',
         '@id',
+        '@delivered',
         'APPLY',
+        //todo! end of month has problems, usually use 86400
         `(@expiresAt - ${todayTimestamp})`,
         'AS',
         'differ', // Search query
         'FILTER',
         expiresInDuration === ExpiresInDuration.Day
-          ? `@differ > 0 && @differ < ${expiresInDuration + 86400 * 1000}`
+          ? //todo! end of month has problems, usually use 86400
+            `@differ > 0 && @differ < ${expiresInDuration + 1164400 * 1000}`
           : expiresInDuration === ExpiresInDuration.Week
             ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
             : expiresInDuration === ExpiresInDuration.Month
               ? `@differ > ${expiresInDuration} && @differ < ${expiresInDuration + 86400 * 1000}`
               : null,
       );
+
       return results;
     } catch (error) {
       console.error('Error searching data:', error);
@@ -172,26 +190,36 @@ export class NotificationsService implements INotificationsService {
       process.env.NODE_ENV !== EnvironmentMode.TESTING
         ? 'notifications:Idx'
         : 'dev:notifications:Idx';
+
     notificationId = notificationId.replaceAll('-', '\\-');
+
     const notification = await this.redisClient.call(
       'FT.SEARCH',
       index,
       `@id:{${notificationId}}`,
     );
-    if (!notification)
-      throw new NotFoundException(
-        'NotificationsService error: notification not found',
-      );
-    if (notification[2][7] !== '')
-      throw new ConflictException(
-        'NotificationsService error: notification has already been read',
-      );
+
+    // if (!notification)
+    //   throw new NotFoundException(
+    //     'NotificationsService error: notification not found',
+    //   );
+    // if (notification[2][8] !== '')
+    //   throw new ConflictException(
+    //     'NotificationsService error: notification has already been read',
+    //   );
     return notification;
   }
 
   async updateNotification(notificationId: string): Promise<void> {
     const notification = await this.getNotificationById(notificationId);
+    console.log('updateNotification ~ notification:', notification);
     const readedAt = new Date().getTime();
     await this.redisClient.hset(notification[1], 'readAt', readedAt);
+  }
+
+  async updateNotificationDelivery(notificationId: string): Promise<void> {
+    const notification = await this.getNotificationById(notificationId);
+
+    await this.redisClient.hset(notification[1], 'delivered', 'true');
   }
 }

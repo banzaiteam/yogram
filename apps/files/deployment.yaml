@@ -22,48 +22,43 @@ spec:
             - containerPort: PORT_CONTAINER
 
           env:
-            - name: AWS_SECRET_KEY
+            - name: FILES_SERVICE_AVATAR_UPLOAD_PATH
               valueFrom:
                 secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: AWS_SECRET_KEY
+                  name: yogram-files-production-config-secret
+                  key: FILES_SERVICE_AVATAR_UPLOAD_PATH
+            - name: FILES_SERVICE_CHUNKS_DIR
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-files-production-config-secret
+                  key: FILES_SERVICE_CHUNKS_DIR
+            - name: UPLOAD_SERVICE_URL_PREFIX
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-files-production-config-secret
+                  key: UPLOAD_SERVICE_URL_PREFIX
             - name: AWS_REGION
               valueFrom:
                 secretKeyRef:
-                  name: files-yogram-production-config-secret
+                  name: yogram-files-production-config-secret
                   key: AWS_REGION
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-files-production-config-secret
+                  key: AWS_SECRET_KEY
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: yogram-files-production-config-secret
+                  key: AWS_ACCESS_KEY
             - name: RMQ_URL
               valueFrom:
                 secretKeyRef:
-                  name: files-yogram-production-config-secret
+                  name: yogram-files-production-config-secret
                   key: RMQ_URL
             - name: BUCKET
               valueFrom:
                 secretKeyRef:
-                  name: files-yogram-production-config-secret
+                  name: yogram-files-production-config-secret
                   key: BUCKET
-            - name: UPLOAD_SERVICE_URL_PREFIX
-              valueFrom:
-                secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: UPLOAD_SERVICE_URL_PREFIX
-            - name: FILES_SERVICE_CHUNKS_DIR
-              valueFrom:
-                secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: FILES_SERVICE_CHUNKS_DIR
-            - name: FILES_SERVICE_AVATAR_UPLOAD_PATH
-              valueFrom:
-                secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: FILES_SERVICE_AVATAR_UPLOAD_PATH
-            - name: AWS_ACCOUNT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: AWS_ACCOUNT_ID
-            - name: AWS_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: files-yogram-production-config-secret
-                  key: AWS_ACCESS_KEY

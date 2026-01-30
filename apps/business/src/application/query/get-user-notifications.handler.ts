@@ -1,6 +1,6 @@
 import { INotification } from '../../../../../apps/libs/common/notifications/interfaces/notification.interface';
-import { NotificationsGateway } from '../../../../../apps/libs/common/notifications/notifications.gateway';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { NotificationsService } from '../../notifications.service';
 
 export class GetUserNotificationsQuery {
   constructor(public readonly userId: string) {}
@@ -10,11 +10,11 @@ export class GetUserNotificationsQuery {
 export class GetUserNotificationsHandler
   implements IQueryHandler<GetUserNotificationsQuery>
 {
-  constructor(private readonly notificationGateway: NotificationsGateway) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   async execute({
     userId,
   }: GetUserNotificationsQuery): Promise<INotification[]> {
-    return await this.notificationGateway.getUserNotifications(userId);
+    return await this.notificationsService.getUserNotifications(userId);
   }
 }

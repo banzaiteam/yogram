@@ -10,9 +10,11 @@ export const socketAuthMiddleware = (
 ): SocketMiddleware => {
   return async (socket: Socket, next) => {
     try {
-      const token = socket.handshake.headers?.authorization;
+      console.log('authorization:', socket.handshake.headers.authorization);
+      const token = socket.handshake.headers.authorization;
+      console.log('🚀 ~ socketAuthMiddleware ~ token:', token);
       if (!token) next(new WsException('Socket Unauthorized Exception'));
-      const payload = jwtService.verify(token.trim());
+      const payload = jwtService.verify(token);
       if (!payload) next(new WsException('Socket Unauthorized Exception'));
       socket.data.user = payload['id'];
       next();

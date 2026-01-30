@@ -65,10 +65,22 @@ export class BusinessQueryRepository
       take: pagination.limit,
       order: sort,
       where: filter,
+      relations: {
+        subscription: true,
+      },
     });
 
     const paginatedResponse: PaymentsPaginatedResponseDto = {
-      items: plainToInstance(ResponsePaymentDto, payments[0]),
+      items: plainToInstance(
+        ResponsePaymentDto,
+        payments[0].map((payment) => {
+          // if (payment.subscription) {
+          //   payment['expiresAt'] = payment.subscription.expiresAt;
+          //   delete payment.subscription;
+          // }
+          return payment;
+        }),
+      ),
       totalItems: payments[1],
       page: pagination.page,
       limit: pagination.limit,

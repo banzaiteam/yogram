@@ -30,5 +30,6 @@ export const getConfiguration = () => {
     dropSchema: process.env.DROP_SCHEMA === 'true',
     JWT_SECRET: process.env.JWT_SECRET,
     TIME_PERIOD: process.env.TIME_PERIOD,
+    PROFILE_SETTINGS_PAGE: process.env.PROFILE_SETTINGS_PAGE,
   };
 };

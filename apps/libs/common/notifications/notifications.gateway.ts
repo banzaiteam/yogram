@@ -1,34 +1,73 @@
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { NotificationResponseDto } from '../../../../apps/libs/Business/dto/response/response-notification.dto';
 import { ExpiresInDuration } from '../../../../apps/business/src/constants/expires-in-duration.enum';
 import { WebsocketEvents } from '../../../../apps/business/src/constants/websocket.event.enum';
 import { INotificationsService } from './interfaces/notification-service.interface';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { INotification } from './interfaces/notification.interface';
-import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { NotificationsService } from './notifications.service';
+import { OnModuleInit } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { socketAuthMiddleware } from './helper/socket-auth.helper';
 import { JwtService } from '@nestjs/jwt';
 
-@WebSocketGateway()
-export class NotificationsGateway implements INotificationsService {
-  private connectedClients: Map<string, Socket> = new Map();
+@WebSocketGateway(0, { namespace: 'event/notification' })
+export class NotificationsGateway
+  implements
+    INotificationsService,
+    OnModuleInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnGatewayInit
+{
+  private connectedSockets: string[] = [];
+
   @WebSocketServer()
-  private server: Server;
+  server: Server; // The Socket.IO server instance
   constructor(
     private readonly notificationsService: NotificationsService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+    console.log('WebSocketServer');
+  }
 
-  afterInit(server: any) {
+  @SubscribeMessage('message')
+  handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: string,
+  ): void {
+    console.log(
+      `Received message from client ${client.id} on 'message' channel: ${data}`,
+    );
+
+    client.emit('messageReceived', `Server received your message: ${data}`);
+  }
+
+  async onModuleInit() {
+    console.log('websocket');
+  }
+
+  afterInit(server: Server) {
     const authMiddleware = socketAuthMiddleware(this.jwtService);
     server.use(authMiddleware);
   }
-  handleDisconnect(socket: Socket) {
-    this.notificationsService.handleDisconnect(socket);
+
+  handleConnection(@ConnectedSocket() client: Socket) {
+    this.notificationsService.addClient(client);
+    client.emit('connection', `${client.data.user} connected`);
   }
 
-  handleConnection(socket: Socket) {
-    this.notificationsService.handleConnection(socket);
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    this.notificationsService.removeClient(client);
+    client.emit('disconnect', `${client.data.user} disconnected`);
   }
 
   async saveNotification(

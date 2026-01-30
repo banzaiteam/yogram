@@ -36,9 +36,9 @@ export class DatabaseModule {
               migrationsTableName: configService.get('migrationsTableName'),
               entities: [`${__dirname}/infrastructure/**/*.entity{.ts,.js}`],
               migrations: [`${__dirname}/../../db/migrations/*{.ts,.js}`],
-              autoLoadEntities: configService.get('autoLoadEntities'),
-              synchronize: configService.get('synchronize'),
-              dropSchema: configService.get('dropSchema'),
+              autoLoadEntities: true,
+              synchronize: false,
+              dropSchema: false,
             },
           dataSourceFactory: async (options) => {
             const dataSource = await new DataSource(options).initialize();

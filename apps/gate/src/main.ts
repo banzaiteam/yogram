@@ -30,10 +30,13 @@ async function bootstrap() {
       'Connection',
       'User-Agent',
       'x-recaptcha-token',
+      '*',
     ],
     exposedHeaders: ['Set-cookie'],
 
     origin: [
+      'https://developer.paypal.com',
+      'https://www.sandbox.paypal.com',
       'https://yogram.ru',
       'http://localhost:5173',
       'http://localhost:56938',
@@ -48,7 +51,7 @@ async function bootstrap() {
   const { port, env } = applyAppSettings(app);
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
-  await app.init();
+  // await app.init();
   await app.listen(port, () => {
     console.log('App starting service GATE listen port: ', port, 'ENV: ', env);
   });

@@ -26,8 +26,8 @@ export class BusinessQueryService {
       Subscription
     >,
     private readonly paymentService: IPaymentService,
-    private readonly notificationGateway: NotificationsGateway,
-    private readonly notificationsProducer: NotificationsProducer,
+    // private readonly notificationGateway: NotificationsGateway,
+    // private readonly notificationsProducer: NotificationsProducer,
   ) {}
 
   async getPaymentServiceSubscription(id: string) {
@@ -80,7 +80,8 @@ export class BusinessQueryService {
       if (
         subscription.expiresAt &&
         new Date(subscription.expiresAt) > new Date() &&
-        subscription.status !== SubscriptionStatus.Approval_Pending
+        subscription.status !== SubscriptionStatus.Approval_Pending &&
+        subscription.status !== SubscriptionStatus.Canceled
       ) {
         if (subscription.status === SubscriptionStatus.Active) {
           subscription['nextPayment'] = subscription.expiresAt;
@@ -104,6 +105,6 @@ export class BusinessQueryService {
   }
 
   async getExpiresInNotifications(expiresIn: ExpiresInDuration): Promise<any> {
-    return await this.notificationGateway.getExpiresInNotifications(expiresIn);
+    // return await this.notificationGateway.getExpiresInNotifications(expiresIn);
   }
 }

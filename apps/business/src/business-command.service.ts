@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpException,
   Injectable,
   NotFoundException,
@@ -12,10 +13,11 @@ import { IPaymentService } from './payment/interfaces/payment-service.interface'
 import { SaveSubscriptionDto } from './payment/payment-services/paypal/dto/save-subscription.dto';
 import { Subscription } from './infrastructure/entity/subscription.entity';
 import { SubscriptionStatus } from './payment/payment-services/paypal/constants/subscription-status.enum';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { BusinessQueryService } from './business-query.service';
 import { SubscriptionUpdateDto } from './dto/subscription-update.dto';
 import { NotificationsGateway } from '../../../apps/libs/common/notifications/notifications.gateway';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class BusinessCommandService {
@@ -26,7 +28,9 @@ export class BusinessCommandService {
     >,
     private readonly paymentService: IPaymentService,
     private readonly businessQueryService: BusinessQueryService,
-    private readonly notificationGateway: NotificationsGateway,
+    // private readonly notificationGateway: NotificationsGateway,
+    @InjectRepository(Subscription)
+    private readonly subscriptionCommandRepository: Repository<Subscription>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -36,13 +40,19 @@ export class BusinessCommandService {
         subscribeDto.userId,
       );
 
-    if (currentSubscriptions.length > 1) {
+    const currentSubscriptionsWithoutCancelled = currentSubscriptions.filter(
+      (subscription) => {
+        return subscription.status !== SubscriptionStatus.Canceled;
+      },
+    );
+
+    if (currentSubscriptionsWithoutCancelled.length > 1) {
       throw new BadRequestException(
         'BusinessCommandService error: user cant have more than 2 not expired subscriptions simultaniously',
       );
     }
 
-    currentSubscriptions?.map((subscription) => {
+    currentSubscriptionsWithoutCancelled?.map((subscription) => {
       if (
         new Date(subscription.expiresAt) > new Date() &&
         subscription.subscriptionType === subscribeDto.subscriptionType
@@ -57,8 +67,13 @@ export class BusinessCommandService {
       currentSubscriptions.length === 1
         ? new Date(currentSubscriptions[0].expiresAt)
         : new Date();
+    console.log(
+      '🚀 ~ BusinessCommandService ~ subscribe ~ start_date:',
+      start_date,
+    );
 
     const response = await this.paymentService.subscribeToPlan(
+      subscribeDto.userId,
       subscribeDto.subscriptionType,
       currentSubscriptions.length === 1 ? start_date.toISOString() : undefined,
     );
@@ -92,7 +107,12 @@ export class BusinessCommandService {
         await this.businessQueryService.getCurrentUserSubscriptions(
           subscription.userId,
         );
-      //todo* the second one subscription should starts from end of the first one (get first expiresAt, get time difference between now and first expiresAt, add this to startAt of the new subscription)
+
+      const currentSubscriptionsWithoutCancelled =
+        currentSubscriptionsArr.filter((subscription) => {
+          return subscription.status !== SubscriptionStatus.Canceled;
+        });
+
       const price = getSubscriptionPrice(subscription.subscriptionType);
       const updatePlanDto = {
         subscriptionType: subscription.subscriptionType,
@@ -107,8 +127,8 @@ export class BusinessCommandService {
       );
       //* expires+1 when it second subscription
       const startDate = new Date(
-        currentSubscriptionsArr.length === 1
-          ? currentSubscriptionsArr[0].expiresAt
+        currentSubscriptionsWithoutCancelled.length === 1
+          ? currentSubscriptionsWithoutCancelled[0].expiresAt
           : paypalSubscription.start_time,
       );
 
@@ -140,11 +160,31 @@ export class BusinessCommandService {
           subscription.userId,
           queryRunner.manager,
         );
-      const firstSubscription: Subscription[] = currentSubscriptions.filter(
-        (subscr) => subscr.id !== subscription.id,
+
+      const currentSubscriptionsWithoutCancelled1 = currentSubscriptions.filter(
+        (subscription) => {
+          return subscription.status !== SubscriptionStatus.Canceled;
+        },
       );
-      if (currentSubscriptions.length === 2) {
+      console.log(
+        '🚀 ~ BusinessCommandService ~ saveSubscription ~ currentSubscriptionsWithoutCancelled1:',
+        currentSubscriptionsWithoutCancelled1,
+      );
+      // get suspended
+      const firstSubscription: Subscription[] =
+        currentSubscriptionsWithoutCancelled1.filter(
+          (subscr) => subscr.id !== subscription.id,
+        );
+      console.log(
+        '🚀 ~ BusinessCommandService ~ saveSubscription ~ firstSubscription:',
+        firstSubscription,
+      );
+      if (currentSubscriptionsWithoutCancelled1.length === 2) {
         firstSubscription[0].status = SubscriptionStatus.Suspended;
+        console.log(
+          '🚀 ~ BusinessCommandService ~ saveSubscription ~ firstSubscription[0]:',
+          firstSubscription[0],
+        );
         await this.suspendSubscription(firstSubscription[0].subscriptionId);
       }
       const subscription1 = await this.paymentService.getSubscription(
@@ -177,6 +217,11 @@ export class BusinessCommandService {
         throw new NotFoundException(
           'BusinessCommandService error: subscription does not exist',
         );
+      if (subscription.status === SubscriptionStatus.Canceled) {
+        throw new ConflictException(
+          'BusinessCommandService error: subscription was canceled',
+        );
+      }
       const currentSubscriptions =
         await this.businessQueryService.getCurrentUserSubscriptions(
           subscription.userId,
@@ -231,6 +276,68 @@ export class BusinessCommandService {
       subscription,
       entityManager,
     );
+  }
+
+  async cancelSubscription(id: string): Promise<void> {
+    console.log('🚀 ~ BusinessCommandService ~ cancelSubscription ~ id:', id);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
+    try {
+      const subscription = await this.businessQueryService.getSubscription(
+        id,
+        queryRunner.manager,
+      );
+      if (!subscription)
+        throw new NotFoundException(
+          'BusinessCommandService error: subscription does not exist',
+        );
+      const currentSubscriptions =
+        await this.businessQueryService.getCurrentUserSubscriptions(
+          subscription.userId,
+          queryRunner.manager,
+        );
+      const paypalSubscription = await this.paymentService.getSubscription(id);
+      console.log(
+        '🚀 ~ BusinessCommandService ~ cancelSubscription ~ paypalSubscription:',
+        paypalSubscription,
+      );
+      if (!paypalSubscription)
+        throw new NotFoundException(
+          'BusinessCommandService error: paypal subscription does not exist',
+        );
+      await this.paymentService.cancelSubscription(id);
+
+      subscription.status = SubscriptionStatus.Canceled;
+      console.log(
+        '🚀 ~ BusinessCommandService ~ cancelSubscription ~ subscription:',
+        subscription,
+      );
+      await queryRunner.manager.save(subscription);
+      // await this.subscriptionCommandRepository.save(subscription);
+
+      // todo! problem if second is suspended
+      // if (currentSubscriptions.length === 2) {
+      //   const anotherSubscription: Subscription[] = currentSubscriptions.filter(
+      //     (subscr) => subscr.id !== subscription.id,
+      //   );
+      //   if (anotherSubscription[0].status === SubscriptionStatus.Suspended) {
+      //     await this.activateSubscription(
+      //       anotherSubscription[0].subscriptionId,
+      //     );
+      //   }
+      // }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.log('BusinessCommandService cancelSubscription ~ err:', err);
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(
+        err.response,
+        err.response.httpStatusCode || err.httpStatusCode,
+      );
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updateSubscription(
@@ -290,7 +397,7 @@ export class BusinessCommandService {
     return await this.businessCommandRepository.saveSubscription(subscription);
   }
 
-  async updateNotification(notificationId: string) {
-    return await this.notificationGateway.updateNotification(notificationId);
-  }
+  // async updateNotification(notificationId: string) {
+  //   return await this.notificationGateway.updateNotification(notificationId);
+  // }
 }

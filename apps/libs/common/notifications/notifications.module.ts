@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DynamicModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { RedisModule } from '../redis/redis.module';
+import { WsAuthAdapter } from './ws-auth.adapter';
 
 @Module({})
 export class NotificationsModule {
@@ -22,7 +23,7 @@ export class NotificationsModule {
         }),
       ],
       providers: [NotificationsService, NotificationsGateway],
-      exports: [NotificationsGateway],
+      exports: [NotificationsGateway, NotificationsService],
     };
   }
 }

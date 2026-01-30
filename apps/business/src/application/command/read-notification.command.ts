@@ -14,6 +14,6 @@ export class ReadNotificationHandler
   ) {}
 
   async execute({ notificationId }: ReadNotificationCommand): Promise<any> {
-    return await this.businessCommandService.updateNotification(notificationId);
+    // return await this.businessCommandService.updateNotification(notificationId);
   }
 }
