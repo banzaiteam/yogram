@@ -169,6 +169,10 @@ export class BusinessService {
     );
   }
 
+  //  async subscriptionActivatedEvent(subscription: void) {
+  //   await this
+  // }
+
   async getUserNotifications(userId: string): Promise<INotification[]> {
     // const path = [HttpBusinessPath.GetNotifications, userId].join('/');
     // return await this.gateService.requestHttpServiceGet(

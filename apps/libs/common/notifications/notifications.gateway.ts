@@ -2,6 +2,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
@@ -24,6 +25,7 @@ export class NotificationsGateway
     INotificationsService,
     OnModuleInit,
     OnGatewayConnection,
+    OnGatewayDisconnect,
     OnGatewayInit
 {
   private connectedSockets: string[] = [];
@@ -58,15 +60,14 @@ export class NotificationsGateway
     server.use(authMiddleware);
   }
 
-  handleConnection(socket: Socket) {
-    console.log(`${socket.id} connected`);
-    //todo* make auth -> connectedSockets.push({socket.id, userId}) -> send to notifications -> add there to array
-    this.connectedSockets.push(socket.id);
-    this.notificationsService.addClient(socket);
-    this.server.emit('connectedSocket', {
-      userId: socket.data.user,
-      socketId: socket.id,
-    });
+  handleConnection(@ConnectedSocket() client: Socket) {
+    this.notificationsService.addClient(client);
+    client.emit('connection', `${client.data.user} connected`);
+  }
+
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    this.notificationsService.removeClient(client);
+    client.emit('disconnect', `${client.data.user} disconnected`);
   }
 
   async saveNotification(
